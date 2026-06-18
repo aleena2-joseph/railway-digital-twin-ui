@@ -1,1205 +1,935 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Earth View - Railway Digital Twin</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Earth View - Railway Digital Twin</title>
+
+<!-- CesiumJS - Real 3D Earth -->
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Widgets/widgets.css" />
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.117/Build/Cesium/Cesium.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
+══════════════════════════════════════════════════ */
 :root {
-  --bg: #0f172a;
-  --panel: #1e293b;
-  --panel-2: #111827;
-  --panel-3: #0b1224;
-  --line: rgba(148, 163, 184, 0.22);
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --dim: #64748b;
-  --blue: #3b82f6;
-  --green: #22c55e;
-  --red: #ef4444;
-  --orange: #f97316;
-  --cyan: #06b6d4;
-  --yellow: #eab308;
-  --purple: #8b5cf6;
-  color-scheme: dark;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-  min-height: 100%;
-  margin: 0;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.login {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.88)),
-    url("https://images.unsplash.com/photo-1540804236945-b6ae24bfe0a9?auto=format&fit=crop&w=1600&q=80") center/cover;
-}
-
-.login-card {
-  width: min(430px, 100%);
-  background: rgba(30, 41, 59, 0.95);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 32px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
-}
-
-.brand-mark,
-.icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: var(--blue);
-  color: white;
-  font-weight: 800;
-}
-
-.login .brand-mark {
-  width: 64px;
-  height: 64px;
-  border-radius: 999px;
-  margin: 0 auto 16px;
-}
-
-.login h1,
-.login p {
-  text-align: center;
-  margin: 0;
-}
-
-.login h1 {
-  font-size: 24px;
-  font-weight: 650;
-}
-
-.login p {
-  color: var(--muted);
-  margin-top: 8px;
-}
-
-.field {
-  margin-top: 20px;
-}
-
-.field label {
-  display: block;
-  color: #cbd5e1;
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.input {
-  width: 100%;
-  height: 44px;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid rgba(148, 163, 184, 0.34);
-  border-radius: 8px;
-  padding: 0 12px;
-  outline: none;
-}
-
-.input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
-}
-
-.check-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 18px 0;
-  color: #cbd5e1;
-  font-size: 14px;
-}
-
-.primary-btn,
-.ghost-btn {
-  border: 0;
-  border-radius: 8px;
-  color: white;
-  padding: 11px 16px;
-  background: var(--blue);
-}
-
-.primary-btn {
-  width: 100%;
-}
-
-.ghost-btn {
-  background: rgba(100, 116, 139, 0.35);
-}
-
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  background: var(--bg);
-}
-
-.sidebar {
-  width: 220px;
-  flex: 0 0 220px;
-  background: var(--panel-2);
-  border-right: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-}
-
-.logo {
-  min-height: 58px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid var(--line);
-}
-
-.logo .brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-}
-
-.logo strong {
-  display: block;
-  font-size: 11px;
-  line-height: 1.1;
-}
-
-.logo span {
-  display: block;
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 1.2;
-}
-
-.nav {
-  padding: 12px 8px;
-  overflow: auto;
-  flex: 1;
-}
-
-.nav-title {
-  margin: 14px 10px 7px;
-  color: var(--dim);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-}
-
-.nav button {
-  width: 100%;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  justify-content: space-between;
-  padding: 9px 10px;
-  margin-bottom: 2px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  text-align: left;
-}
-
-.nav button:hover,
-.nav button.active {
-  background: var(--blue);
-  color: white;
-}
-
-.nav-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-}
-
-.nav-icon {
-  width: 18px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.badge {
-  min-width: 18px;
-  height: 18px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 999px;
-  background: var(--red);
-  color: white;
-  font-size: 10px;
-}
-
-.system-card {
-  margin: 0 12px 12px;
-  padding: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  border-radius: 8px;
-  background: linear-gradient(90deg, rgba(30, 64, 175, 0.45), rgba(30, 41, 59, 0.35));
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  display: inline-block;
-  border-radius: 999px;
-  background: var(--green);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
-}
-
-.content-wrap {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  height: 58px;
-  flex: 0 0 58px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--line);
-  background: var(--panel);
-}
-
-.topbar h2 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 550;
-}
-
-.top-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #cbd5e1;
-  font-size: 12px;
-}
-
-.page {
-  flex: 1;
-  overflow: auto;
-  padding: 14px;
-}
-
-.grid {
-  display: grid;
-  gap: 12px;
-}
-
-.cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.cols-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.cols-5 {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.cols-6 {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.compact {
-  padding: 12px;
-}
-
-.card h3,
-.card h4 {
-  margin: 0 0 14px;
-  font-weight: 550;
-}
-
-.subtle {
-  color: var(--muted);
-}
-
-.dim {
-  color: var(--dim);
-}
-
-.kpi {
-  min-height: 104px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.kpi-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.kpi-title {
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.kpi-value {
-  margin-top: 4px;
-  font-size: 27px;
-  line-height: 1;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 11px;
-  background: rgba(59, 130, 246, 0.16);
-  color: #93c5fd;
-}
-
-.pill.green {
-  background: rgba(34, 197, 94, 0.16);
-  color: #86efac;
-}
-
-.pill.red {
-  background: rgba(239, 68, 68, 0.16);
-  color: #fca5a5;
-}
-
-.pill.orange {
-  background: rgba(249, 115, 22, 0.16);
-  color: #fdba74;
-}
-
-.gauge-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.gauge {
-  text-align: center;
-}
-
-.gauge svg {
-  width: 86px;
-  max-width: 100%;
-}
-
-.donut-wrap {
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-.donut {
-  width: 140px;
-  height: 140px;
-  border-radius: 999px;
-  background: conic-gradient(var(--green) 0 83%, var(--red) 83% 91%, var(--orange) 91% 100%);
-  position: relative;
-}
-
-.donut::after {
-  content: "";
-  position: absolute;
-  inset: 34px;
-  border-radius: inherit;
-  background: var(--panel);
-}
-
-.donut-center {
-  position: absolute;
-  text-align: center;
-}
-
-.legend {
-  margin-top: 12px;
-  display: grid;
-  gap: 6px;
-  font-size: 12px;
-}
-
-.legend-row,
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.color-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  display: inline-block;
-  margin-right: 7px;
-}
-
-.alert-list {
-  display: grid;
-  gap: 8px;
-}
-
-.alert {
-  background: var(--bg);
-  border-left: 3px solid var(--orange);
-  border-radius: 6px;
-  padding: 9px;
-}
-
-.alert.crit {
-  border-left-color: var(--red);
-}
-
-.alert.info {
-  border-left-color: var(--blue);
-}
-
-.map-card {
-  min-height: 300px;
-  padding: 0;
-  overflow: hidden;
-}
-
-.panel-head {
-  min-height: 42px;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-}
-
-.map-area {
-  height: 100%;
-  min-height: 258px;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-    radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.16), transparent 24%),
-    #0a1020;
-  background-size: 34px 34px, 34px 34px, auto, auto;
-}
-
-.route-line {
-  position: absolute;
-  height: 3px;
-  background: var(--orange);
-  transform-origin: left center;
-  opacity: 0.85;
-}
-
-.route-line.blue {
-  background: #60a5fa;
-}
-
-.route-line.purple {
-  background: #a78bfa;
-}
-
-.map-city,
-.train-pin {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-}
-
-.map-city {
-  color: var(--muted);
-  font-size: 10px;
-  text-shadow: 0 0 4px #000;
-}
-
-.train-pin {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-  font-size: 9px;
-}
-
-.train-pin::before {
-  content: "";
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background: currentColor;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 12px currentColor;
-}
-
-.train-pin span {
-  color: currentColor;
-  background: rgba(30, 41, 59, 0.88);
-  border: 1px solid currentColor;
-  border-radius: 4px;
-  padding: 2px 5px;
-}
-
-.mini-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.metric-box {
-  background: var(--bg);
-  border-radius: 6px;
-  padding: 8px;
-}
-
-.metric-box strong {
-  display: block;
-  margin-top: 3px;
-  font-size: 18px;
-}
-
-.spark {
-  width: 100%;
-  height: 94px;
-}
-
-.asset-tree {
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-}
-
-.tree-row {
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #dbeafe;
-  padding: 8px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tree-row:hover,
-.tree-row.active {
-  background: rgba(100, 116, 139, 0.22);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th,
-.table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-}
-
-.table th {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.progress {
-  height: 8px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(100, 116, 139, 0.45);
-}
-
-.progress > span {
-  display: block;
-  height: 100%;
-  width: var(--value, 50%);
-  background: var(--bar, var(--blue));
-}
-
-.route-vertical {
-  position: relative;
-  display: grid;
-  gap: 28px;
-  margin-top: 28px;
-}
-
-.route-vertical::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 31px;
-  width: 4px;
-  border-radius: 999px;
-  background: linear-gradient(var(--blue), var(--green), #475569);
-}
-
-.station-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.station-marker {
-  width: 66px;
-  height: 66px;
-  border: 5px solid var(--panel);
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  z-index: 1;
-  background: #475569;
-}
-
-.station-marker.done {
-  background: var(--blue);
-}
-
-.station-marker.current {
-  background: var(--green);
-}
-
-.toolbar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.device-card {
-  padding: 0;
-  overflow: hidden;
-}
-
-.device-head,
-.device-body,
-.device-foot {
-  padding: 14px;
-}
-
-.device-head {
-  border-bottom: 1px solid var(--line);
-}
-
-.device-foot {
-  border-top: 1px solid var(--line);
-  background: var(--bg);
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-@media (max-width: 1180px) {
-  .cols-6,
-  .cols-5,
-  .cols-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .app-shell {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    flex-basis: auto;
-    max-height: 310px;
-  }
-
-  .cols-2,
-  .cols-3,
-  .cols-4,
-  .cols-5,
-  .cols-6,
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .topbar {
-    height: auto;
-    min-height: 58px;
-    flex-wrap: wrap;
-    padding: 12px;
-  }
-}
-
-  </style>
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:1000;
+  position:relative;
+}
+
+.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.sb-overview-btn svg{width:15px;height:15px}
+
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
+.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
+.sb-train-img:hover img{opacity:.9}
+
+.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
+.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+.content{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* ══════════════════════════════════════════════════
+   CESIUM / REAL EARTH CONTAINER
+══════════════════════════════════════════════════ */
+.earth-container{
+  flex:1;
+  min-height:520px;
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:#0f172a;
+}
+
+#cesiumContainer{
+  width:100%;
+  height:100%;
+  position:relative;
+}
+
+/* ─── OVERLAY UI (Google Earth Style) ─── */
+.earth-search{
+  position:absolute;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:50;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  padding:6px 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:280px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.earth-search input{
+  background:transparent;
+  border:none;
+  color:#fff;
+  font-size:13px;
+  font-weight:400;
+  padding:4px 0;
+  width:100%;
+  outline:none;
+  font-family:inherit;
+}
+.earth-search input::placeholder{color:rgba(255,255,255,0.4);}
+.earth-search .icon{color:rgba(255,255,255,0.3);font-size:14px;}
+.earth-search .shortcut{
+  font-size:9px;color:rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.05);padding:2px 8px;
+  border-radius:4px;border:1px solid rgba(255,255,255,0.05);
+}
+
+.earth-sidepanel{
+  position:absolute;top:70px;right:16px;z-index:50;
+  display:flex;flex-direction:column;gap:6px;
+}
+.earth-sidepanel button{
+  width:38px;height:38px;border-radius:8px;
+  background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.7);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;cursor:pointer;
+}
+.earth-sidepanel button:hover{
+  background:rgba(59,130,246,0.25);
+  border-color:rgba(59,130,246,0.2);color:#fff;
+}
+.earth-sidepanel .label{
+  font-size:7px;color:rgba(255,255,255,0.2);
+  text-align:center;letter-spacing:0.5px;margin-top:2px;
+}
+
+.earth-3dtoggle{
+  position:absolute;bottom:80px;right:16px;z-index:50;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.earth-3dtoggle button{
+  width:44px;height:44px;border-radius:8px;
+  background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;cursor:pointer;
+}
+.earth-3dtoggle button.active{
+  background:rgba(59,130,246,0.2);
+  border-color:rgba(59,130,246,0.3);color:#60a5fa;
+}
+.earth-3dtoggle button:hover{background:rgba(255,255,255,0.12);}
+.earth-3dtoggle .label{font-size:7px;color:rgba(255,255,255,0.2);}
+
+.earth-camera{
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  z-index:50;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  border-radius:20px;padding:6px 18px;display:flex;align-items:center;
+  gap:14px;font-size:11px;color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.04);
+}
+.earth-camera .separator{color:rgba(255,255,255,0.1);}
+.earth-camera .highlight{color:rgba(255,255,255,0.9);font-weight:500;}
+.earth-camera .coords{
+  color:rgba(255,255,255,0.4);font-size:10px;
+  font-family:'Courier New',monospace;
+}
+
+.earth-banner{
+  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+  z-index:40;background:rgba(0,0,0,0.7);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.04);border-radius:10px;
+  padding:10px 20px;display:flex;align-items:center;gap:16px;
+  color:rgba(255,255,255,0.7);font-size:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.earth-banner .dismiss-btn{
+  color:rgba(255,255,255,0.5);font-size:11px;padding:4px 14px;
+  border-radius:6px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.04);cursor:pointer;
+  transition:all 0.2s;
+}
+.earth-banner .dismiss-btn:hover{background:rgba(255,255,255,0.12);color:#fff;}
+
+/* ─── TRAIN POPUP ─── */
+.earth-popup{
+  position:absolute;bottom:85px;left:50%;transform:translateX(-50%);
+  z-index:60;background:rgba(15,23,42,0.95);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.06);border-radius:12px;
+  padding:14px 20px;min-width:280px;display:none;
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+.earth-popup.visible{display:block;}
+.earth-popup .header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+}
+.earth-popup .header .name{font-size:14px;font-weight:700;color:#fff;}
+.earth-popup .header .status{
+  font-size:9px;font-weight:600;padding:2px 12px;border-radius:12px;
+}
+.earth-popup .grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;
+}
+.earth-popup .grid .row{
+  display:flex;justify-content:space-between;padding:2px 0;font-size:10px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.earth-popup .grid .row .lbl{color:rgba(255,255,255,0.35);}
+.earth-popup .grid .row .val{color:#f1f5f9;font-weight:500;}
+.earth-popup .close-btn{
+  position:absolute;top:6px;right:10px;
+  color:rgba(255,255,255,0.15);font-size:14px;cursor:pointer;
+  background:none;border:none;
+}
+.earth-popup .close-btn:hover{color:#fff;}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1200px){:root{--sidebar-w:190px}}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+  .earth-search{min-width:200px;padding:4px 12px;}
+  .earth-search input{font-size:12px;}
+  .earth-search .shortcut{display:none;}
+  .earth-camera{font-size:9px;padding:4px 12px;gap:8px;flex-wrap:wrap;justify-content:center;}
+}
+@media(max-width:768px){
+  .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .earth-container{min-height:350px}
+  .earth-sidepanel{top:65px;right:10px;}
+  .earth-sidepanel button{width:32px;height:32px;font-size:13px;}
+  .earth-3dtoggle{display:none;}
+  .earth-banner{display:none;}
+  .earth-popup{min-width:220px;padding:10px 14px;bottom:70px;}
+}
+@media(max-width:600px){
+  .topbar{padding:0 10px}
+  .content{padding:10px}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .earth-container{min-height:280px}
+  .earth-search{min-width:160px;padding:4px 10px;}
+  .earth-search input{font-size:11px;}
+  .earth-camera{font-size:8px;padding:3px 10px;gap:4px;flex-wrap:wrap;}
+  .earth-camera .coords{font-size:8px;}
+  .earth-popup .grid{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
-  <div id="app"></div>
-  <script>
-    window.__INITIAL_VIEW__ = "dashboard";
-    window.__INITIAL_PAGE__ = "google-earth";
-  </script>
-  <script>
-const state = {
-  view: window.__INITIAL_VIEW__ || "login",
-  page: window.__INITIAL_PAGE__ || "overview",
-  selectedAsset: null,
-  deviceSearch: "",
-  deviceStatus: "all"
-};
 
-const pages = [
-  ["overview", "Overview", "OD", "MONITORING"],
-  ["operations", "Operations", "OP", "MONITORING"],
-  ["asset-hierarchy", "Asset Hierarchy", "AH", "MONITORING"],
-  ["asset-details", "Asset Details", "AD", "MONITORING"],
-  ["live-telemetry", "Live Telemetry", "LT", "MONITORING"],
-  ["gis-monitoring", "GIS Monitoring", "GM", "MONITORING"],
-  ["google-earth", "Google Earth View", "GE", "MONITORING"],
-  ["route-visualization", "Route Visualization", "RV", "MONITORING"],
-  ["devices", "Devices", "DV", "MONITORING"],
-  ["api-cards", "API Cards", "API", "MANAGEMENT"],
-  ["credentials", "Credentials", "KEY", "MANAGEMENT"],
-  ["settings", "Settings", "ST", "MANAGEMENT"],
-  ["alerts", "Alerts", "AL", "SYSTEM", 6],
-  ["reports", "Reports", "RP", "SYSTEM"]
-];
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
 
-const kpis = [
-  ["Total Trains", "12", "All Trains", "TR", "blue", "+2"],
-  ["Online Trains", "10", "Running", "ON", "green", "+1"],
-  ["Offline Trains", "2", "Not Connected", "OF", "red", "-"],
-  ["Total Devices", "456", "Connected", "DV", "purple", "+18"],
-  ["Active Alerts", "8", "Requires Attention", "AL", "orange", ""],
-  ["Total Distance", "1,256 km", "Today", "KM", "cyan", ""]
-];
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="13" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <circle cx="7.5" cy="18.5" r=".5" fill="currentColor"/>
+        <circle cx="16.5" cy="18.5" r=".5" fill="currentColor"/>
+        <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/>
+        <line x1="8" y1="14" x2="16" y2="14"/>
+      </svg>
+    </div>
+    <div class="sb-brand">
+      <div class="b1">RAILWAY</div>
+      <div class="b2">Digital Twin</div>
+      <div class="b3">Monitoring Platform</div>
+    </div>
+  </div>
 
-const alerts = [
-  ["10:42", "Train 07", "Brake Pressure Low", "warn"],
-  ["10:31", "Train 03", "High Engine Temp", "crit"],
-  ["10:15", "Train 01", "GPS Signal Lost", "warn"],
-  ["09:58", "Train 05", "Door Sensor Fault", "info"]
-];
+  <div class="sb-overview">
+    <button class="sb-overview-btn" onclick="openOverview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Overview</span>
+    </button>
+  </div>
 
-const devices = [
-  ["RTU-001", "Remote Terminal Unit", "online", "2 mins ago", "Train 01", 95],
-  ["RTU-002", "Remote Terminal Unit", "offline", "25 mins ago", "Train 02", 0],
-  ["RTU-003", "Remote Terminal Unit", "online", "1 min ago", "Train 03", 88],
-  ["GPS-001", "GPS Tracker", "online", "30 secs ago", "Train 01", 100],
-  ["GPS-002", "GPS Tracker", "online", "45 secs ago", "Train 02", 92],
-  ["GPS-003", "GPS Tracker", "offline", "1 hour ago", "Train 03", 0],
-  ["SEN-001", "Temperature Sensor", "online", "1 min ago", "Train 01", 85],
-  ["SEN-002", "Temperature Sensor", "online", "2 mins ago", "Train 02", 90],
-  ["SEN-003", "Pressure Sensor", "online", "3 mins ago", "Train 01", 78]
-];
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item" onclick="openAssetHierarchy()"><i data-lucide="layers"></i><span>Asset Hierarchy</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openAssetDetails()"><i data-lucide="layers"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openLiveTelemetry()"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openGisMonitoring()"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item active" onclick="openGoogleEarthView()"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openRoutevisualization()"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openDevices()"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
 
-const assets = [
-  { id: "root", name: "Railway Network", type: "network", status: "", parent: "", depth: 0 },
-  { id: "train-01", name: "Train 01", type: "train", status: "online", parent: "root", depth: 1 },
-  { id: "train-01-engine", name: "Engine", type: "engine", status: "online", parent: "train-01", depth: 2 },
-  { id: "train-01-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-01", depth: 2 },
-  { id: "train-01-coach-2", name: "Coach 2", type: "coach", status: "online", parent: "train-01", depth: 2 },
-  { id: "train-02", name: "Train 02", type: "train", status: "online", parent: "root", depth: 1 },
-  { id: "train-02-engine", name: "Engine", type: "engine", status: "online", parent: "train-02", depth: 2 },
-  { id: "train-02-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-02", depth: 2 },
-  { id: "train-03", name: "Train 03", type: "train", status: "offline", parent: "root", depth: 1 },
-  { id: "train-03-engine", name: "Engine", type: "engine", status: "offline", parent: "train-03", depth: 2 },
-  { id: "train-03-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-03", depth: 2 },
-  { id: "train-03-coach-2", name: "Coach 2", type: "coach", status: "online", parent: "train-03", depth: 2 }
-];
+  <div class="sb-sec">Management</div>
+  <div class="sb-item"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
 
-function $(selector) {
-  return document.querySelector(selector);
-}
+  <div class="sb-sec">Monitoring</div>
+  
+  <div class="sb-item"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
 
-function color(name) {
-  return `var(--${name})`;
-}
+  <div style="padding:6px 0 2px">
+    <button class="sb-logout" onclick="doLogout()">
+      <i data-lucide="log-out"></i><span>Logout</span>
+    </button>
+  </div>
 
-function render() {
-  if (state.view === "login") {
-    renderLogin();
-    return;
-  }
-  const pageMeta = pages.find((page) => page[0] === state.page) || pages[0];
-  document.title = `${pageMeta[1]} - Railway Digital Twin`;
-  $("#app").innerHTML = `
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="logo">
-          <div class="brand-mark">TR</div>
-          <div><strong>RAILWAY</strong><span>DIGITAL TWIN</span><span>MONITORING PLATFORM</span></div>
-        </div>
-        <nav class="nav">${renderNav()}</nav>
-        <div class="system-card"><div><span class="status-dot"></span> <span class="pill green">SYSTEM ONLINE</span></div><div class="dim" style="font-size:11px;margin-top:8px">All systems operational</div></div>
-      </aside>
-      <div class="content-wrap">
-        <header class="topbar">
-          <h2>${pageMeta[1] === "Operations" ? "Operations Overview" : pageMeta[1]}</h2>
-          <div class="top-actions"><span class="badge">1</span><span id="clock"></span><button class="ghost-btn" data-login>Admin</button></div>
-        </header>
-        <main class="page">${renderPage()}</main>
+  <div class="sb-train-img">
+    <img src="assets/images/train_img.png" alt="Train" id="sidebar-train-img"/>
+  </div>
+
+  <div class="sb-footer">© 2026 Railway Systems</div>
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="globe" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Google Earth View</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 18, 2026</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
-    </div>`;
-  bindEvents();
-  updateClock();
-}
-
-function renderLogin() {
-  $("#app").innerHTML = `
-    <main class="login">
-      <section class="login-card">
-        <div class="brand-mark">TR</div>
-        <h1>Railway Digital Twin</h1>
-        <p>Monitoring Platform</p>
-        <form id="login-form">
-          <div class="field"><label>Username</label><input class="input" type="text" placeholder="Enter username"></div>
-          <div class="field"><label>Password</label><input class="input" type="password" placeholder="Enter password"></div>
-          <label class="check-row"><input type="checkbox"> Remember Me</label>
-          <button class="primary-btn" type="submit">Login</button>
-        </form>
-        <p class="dim" style="font-size:12px;margin-top:18px">Railway Operations Control Center v2.0</p>
-      </section>
-    </main>`;
-  $("#login-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    state.view = "dashboard";
-    state.page = "overview";
-    location.hash = "#overview";
-    render();
-  });
-}
-
-function renderNav() {
-  const groups = ["MONITORING", "MANAGEMENT", "SYSTEM"];
-  return groups.map((group) => `
-    <div>
-      <div class="nav-title">${group}</div>
-      ${pages.filter((page) => page[3] === group).map((page) => `
-        <button class="${state.page === page[0] ? "active" : ""}" data-page="${page[0]}">
-          <span class="nav-icon">${page[2]}</span><span class="nav-label">${page[1]}</span>
-          ${page[4] ? `<span class="badge">${page[4]}</span>` : "<span>></span>"}
-        </button>`).join("")}
-    </div>`).join("");
-}
-
-function bindEvents() {
-  document.querySelectorAll("[data-page]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.page = button.dataset.page;
-      location.hash = `#${state.page}`;
-      render();
-    });
-  });
-  document.querySelectorAll("[data-login]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.view = "login";
-      location.hash = "";
-      render();
-    });
-  });
-  document.querySelectorAll("[data-asset]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.selectedAsset = button.dataset.asset;
-      render();
-    });
-  });
-  const search = $("#device-search");
-  if (search) {
-    search.addEventListener("input", (event) => {
-      state.deviceSearch = event.target.value;
-      render();
-    });
-  }
-  const status = $("#device-status");
-  if (status) {
-    status.addEventListener("change", (event) => {
-      state.deviceStatus = event.target.value;
-      render();
-    });
-  }
-}
-
-function updateClock() {
-  const clock = $("#clock");
-  if (!clock) return;
-  const now = new Date();
-  clock.textContent = `${now.toLocaleTimeString("en-US", { hour12: false })}  ${now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
-}
-
-setInterval(updateClock, 1000);
-
-function renderPage() {
-  switch (state.page) {
-    case "asset-hierarchy": return renderAssetHierarchy();
-    case "asset-details": return renderAssetDetails();
-    case "live-telemetry": return renderLiveTelemetry();
-    case "gis-monitoring": return renderGIS();
-    case "google-earth": return renderEarth();
-    case "route-visualization": return renderRoute();
-    case "devices": return renderDevices();
-    case "settings": return renderSettings();
-    case "api-cards": return renderSimple("API Cards", "Manage railway integration cards and quotas.", ["REST Bridge", "Telemetry Stream", "GIS Tile Service"]);
-    case "credentials": return renderSimple("Credentials", "Rotate and audit platform access keys.", ["Primary API Key", "Map Provider Token", "Operations Webhook"]);
-    case "alerts": return renderSimple("Alerts", "Critical and warning events requiring operator attention.", alerts.map((a) => `${a[1]} - ${a[2]}`));
-    case "reports": return renderSimple("Reports", "Operational reports and system health snapshots.", ["Daily Movement Summary", "Asset Health Report", "Device Connectivity"]);
-    case "operations":
-    case "overview":
-    default: return renderOverview();
-  }
-}
-
-function renderOverview() {
-  return `
-    <div class="grid cols-6">${kpis.map((kpi) => card(`
-      <div class="kpi">
-        <div class="kpi-top"><div><div class="kpi-title">${kpi[0]}</div><div class="kpi-value">${kpi[1]}</div></div><div class="icon-box" style="background:${color(kpi[4])}">${kpi[3]}</div></div>
-        <div>${kpi[5] ? `<span class="pill ${kpi[4]}">${kpi[5]}</span>` : ""} <span class="dim" style="font-size:11px">${kpi[2]}</span></div>
-      </div>`, "compact")).join("")}</div>
-    <div class="grid cols-5" style="margin-top:12px">
-      ${card(`<h3>System Health</h3><div class="gauge-grid">${gauge(92, "Engine Status", "Healthy", "green")}${gauge(88, "Brake Status", "Healthy", "green")}${gauge(95, "Power System", "Healthy", "green")}${gauge(90, "Comm. Status", "Good", "cyan")}</div>`)}
-      ${card(`<h3>Train Status</h3><div class="donut-wrap"><div class="donut"></div><div class="donut-center"><div style="font-size:24px">12</div><div class="dim">Total</div></div></div>${legend([["Running", "10 (83%)", "green"], ["Stopped", "1 (8%)", "red"], ["Maintenance", "1 (8%)", "orange"]])}`)}
-      ${card(`<div class="row"><h3>Alerts</h3><button class="ghost-btn">View All</button></div><div class="alert-list">${alerts.map((a) => `<div class="alert ${a[3]}"><div class="dim" style="font-size:11px">${a[0]} <span class="pill">${a[1]}</span></div><div style="font-size:12px;margin-top:4px">${a[2]}</div></div>`).join("")}</div>`)}
-      ${card(`<div class="panel-head"><span>Live Train Tracking</span><span class="pill green"><span class="status-dot"></span>Live</span></div>${mapArea("dark")}`, "map-card", "grid-column:span 2")}
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
     </div>
-    <div class="grid cols-4" style="margin-top:12px">
-      ${card(`<div class="row"><h3>Live Telemetry - Train 01</h3><span class="pill">Details</span></div><div class="mini-metrics">${metric("Speed", "128 km/h")}${metric("Voltage", "25.4 kV")}${metric("Current", "5.6 A")}${metric("Brake Pressure", "4.2 bar", "red")}</div>${sparkline([95,110,118,125,128], "blue")}`)}
-      ${card(`<h3>Asset Hierarchy</h3>${compactTree()}`)}
-      ${card(`<h3>Asset Details - Train 01</h3>${detailRows([["Train ID","WR-101"],["Type","E"],["Status","Running"],["Driver","John Smith"],["Location","142 km"],["Speed","128 km/h"],["Last Update","10:45:30 AM"]])}`)}
-      ${card(`<div class="row"><h3>Route Visualization</h3><span class="pill">Full Route</span></div>${routeStrip()}<div class="grid cols-3">${metric("Covered","356 km")}${metric("Remaining","142 km")}${metric("ETA","01:45")}</div>${sparkline([0,214,356,498], "cyan")}`)}
-    </div>`;
-}
+  </div>
 
-function renderAssetHierarchy() {
-  const selected = assets.find((asset) => asset.id === state.selectedAsset) || null;
-  return `<div class="grid cols-3">
-    ${card(`<h3>Asset Hierarchy</h3><p class="subtle">Network structure</p><div class="asset-tree">${assets.map((asset) => treeButton(asset)).join("")}</div>`)}
-    ${card(`<h3>Asset Details</h3><p class="subtle">Selected asset information</p>${selected ? assetInfo(selected) : `<div class="dim" style="padding:80px 0;text-align:center">Select an asset from the hierarchy to view details</div>`}`, "", "grid-column:span 2")}
-  </div>`;
-}
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content">
 
-function renderAssetDetails() {
-  return `
-    ${card(`<div class="row"><div class="row" style="justify-content:flex-start"><div class="icon-box">TR</div><div><h3 style="margin:0">Express Train 01</h3><div class="subtle">Train ID: TRN-2024-001</div></div></div><span class="pill green"><span class="status-dot"></span>ONLINE</span></div><div class="grid cols-2" style="margin-top:22px">${metric("Current Speed", "120 km/h")}${metric("Current Location", "Between Station B and Station C")}</div>`)}
-    <div style="height:14px"></div>
-    ${card(`<h3>Health Monitoring</h3><div class="grid cols-2">${health("Engine Health",98,"green")}${health("Brake Health",95,"green")}${health("Battery Health",82,"blue")}${health("Communication Status",100,"green")}</div>`)}
-    <div class="grid cols-3" style="margin-top:14px">${card(metric("Total Distance Traveled","1,245 km") + `<div class="dim">This month</div>`)}${card(metric("Operating Hours","342 hrs") + `<div class="dim">This month</div>`)}${card(metric("Last Maintenance","15 days") + `<div class="dim">ago</div>`)}</div>`;
-}
+    <!-- Earth Container -->
+    <div class="earth-container">
 
-function renderLiveTelemetry() {
-  const data = [["Speed",120,"km/h","blue",180],["Voltage",385,"V","yellow",500],["Current",245,"A","green",400],["Temperature",68,"C","red",100],["Brake Pressure",8.5,"bar","purple",10],["Fuel Level",75,"%","cyan",100]];
-  return `
-    <div class="grid cols-3">${data.map((m) => card(`<div class="row"><div class="icon-box" style="background:${color(m[3])}">${m[0].slice(0,2).toUpperCase()}</div><div><span style="font-size:30px">${m[1]}</span> <span class="subtle">${m[2]}</span></div></div><p class="subtle">${m[0]}</p>${progress((m[1] / m[4]) * 100, m[3])}`)).join("")}</div>
-    <div class="grid cols-2" style="margin-top:14px">${card(`<h3>Speed vs Time</h3>${chart([0,40,80,120,110,120,100], "blue")}`)}${card(`<h3>Temperature vs Time</h3>${chart([45,52,58,65,68,66,68], "red")}`)}</div>
-    <div style="height:14px"></div>${card(`<h3>Voltage vs Time</h3>${chart([380,385,390,385,380,385,385], "yellow")}`)}`;
-}
+      <!-- Cesium Container -->
+      <div id="cesiumContainer"></div>
 
-function renderGIS() {
-  return `${infoCards([["Active Trains","2","green"],["Avg Speed","108 km/h","blue"],["GPS Accuracy","High","purple"]])}${card(`<div class="panel-head"><div><h3 style="margin:0">Live GIS Monitoring</h3><div class="subtle">Real-time train positions on map</div></div></div>${mapArea("dark", 600)}`, "map-card")}<div style="height:14px"></div>${trainTable()}`;
-}
+      <!-- Search Bar -->
+      <div class="earth-search">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Search Google Earth" value="Railway Network - India">
+        <span class="shortcut">⌘K</span>
+      </div>
 
-function renderEarth() {
-  return `${infoCards([["View Mode","Satellite","blue"],["Train Markers","3 Active","orange"],["Route Overlay","Enabled","green"]])}${card(`<div class="panel-head"><div><h3 style="margin:0">Google Earth View</h3><div class="subtle">Satellite-based train tracking with terrain visualization</div></div><div><button class="primary-btn" style="width:auto">Satellite</button> <button class="ghost-btn">3D View</button></div></div>${mapArea("satellite", 650)}`, "map-card")}<div style="height:14px"></div>${card(`<h3>Map Legend</h3><div class="grid cols-2"><div><span class="color-dot" style="background:var(--blue)"></span>Train Position Marker</div><div><span class="color-dot" style="background:var(--orange)"></span>Railway Route</div></div>`)}`;
-}
+      <!-- Side Panel Controls -->
+      <div class="earth-sidepanel">
+        <button onclick="resetCamera()" title="Reset View">⌂</button>
+        <button onclick="zoomInCesium()" title="Zoom In">+</button>
+        <button onclick="zoomOutCesium()" title="Zoom Out">−</button>
+        <button onclick="toggleLayers()" title="Layers">⊞</button>
+        <div class="label">View</div>
+      </div>
 
-function renderRoute() {
-  return `${infoCards([["Distance Covered","120 km","blue"],["Remaining Distance","60 km","orange"],["ETA","2 hours 30 minutes","green"],["Current Speed","120 km/h","purple"]], 4)}
-    ${card(`<h3>Express Train 01</h3><p class="subtle">Route: Station A -> Station D</p><div class="row"><span class="subtle">Overall Progress</span><span>67%</span></div>${progress(67, "green")}<div class="route-vertical">${["Station A|completed|0 km|Departed: 60 mins ago","Station B|completed|45 km|Departed: 40 mins ago","Station C|current|120 km|Train is here","Station D|upcoming|180 km|Platform 3"].map((item) => {
-      const [name, status, distance, extra] = item.split("|");
-      return `<div class="station-row"><div class="station-marker ${status === "completed" ? "done" : status === "current" ? "current" : ""}">ST</div><div class="card" style="flex:1;background:${status === "current" ? "rgba(34,197,94,.10)" : "var(--bg)"}"><div class="row"><h4 style="margin:0">${name}</h4><span class="pill ${status === "current" ? "green" : status === "completed" ? "blue" : ""}">${status.toUpperCase()}</span></div><div class="subtle">${distance} | ${extra}</div></div></div>`;
-    }).join("")}</div>`)}
-    <div class="grid cols-2" style="margin-top:14px">${card(`<h3>Journey Statistics</h3>${detailRows([["Total Stops","4"],["Completed Stops","2"],["Average Speed","110 km/h"],["Total Travel Time","4 hours"]])}`)}${card(`<h3>Next Station</h3>${detailRows([["Station","Station D"],["Distance","60 km"],["Estimated Arrival","2h 30min"],["Platform","Platform 3"]])}`)}</div>`;
-}
+      <!-- 3D Toggle -->
+      <div class="earth-3dtoggle">
+        <button class="active" onclick="set3DView()">3D</button>
+        <button onclick="set2DView()">2D</button>
+        <div class="label">3D</div>
+      </div>
 
-function renderDevices() {
-  const filtered = devices.filter((d) => {
-    const haystack = d.join(" ").toLowerCase();
-    return haystack.includes(state.deviceSearch.toLowerCase()) && (state.deviceStatus === "all" || d[2] === state.deviceStatus);
-  });
-  const online = devices.filter((d) => d[2] === "online").length;
-  return `${infoCards([["Total Devices", devices.length, "blue"], ["Online Devices", online, "green"], ["Offline Devices", devices.length - online, "red"]])}
-    ${card(`<div class="toolbar"><input id="device-search" class="input" style="flex:1;min-width:220px" value="${escapeHtml(state.deviceSearch)}" placeholder="Search devices..."><select id="device-status" class="input" style="width:180px"><option value="all">All Status</option><option value="online" ${state.deviceStatus === "online" ? "selected" : ""}>Online</option><option value="offline" ${state.deviceStatus === "offline" ? "selected" : ""}>Offline</option></select></div>`)}
-    <div class="grid cols-3" style="margin-top:14px">${filtered.map((d) => card(`<div class="device-head"><div class="row"><h3 style="margin:0">${d[0]}</h3><span class="pill ${d[2] === "online" ? "green" : "red"}">${d[2].toUpperCase()}</span></div><div class="subtle">${d[1]}</div></div><div class="device-body">${detailRows([["Location", d[4]], ["Last Seen", d[3]], ["Signal Strength", `${d[5]}%`]])}${progress(d[5], d[5] > 80 ? "green" : d[5] > 0 ? "yellow" : "red")}</div><div class="device-foot"><button class="primary-btn">View Details</button></div>`, "device-card")).join("") || card(`<p class="subtle">No devices found matching your criteria</p>`)}</div>`;
-}
+      <!-- Dismiss Banner -->
+      <div class="earth-banner" id="earthBanner">
+        <span>Access the data catalog anytime to explore and add more layers.</span>
+        <button class="dismiss-btn" onclick="dismissBanner()">Dismiss</button>
+      </div>
 
-function renderSettings() {
-  return `${card(`<h3>System Settings</h3><p class="subtle">Configure and manage your railway monitoring platform</p>`)}
-    <div class="settings-grid" style="margin-top:14px">
-      ${settingsPanel("General Settings", "Organization Name", "Railway Control Center", "Time Zone", "UTC +5:30 (IST)")}
-      ${settingsPanel("Notifications", "Critical Alerts", "Enabled", "Email Notifications", "Disabled")}
-      ${settingsPanel("Security", "Two-Factor Authentication", "Disabled", "Session Timeout", "30 minutes")}
-      ${settingsPanel("Data Management", "Data Retention Period", "30 days", "Export", "Available")}
-      ${settingsPanel("Display", "Theme", "Dark (SCADA)", "Chart Refresh Rate", "1 second")}
-      ${settingsPanel("API Configuration", "API Endpoint", "https://api.railway-twin.com/v1", "Connection", "Ready")}
+      <!-- Camera Info -->
+      <div class="earth-camera">
+        <span class="highlight" id="cameraDist">3,000 km</span>
+        <span class="separator">|</span>
+        <span>Camera: <span class="highlight" id="cameraDist2">18,643 km</span></span>
+        <span class="separator">|</span>
+        <span class="coords" id="cameraCoords">0°13'10.21"S 35°19'07.55"E</span>
+      </div>
+
+      <!-- Train Popup -->
+      <div class="earth-popup" id="trainPopup">
+        <button class="close-btn" onclick="closePopup()">✕</button>
+        <div class="header">
+          <span class="name" id="popupName">Train-001</span>
+          <span class="status" id="popupStatus" style="background:rgba(34,197,94,0.2);color:#22c55e;">● RUNNING</span>
+        </div>
+        <div class="grid">
+          <div class="row"><span class="lbl">Speed</span><span class="val" id="popupSpeed">128 km/h</span></div>
+          <div class="row"><span class="lbl">Temperature</span><span class="val" id="popupTemp">35°C</span></div>
+          <div class="row"><span class="lbl">Fuel Level</span><span class="val" id="popupFuel">90%</span></div>
+          <div class="row"><span class="lbl">Status</span><span class="val" id="popupStatusText">Running</span></div>
+          <div class="row"><span class="lbl">Driver</span><span class="val" id="popupDriver">Rajesh Kumar</span></div>
+          <div class="row"><span class="lbl">Next Station</span><span class="val" id="popupNext">Vadodara</span></div>
+        </div>
+      </div>
+
     </div>
-    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="ghost-btn">Reset to Defaults</button><button class="primary-btn" style="width:auto">Save Changes</button></div>`;
-}
 
-function renderSimple(title, subtitle, items) {
-  return `${card(`<h3>${title}</h3><p class="subtle">${subtitle}</p>`)}<div class="grid cols-3" style="margin-top:14px">${items.map((item) => card(`<h3>${item}</h3><p class="subtle">Status: active</p>${progress(76, "blue")}`)).join("")}</div>`;
-}
+  </div>
+</div>
+</div>
 
-function card(content, extraClass = "", style = "") {
-  return `<section class="card ${extraClass}" style="${style}">${content}</section>`;
-}
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+lucide.createIcons();
 
-function metric(label, value, tone = "") {
-  return `<div class="metric-box"><div class="dim" style="font-size:12px">${label}</div><strong class="${tone ? `pill ${tone}` : ""}">${value}</strong></div>`;
+/* ─── CLOCK ─── */
+function updateClock(){
+  const n=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 }
+updateClock(); setInterval(updateClock,1000);
 
-function gauge(value, label, status, tone) {
-  const circumference = 214;
-  const offset = circumference - (value / 100) * circumference;
-  return `<div class="gauge"><svg viewBox="0 0 86 86"><circle cx="43" cy="43" r="34" fill="none" stroke="#14532d" stroke-width="8"/><circle cx="43" cy="43" r="34" fill="none" stroke="${color(tone)}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 43 43)"/><text x="43" y="40" text-anchor="middle" fill="white" font-size="13" font-weight="700">${value}%</text><text x="43" y="54" text-anchor="middle" fill="${color(tone)}" font-size="8">${status}</text></svg><div class="dim" style="font-size:11px">${label}</div></div>`;
-}
+/* ─── THEME ─── */
+let isDark = localStorage.getItem('rdt-theme') === 'dark';
 
-function legend(rows) {
-  return `<div class="legend">${rows.map((r) => `<div class="legend-row"><span><span class="color-dot" style="background:${color(r[2])}"></span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>`;
-}
-
-function progress(value, tone) {
-  return `<div class="progress" style="--value:${value}%;--bar:${color(tone)}"><span></span></div>`;
-}
-
-function sparkline(values, tone) {
-  return chart(values, tone, "spark");
-}
-
-function chart(values, tone, cls = "") {
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-  const points = values.map((value, index) => {
-    const x = 10 + index * (280 / (values.length - 1));
-    const y = 110 - ((value - min) / Math.max(1, max - min)) * 86;
-    return `${x},${y}`;
-  }).join(" ");
-  return `<svg class="${cls || "spark"}" viewBox="0 0 310 120" preserveAspectRatio="none"><polyline points="10,110 300,110" stroke="#334155"/><polyline fill="none" stroke="${color(tone)}" stroke-width="3" points="${points}"/><polygon fill="${color(tone)}" opacity=".12" points="${points} 300,110 10,110"/></svg>`;
-}
-
-function mapArea(mode = "dark", height = 258) {
-  const bg = mode === "satellite" ? "background:linear-gradient(135deg,#1f3a2e,#0f172a 48%,#273c2f)" : "";
-  return `<div class="map-area" style="min-height:${height}px;${bg}">
-    <div class="route-line" style="left:12%;top:75%;width:66%;transform:rotate(-20deg)"></div>
-    <div class="route-line blue" style="left:50%;top:42%;width:22%;transform:rotate(-35deg)"></div>
-    <div class="route-line purple" style="left:30%;top:55%;width:24%;transform:rotate(20deg)"></div>
-    ${["Mumbai:14:76","Valsad:28:63","Surat:41:55","Bharuch:55:46","Vadodara:66:38","Ahmedabad:78:24","Rajkot:55:16","Bhavnagar:28:35"].map((item) => {
-      const [name, x, y] = item.split(":");
-      return `<span class="map-city" style="left:${x}%;top:${y}%">${name}</span>`;
-    }).join("")}
-    ${["Train 01:128 km/h:57:42:orange","Train 02:96 km/h:64:22:blue","Train 03:78 km/h:50:46:purple","Train 04:78 km/h:42:50:orange","Train 05:Stopped:31:64:red"].map((item) => {
-      const [name, speed, x, y, tone] = item.split(":");
-      return `<div class="train-pin" style="left:${x}%;top:${y}%;color:${color(tone)}"><span>${name}<br>${speed}</span></div>`;
-    }).join("")}
-  </div>`;
-}
-
-function routeStrip() {
-  return `<div class="row" style="gap:0;margin:12px 0">${["Mumbai","Surat","Vadodara","Ahmedabad"].map((stop, index) => `<div style="flex:1;text-align:center;color:${index === 1 ? color("blue") : "var(--dim)"}"><div class="status-dot" style="background:${index <= 1 ? color("blue") : "#64748b"}"></div><div style="font-size:10px;margin-top:4px">${stop}</div></div>`).join("")}</div>`;
-}
-
-function compactTree() {
-  return `<div class="asset-tree">${["Railway Network","Western Railway","WR-101  Running","Engine","Coach 1","Coach 2","Brake System","Train 03  Stopped"].map((name, index) => `<div class="tree-row" style="padding-left:${8 + Math.min(index, 3) * 10}px">${index < 3 ? ">" : "-"} ${name}</div>`).join("")}</div>`;
-}
-
-function treeButton(asset) {
-  return `<button class="tree-row ${state.selectedAsset === asset.id ? "active" : ""}" data-asset="${asset.id}" style="padding-left:${12 + asset.depth * 22}px"><span>${asset.depth < 2 ? ">" : "-"}</span><span>${asset.name}</span>${asset.status ? `<span class="status-dot" style="background:${asset.status === "online" ? color("green") : color("red")};margin-left:auto"></span>` : ""}</button>`;
-}
-
-function assetInfo(asset) {
-  const children = assets.filter((item) => item.parent === asset.id);
-  return `<div class="card" style="background:var(--bg);margin-top:16px"><div class="row"><div><h3 style="margin:0">${asset.name}</h3><p class="subtle">Type: ${asset.type.toUpperCase()}</p></div>${asset.status ? `<span class="pill ${asset.status === "online" ? "green" : "red"}">${asset.status.toUpperCase()}</span>` : ""}</div>${detailRows([["Asset ID", asset.id], ["Last Updated", new Date().toLocaleTimeString()]])}</div>${asset.type === "train" ? `<div class="grid cols-2" style="margin-top:14px">${metric("Current Speed","85 km/h")}${metric("Location","Station A")}${metric("Engine Health","98%")}${metric("Total Distance","1,245 km")}</div>` : ""}${children.length ? card(`<h3>Child Assets (${children.length})</h3>${children.map((child) => `<div class="row" style="padding:10px;background:var(--panel);border-radius:6px;margin-top:8px"><span>${child.name}</span><span class="status-dot" style="background:${child.status === "online" ? color("green") : color("red")}"></span></div>`).join("")}`, "", "background:var(--bg);margin-top:14px") : ""}`;
-}
-
-function detailRows(rows) {
-  return `<div>${rows.map((row) => `<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><span class="subtle">${row[0]}</span><span>${row[1]}</span></div>`).join("")}</div>`;
-}
-
-function health(label, value, tone) {
-  return `<div class="card" style="background:var(--bg)"><div class="row"><div><div class="subtle">${label}</div><div style="font-size:26px">${value}%</div></div><span class="pill ${tone}">${value > 96 ? "EXCELLENT" : "GOOD"}</span></div>${progress(value, tone)}</div>`;
-}
-
-function infoCards(rows, count = 3) {
-  return `<div class="grid cols-${count}">${rows.map((row) => card(`<div class="row"><div><div class="subtle">${row[0]}</div><div style="font-size:24px;margin-top:6px">${row[1]}</div></div><div class="icon-box" style="background:${color(row[2])}">${String(row[0]).slice(0,2).toUpperCase()}</div></div>`)).join("")}</div><div style="height:14px"></div>`;
-}
-
-function trainTable() {
-  return card(`<h3>Train Locations</h3><table class="table"><thead><tr><th>Train</th><th>Position</th><th>Speed</th><th>Status</th></tr></thead><tbody>${[["Train 01","28.6139, 77.2090","120 km/h","online"],["Train 02","28.7041, 77.1025","95 km/h","online"],["Train 03","28.5355, 77.3910","0 km/h","offline"]].map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td><span class="pill ${row[3] === "online" ? "green" : "red"}">${row[3].toUpperCase()}</span></td></tr>`).join("")}</tbody></table>`);
-}
-
-function settingsPanel(title, firstLabel, firstValue, secondLabel, secondValue) {
-  return card(`<h3>${title}</h3><div class="field"><label>${firstLabel}</label><input class="input" value="${escapeHtml(firstValue)}"></div><div class="field"><label>${secondLabel}</label><input class="input" value="${escapeHtml(secondValue)}"></div>`);
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
-}
-
-window.addEventListener("hashchange", () => {
-  const hash = location.hash.replace("#", "");
-  if (hash && pages.some((page) => page[0] === hash)) {
-    state.view = "dashboard";
-    state.page = hash;
-    render();
+function applyTheme(){
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const icon = document.getElementById('theme-icon');
+  if(icon){
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
   }
+}
+
+function toggleTheme(){
+  isDark = !isDark;
+  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+applyTheme();
+
+/* ─── NAVIGATION ─── */
+function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+function openOverview(){ window.location.href = 'index.html'; }
+function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+function openDevices(){ window.location.href = 'devices.html'; }
+function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
+
+/* ─── TRAIN DATA ─── */
+const TRAINS = [
+  { id: 't1', name: 'Train 01', lat: 21.95, lng: 73.09, speed: 128, status: 'Running', color: '#22c55e', driver: 'Rajesh Kumar', nextStation: 'Vadodara', temp: 35, fuel: 90 },
+  { id: 't2', name: 'Train 02', lat: 22.44, lng: 71.80, speed: 96, status: 'Running', color: '#22c55e', driver: 'Priya Patel', nextStation: 'Ahmedabad', temp: 38, fuel: 72 },
+  { id: 't3', name: 'Train 03', lat: 21.50, lng: 73.05, speed: 0, status: 'Stopped', color: '#f97316', driver: 'Vikram Singh', nextStation: 'Surat', temp: 42, fuel: 55 },
+  { id: 't4', name: 'Train 04', lat: 22.75, lng: 72.85, speed: 78, status: 'Warning', color: '#f59e0b', driver: 'Amit Sharma', nextStation: 'Ahmedabad', temp: 40, fuel: 45 },
+  { id: 't5', name: 'Train 05', lat: 22.19, lng: 72.63, speed: 110, status: 'Running', color: '#22c55e', driver: 'John Smith', nextStation: 'Vadodara', temp: 34, fuel: 82 },
+  { id: 't6', name: 'Train 06', lat: 23.02, lng: 72.57, speed: 0, status: 'Offline', color: '#94a3b8', driver: 'N/A', nextStation: 'Ahmedabad', temp: 0, fuel: 0 },
+];
+
+const ROUTES = [
+  { color: '#f59e0b', points: [ [19.076,72.877], [20.599,72.934], [20.946,72.952], [21.170,72.831], [21.705,72.996], [22.307,73.181], [22.557,72.954], [23.022,72.571] ] },
+  { color: '#60a5fa', points: [ [22.303,70.802], [22.680,71.350], [22.900,71.880], [23.022,72.571] ] },
+];
+
+let viewer = null;
+let cesiumInitialized = false;
+let trainEntities = {};
+let routeEntities = [];
+let selectedTrainId = null;
+
+/* ─── CESIUM ION TOKEN ─── */
+// You need to get your own token from https://cesium.com/ion/
+// This is a demo token with limited usage
+const CESIUM_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0ZjY5YzdkOS1hOTk4LTRhNTYtODJkZS1jNzE4ZjVhOTAxOTAiLCJpZCI6MjU5ODA1LCJpYXQiOjE3Mzc4Mjc2NTV9.7hX_tUYjL5Fx57rG4j6Un6PvTZfCNE60nTmH4D2gW6U';
+
+/* ─── INIT CESIUM ─── */
+function initCesium(){
+  const container = document.getElementById('cesiumContainer');
+  if(!container || cesiumInitialized) return;
+
+  try {
+    Cesium.Ion.defaultAccessToken = CESIUM_TOKEN;
+
+    viewer = new Cesium.Viewer('cesiumContainer', {
+      terrainProvider: Cesium.createWorldTerrain(),
+      imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        subdomains: 'abcd',
+        credit: '© OpenStreetMap contributors, © CARTO'
+      }),
+      baseLayerPicker: false,
+      geocoder: false,
+      navigationHelpButton: false,
+      homeButton: false,
+      animation: false,
+      timeline: false,
+      fullscreenButton: false,
+      vrButton: false,
+      sceneModePicker: false,
+    });
+
+    // Remove credits
+    viewer.cesiumWidget.creditContainer.style.display = 'none';
+
+    // Initial view - India
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(72.5, 22.0, 800000),
+      duration: 1.5
+    });
+
+    // Add trains
+    TRAINS.forEach(train => addTrainEntity(train));
+
+    // Add routes
+    ROUTES.forEach(route => addRouteEntity(route));
+
+    // Selection handler
+    viewer.selectedEntityChanged.addEventListener((entity) => {
+      if(entity && entity.id && entity.id.startsWith('train-')){
+        const trainId = entity.id.replace('train-', '');
+        showTrainPopup(trainId);
+      }
+    });
+
+    // Click handler
+    viewer.screenSpaceEventHandler.setInputAction((click) => {
+      const picked = viewer.scene.pick(click.position);
+      if(Cesium.defined(picked) && picked.id && picked.id.id && picked.id.id.startsWith('train-')){
+        const trainId = picked.id.id.replace('train-', '');
+        showTrainPopup(trainId);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    // Update camera info
+    viewer.camera.changed.addEventListener(() => {
+      updateCameraInfo();
+    });
+
+    cesiumInitialized = true;
+    console.log('✅ Cesium Viewer initialized successfully!');
+
+  } catch(error) {
+    console.error('❌ Error initializing Cesium:', error);
+    // Show fallback message
+    container.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.4);flex-direction:column;gap:16px;">
+        <div style="font-size:48px;">🌍</div>
+        <div style="font-size:14px;font-weight:600;">CesiumJS Earth View</div>
+        <div style="font-size:12px;text-align:center;max-width:400px;">Unable to load Cesium. Please check your internet connection and try refreshing.</div>
+        <button onclick="location.reload()" style="padding:8px 24px;border-radius:8px;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;font-size:13px;cursor:pointer;">🔄 Retry</button>
+      </div>
+    `;
+  }
+}
+
+function addTrainEntity(train){
+  if(!viewer) return;
+
+  const statusColors = { 'Running': '#22c55e', 'Stopped': '#f97316', 'Warning': '#f59e0b', 'Offline': '#94a3b8' };
+  const color = statusColors[train.status] || train.color;
+
+  const entity = viewer.entities.add({
+    id: 'train-' + train.id,
+    position: Cesium.Cartesian3.fromDegrees(train.lng, train.lat, 500),
+    billboard: {
+      image: createTrainPin(train),
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+      heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+      scale: 0.7,
+    },
+    label: {
+      text: train.name + '\n' + train.speed + ' km/h',
+      font: '9px Inter, sans-serif',
+      fillColor: Cesium.Color.WHITE,
+      outlineColor: Cesium.Color.BLACK,
+      outlineWidth: 2,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      verticalOrigin: Cesium.VerticalOrigin.TOP,
+      pixelOffset: new Cesium.Cartesian2(0, 16),
+      showBackground: true,
+      backgroundColor: Cesium.Color.fromCssColorString('rgba(15,23,42,0.85)'),
+      backgroundPadding: new Cesium.Cartesian2(6, 4),
+    },
+    properties: {
+      trainId: train.id,
+      status: train.status,
+      speed: train.speed,
+    }
+  });
+
+  trainEntities[train.id] = entity;
+}
+
+function createTrainPin(train){
+  const canvas = document.createElement('canvas');
+  canvas.width = 48;
+  canvas.height = 52;
+  const ctx = canvas.getContext('2d');
+
+  const statusColors = { 'Running': '#22c55e', 'Stopped': '#f97316', 'Warning': '#f59e0b', 'Offline': '#94a3b8' };
+  const color = statusColors[train.status] || train.color;
+
+  const grad = ctx.createRadialGradient(24, 18, 0, 24, 18, 28);
+  grad.addColorStop(0, color + '66');
+  grad.addColorStop(1, color + '00');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(24, 18, 28, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(24, 18, 14, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 12px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🚆', 24, 18);
+
+  if(train.status !== 'Offline'){
+    ctx.beginPath();
+    ctx.arc(36, 8, 5, 0, Math.PI * 2);
+    ctx.fillStyle = train.status === 'Warning' ? '#f59e0b' : '#22c55e';
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+function addRouteEntity(route){
+  if(!viewer) return;
+  const positions = route.points.map(p => Cesium.Cartesian3.fromDegrees(p[1], p[0]));
+  const entity = viewer.entities.add({
+    polyline: {
+      positions: positions,
+      width: 4,
+      material: Cesium.Color.fromCssColorString(route.color),
+      clampToGround: true,
+    },
+  });
+  routeEntities.push(entity);
+}
+
+/* ─── POPUP ─── */
+function showTrainPopup(trainId){
+  selectedTrainId = trainId;
+  const train = TRAINS.find(t => t.id === trainId);
+  if(!train) return;
+
+  const statusColors = { 'Running': '#22c55e', 'Stopped': '#f97316', 'Warning': '#f59e0b', 'Offline': '#94a3b8' };
+  const color = statusColors[train.status] || train.color;
+
+  document.getElementById('popupName').textContent = train.name;
+  document.getElementById('popupStatus').textContent = '● ' + train.status.toUpperCase();
+  document.getElementById('popupStatus').style.background = color + '33';
+  document.getElementById('popupStatus').style.color = color;
+  document.getElementById('popupSpeed').textContent = train.speed + ' km/h';
+  document.getElementById('popupTemp').textContent = train.temp + '°C';
+  document.getElementById('popupFuel').textContent = train.fuel + '%';
+  document.getElementById('popupStatusText').textContent = train.status;
+  document.getElementById('popupDriver').textContent = train.driver;
+  document.getElementById('popupNext').textContent = train.nextStation;
+  document.getElementById('trainPopup').classList.add('visible');
+
+  // Fly to train
+  if(viewer){
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(train.lng, train.lat, 20000),
+      duration: 1.2,
+    });
+  }
+}
+
+function closePopup(){
+  document.getElementById('trainPopup').classList.remove('visible');
+}
+
+/* ─── CAMERA CONTROLS ─── */
+function resetCamera(){
+  if(viewer){
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(72.5, 22.0, 800000),
+      duration: 1.5,
+    });
+  }
+  closePopup();
+}
+
+function zoomInCesium(){
+  if(viewer){
+    const pos = viewer.camera.position;
+    const dist = Cesium.Cartesian3.distance(pos, viewer.camera._position);
+    viewer.camera.zoomIn(dist * 0.5);
+  }
+}
+
+function zoomOutCesium(){
+  if(viewer){
+    const pos = viewer.camera.position;
+    const dist = Cesium.Cartesian3.distance(pos, viewer.camera._position);
+    viewer.camera.zoomOut(dist * 0.5);
+  }
+}
+
+function set3DView(){
+  if(viewer){
+    viewer.scene.morphTo3D(1);
+    document.querySelector('.earth-3dtoggle button.active').classList.remove('active');
+    document.querySelector('.earth-3dtoggle button:first-child').classList.add('active');
+  }
+}
+
+function set2DView(){
+  if(viewer){
+    viewer.scene.morphTo2D(1);
+    document.querySelector('.earth-3dtoggle button.active').classList.remove('active');
+    document.querySelector('.earth-3dtoggle button:last-child').classList.add('active');
+  }
+}
+
+function toggleLayers(){
+  // Toggle train visibility
+  const visible = document.querySelectorAll('.train-marker')?.[0]?.style.display !== 'none';
+  Object.values(trainEntities).forEach(e => { if(e) e.show = !e.show; });
+}
+
+function dismissBanner(){
+  document.getElementById('earthBanner').style.display = 'none';
+}
+
+/* ─── UPDATE CAMERA INFO ─── */
+function updateCameraInfo(){
+  if(!viewer) return;
+  try {
+    const dist = viewer.camera.getMagnitude();
+    const distKm = Math.round(dist / 1000);
+    document.getElementById('cameraDist2').textContent = distKm.toLocaleString() + ' km';
+    
+    // Update coords
+    const cart = viewer.camera.positionCartographic;
+    if(cart){
+      const lat = Cesium.Math.toDegrees(cart.latitude);
+      const lng = Cesium.Math.toDegrees(cart.longitude);
+      const latDir = lat >= 0 ? 'N' : 'S';
+      const lngDir = lng >= 0 ? 'E' : 'W';
+      document.getElementById('cameraCoords').textContent = 
+        Math.abs(lat).toFixed(2) + '°' + latDir + ' ' + 
+        Math.abs(lng).toFixed(2) + '°' + lngDir;
+    }
+  } catch(e) {}
+}
+
+/* ─── SIMULATE TRAIN MOVEMENT ─── */
+setInterval(() => {
+  if(!cesiumInitialized) return;
+  
+  TRAINS.forEach(train => {
+    if(train.status === 'Running' && train.speed > 0){
+      train.lat += (Math.random() - 0.48) * 0.001;
+      train.lng += (Math.random() - 0.48) * 0.001;
+      
+      const entity = trainEntities[train.id];
+      if(entity){
+        entity.position = Cesium.Cartesian3.fromDegrees(train.lng, train.lat, 500);
+        entity.label.text = train.name + '\n' + Math.round(train.speed) + ' km/h';
+      }
+    }
+  });
+}, 2000);
+
+/* ─── UPDATE TELEMETRY ─── */
+setInterval(() => {
+  if(selectedTrainId){
+    const train = TRAINS.find(t => t.id === selectedTrainId);
+    if(train && train.status === 'Running'){
+      train.speed = Math.min(160, Math.max(80, train.speed + (Math.random() - 0.47) * 6));
+      train.temp = Math.min(45, Math.max(30, train.temp + (Math.random() - 0.48) * 1.5));
+      train.fuel = Math.max(10, train.fuel - 0.2);
+      
+      const popup = document.getElementById('trainPopup');
+      if(popup.classList.contains('visible')){
+        document.getElementById('popupSpeed').textContent = Math.round(train.speed) + ' km/h';
+        document.getElementById('popupTemp').textContent = Math.round(train.temp) + '°C';
+        document.getElementById('popupFuel').textContent = Math.round(train.fuel) + '%';
+      }
+    }
+  }
+}, 2500);
+
+/* ─── UPDATE CAMERA COORDS ─── */
+setInterval(() => {
+  updateCameraInfo();
+}, 3000);
+
+/* ─── INIT ─── */
+setTimeout(() => {
+  initCesium();
+}, 500);
+
+// Resize handler
+window.addEventListener('resize', () => {
+  if(viewer) viewer.resize();
 });
 
-const initial = location.hash.replace("#", "");
-if (initial && pages.some((page) => page[0] === initial)) {
-  state.view = "dashboard";
-  state.page = initial;
-} else if (window.__INITIAL_PAGE__) {
-  state.view = window.__INITIAL_VIEW__ || "dashboard";
-  state.page = window.__INITIAL_PAGE__;
-}
+lucide.createIcons();
+</script>
 
-render();
-
-  </script>
 </body>
 </html>

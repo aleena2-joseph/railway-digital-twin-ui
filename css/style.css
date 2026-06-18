@@ -52,7 +52,16 @@
   --nav-act-bg:   #1e293b;
   --nav-act-txt:  #60a5fa;
 }
+.active-page{
+    background:#3b82f6 !important;
+    color:#fff !important;
+}
 
+.sb-item.active{
+    background:var(--nav-act-bg);
+    color:var(--nav-act-txt);
+    border-right:2px solid #3b82f6;
+}
 /* ══════════════════════════════════════════════════
    RESET
 ══════════════════════════════════════════════════ */
@@ -584,3 +593,134 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 [data-theme="dark"] #leaflet-map .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
 [data-theme="dark"] #leaflet-map .leaflet-popup-content-wrapper{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
 [data-theme="dark"] #leaflet-map .leaflet-popup-tip{background:#1e293b}
+/* Additional styles for refactored components */
+
+/* ═══ PAGE CONTENT WRAPPER ═══ */
+#page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ═══ ASSET DETAILS PAGE SPECIFIC ═══ */
+.asset-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.asset-details-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.asset-details-card h3 {
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.asset-status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.asset-status-badge.online {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+}
+
+.asset-status-badge.offline {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+/* ═══ RESPONSIVE FIXES ═══ */
+@media(max-width: 768px) {
+  .asset-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .asset-details-card {
+    padding: 15px;
+  }
+}
+
+/* ═══ SIDEBAR ACTIVE STATE ═══ */
+.sb-item.active-page {
+  background: var(--nav-act-bg) !important;
+  color: var(--nav-act-txt) !important;
+  border-right: 2.5px solid var(--accent) !important;
+}
+
+/* Ensure sidebar overview button uses same active style */
+.sb-overview-btn.active-page {
+  background: var(--nav-act-bg) !important;
+  color: var(--nav-act-txt) !important;
+}
+/* Sidebar active state styles */
+.sb-item.active-page {
+  background: var(--nav-act-bg) !important;
+  color: var(--nav-act-txt) !important;
+  border-right: 2.5px solid var(--accent) !important;
+}
+
+.sb-overview-btn.active-page {
+  background: var(--nav-act-bg) !important;
+  color: var(--nav-act-txt) !important;
+}
+
+/* Ensure proper sidebar item styling */
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--nav-txt);
+  font-size: 11.5px;
+  transition: background .12s, color .12s;
+  border-right: 2.5px solid transparent;
+  text-decoration: none;
+}
+
+.sb-item:hover {
+  background: var(--nav-hover);
+  color: var(--text);
+}
+
+.sb-item.active {
+  background: var(--nav-act-bg);
+  color: var(--nav-act-txt);
+  border-right-color: var(--accent);
+}
+
+/* Ensure sidebar overview button styling */
+.sb-overview-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+.sb-overview-btn.active-page {
+  background: var(--nav-act-bg) !important;
+  color: var(--nav-act-txt) !important;
+}

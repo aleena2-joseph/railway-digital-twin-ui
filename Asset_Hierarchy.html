@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asset Hierarchy - Railway Digital Twin</title>
 
-<link rel="stylesheet" href="css/style.css">
-
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -16,27 +14,476 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
+
+/* Logo area */
+.sb-logo{
+  padding:14px 12px 12px;
+  border-bottom:1px solid var(--sidebar-bd);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.sb-logo-icon{
+  width:38px;height:38px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+/* Overview active pill */
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:9px 14px;border-radius:8px;
+  background:#3b82f6;color:#fff;
+  font-size:12px;font-weight:600;
+  border:none;cursor:pointer;
+}
+.sb-overview-btn svg{width:15px;height:15px}
+
+/* Section label */
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+
+/* Nav item */
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 12px;cursor:pointer;
+  color:var(--nav-txt);font-size:11.5px;
+  transition:background .12s,color .12s;
+  border-right:2.5px solid transparent;
+}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;min-width:17px;height:17px;
+  background:#ef4444;border-radius:8px;
+  font-size:9px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;
+}
+
+/* Train image in sidebar */
+.sb-train-img{
+  flex-shrink:0;
+  overflow:hidden;
+  height:160px;
+  position:relative;
+  margin-top:auto;
+}
+.sb-train-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  opacity:.75;
+  transition:opacity .25s;
+  position:absolute;
+  top:0;
+  left:0;
+}
+.sb-train-img:hover img{opacity:.9}
+
+/* Logout btn */
+.sb-logout{
+  display:flex;align-items:center;gap:8px;
+  width:calc(100% - 20px);margin:6px 10px 4px;
+  padding:8px 14px;border-radius:8px;
+  background:var(--red-bg);color:var(--red);
+  font-size:11.5px;font-weight:600;
+  border:1px solid rgba(220,38,38,.2);
+  cursor:pointer;transition:background .15s;
+}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;box-shadow:var(--shadow);
+  transition:background .25s;
+}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted);
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:7px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+/* Scrollable content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:12px 14px;
+  display:flex;flex-direction:column;gap:10px;
+}
+
+/* ══════════════════════════════════════════════════
+   ASSET HIERARCHY PAGE LAYOUT - NEW DESIGN
+══════════════════════════════════════════════════ */
+.ah-row{
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:10px;
+  flex:1;
+  min-height:0;
+}
+
+/* Panel base */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+.ph{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px 7px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.pt{font-size:11.5px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}
+
+.dim{font-size:10px;color:var(--muted)}
+
+/* ═══ LEFT PANEL - TREE WITH SEARCH ═══ */
+.tree-wrapper{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Search bar */
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;margin-bottom:10px;flex-shrink:0;
+}
+.search-box input{
+  flex:1;border:none;background:transparent;outline:none;
+  font-size:11px;color:var(--text);font-family:inherit;
+}
+.search-box input::placeholder{color:var(--dim)}
+.search-box svg{width:14px;height:14px;color:var(--dim);flex-shrink:0}
+
+.tree{
+  flex:1;overflow-y:auto;
+  padding-right:4px;
+}
+
+/* Tree items - new design */
+.tree-root-label{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 4px;font-weight:600;font-size:11.5px;
+  color:var(--text);
+}
+.tree-root-label svg{width:12px;height:12px;color:var(--muted)}
+
+.tree-item{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 4px 4px 8px;
+  border-radius:4px;cursor:pointer;
+  transition:background .12s;
+  font-size:11px;color:var(--text);
+  position:relative;
+}
+.tree-item:hover{background:var(--nav-hover)}
+.tree-item.active{background:var(--nav-hover)}
+
+.tree-item .chevron{
+  width:11px;height:11px;color:var(--muted);flex-shrink:0;
+  transition:transform .15s;cursor:pointer;
+}
+.tree-item .chevron.open{transform:rotate(90deg)}
+.tree-item .indent{width:12px;flex-shrink:0}
+.tree-item .icon{width:14px;height:14px;flex-shrink:0;color:var(--muted)}
+.tree-item .label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree-item .badge{
+  font-size:8px;padding:1px 6px;border-radius:3px;font-weight:600;
+  flex-shrink:0;
+}
+.tree-item .badge.running{background:var(--green-bg);color:var(--green)}
+.tree-item .badge.stopped{background:var(--red-bg);color:var(--red)}
+.tree-item .badge.maintenance{background:var(--orange-bg);color:var(--orange)}
+
+.tree-item .status-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+.tree-item .status-dot.online{background:var(--green)}
+.tree-item .status-dot.offline{background:var(--red)}
+
+.tree-item .child-count{
+  font-size:8px;color:var(--dim);flex-shrink:0;
+  background:var(--card2);padding:0 4px;border-radius:2px;
+}
+
+/* ═══ RIGHT PANEL - DETAILS ═══ */
+.details-wrapper{flex:1;display:flex;flex-direction:column;overflow-y:auto;gap:12px}
+
+/* Top card with train name and status */
+.detail-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+.detail-header-left{display:flex;align-items:center;gap:10px}
+.detail-header-left .icon-box{
+  width:36px;height:36px;border-radius:8px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:14px;font-weight:700;
+}
+.detail-header-left .train-name{font-size:14px;font-weight:700;color:var(--text)}
+.detail-header-left .train-id{font-size:10px;color:var(--dim)}
+.detail-header .status-badge{
+  padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;
+}
+.detail-header .status-badge.running{background:var(--green-bg);color:var(--green)}
+.detail-header .status-badge.stopped{background:var(--red-bg);color:var(--red)}
+.detail-header .status-badge.maintenance{background:var(--orange-bg);color:var(--orange)}
+
+/* Metric cards row */
+.metrics-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.metric-card{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;text-align:center;
+}
+.metric-card .label{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.metric-card .value{font-size:16px;font-weight:800;color:var(--text);margin-top:2px}
+.metric-card .value .unit{font-size:10px;font-weight:400;color:var(--muted)}
+
+/* Child assets section */
+.child-assets-section{
+  flex:1;min-height:0;display:flex;flex-direction:column;
+}
+.child-assets-section .section-title{
+  font-size:11px;font-weight:700;color:var(--text);
+  margin-bottom:6px;flex-shrink:0;
+}
+.child-assets-section .child-count{
+  font-size:9px;color:var(--dim);font-weight:400;
+}
+.child-list{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;
+}
+.child-item{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:6px;padding:6px 10px;
+  transition:background .12s;
+}
+.child-item:hover{background:var(--nav-hover)}
+.child-item .child-icon{
+  width:20px;height:20px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.child-item .child-icon.engine{background:#f59e0b}
+.child-item .child-icon.coach{background:#3b82f6}
+.child-item .child-icon.brake{background:#ef4444}
+.child-item .child-icon.gps{background:#8b5cf6}
+.child-item .child-icon.default{background:#64748b}
+.child-item .child-info{flex:1;min-width:0}
+.child-item .child-name{font-size:10.5px;font-weight:600;color:var(--text)}
+.child-item .child-id{font-size:9px;color:var(--dim)}
+.child-item .child-status{
+  font-size:8px;font-weight:600;padding:1px 6px;border-radius:3px;flex-shrink:0;
+}
+.child-item .child-status.online{background:var(--green-bg);color:var(--green)}
+.child-item .child-status.offline{background:var(--red-bg);color:var(--red)}
+
+/* Asset info grid at bottom */
+.asset-info-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4px 16px;padding-top:8px;border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.asset-info-item{
+  display:flex;justify-content:space-between;padding:4px 0;
+  font-size:10.5px;
+}
+.asset-info-item .info-label{color:var(--muted)}
+.asset-info-item .info-value{font-weight:600;color:var(--text)}
+.asset-info-item .info-value .live-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--green);margin-right:4px;
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1200px){
+  :root{--sidebar-w:190px}
+  .ah-row{grid-template-columns:1fr}
+  .metrics-row{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+}
+@media(max-width:768px){
+  .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .metrics-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .topbar{padding:0 10px}
+  .content{padding:10px}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .ph{padding:7px 10px 6px}
+  .pb{padding:8px 10px}
+  .metrics-row{grid-template-columns:1fr}
+  .asset-info-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-
-<!-- ═══════════════ GLOBAL TRAIN TOOLTIP ═══════════════ -->
-<div id="train-tt">
-  <div id="tt-title"></div>
-  <div id="tt-grid">
-    <div><div class="tt-l">Speed</div><div class="tt-v" id="tt-speed"></div></div>
-    <div><div class="tt-l">Status</div><div class="tt-v" id="tt-status"></div></div>
-    <div><div class="tt-l">Route</div><div class="tt-v" id="tt-route" style="font-size:10px"></div></div>
-    <div><div class="tt-l">Next Station</div><div class="tt-v" id="tt-next" style="font-size:10px"></div></div>
-  </div>
-  <div id="tt-upd"></div>
-</div>
 
 <!-- ═══════════════ APP ═══════════════ -->
 <div class="app">
 
-<!-- ════════ SIDEBAR (identical to index.html) ════════ -->
+<!-- ════════ SIDEBAR ════════ -->
 <aside class="sidebar">
-  <!-- Logo -->
   <div class="sb-logo">
     <div class="sb-logo-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -55,40 +502,34 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     </div>
   </div>
 
-  <!-- Overview button (not active here) -->
   <div class="sb-overview">
-    <button class="sb-overview-btn" onclick="openOverview()" style="background:var(--card2);color:var(--text);border:1px solid var(--border)">
+    <button class="sb-overview-btn" onclick="openOverview()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       <span>Overview</span>
     </button>
   </div>
 
-  <!-- MONITORING -->
   <div class="sb-sec">Monitoring</div>
   <div class="sb-item active" onclick="openAssetHierarchy()"><i data-lucide="layers"></i><span>Asset Hierarchy</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="info"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openAssetDetails()"><i data-lucide="layers"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openLiveTelemetry()"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openGisMonitoring()"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openGoogleEarthView()"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openRoutevisualization()"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openDevices()"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
 
-  <!-- MANAGEMENT -->
   <div class="sb-sec">Management</div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
 
-  <!-- MONITORING 2 -->
   <div class="sb-sec">Monitoring</div>
-  <div class="sb-item" onclick="openOverview()"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
+  <div class="sb-item"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
 
-  <!-- Logout -->
   <div style="padding:6px 0 2px">
     <button class="sb-logout" onclick="doLogout()">
       <i data-lucide="log-out"></i><span>Logout</span>
     </button>
   </div>
 
-  <!-- SIDEBAR TRAIN IMAGE -->
   <div class="sb-train-img">
     <img src="assets/images/train_img.png" alt="Train" id="sidebar-train-img"/>
   </div>
@@ -99,7 +540,6 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <!-- ════════ MAIN ════════ -->
 <div class="main">
 
-  <!-- Topbar (identical structure to index.html) -->
   <div class="topbar">
     <div class="tb-left">
       <i data-lucide="layers" style="width:17px;height:17px;color:var(--muted)"></i>
@@ -111,16 +551,13 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
         <span style="color:var(--border)">|</span>
         <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
-      <!-- Theme toggle -->
       <button class="ib" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark / Light mode">
         <i data-lucide="sun" id="theme-icon"></i>
       </button>
-      <!-- Notification -->
       <div class="notif-wrap">
         <button class="ib"><i data-lucide="bell"></i></button>
         <span class="notif-dot">8</span>
       </div>
-      <!-- Admin -->
       <div class="admin-chip">
         <div class="admin-av">A</div>
         <div>
@@ -132,41 +569,387 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     </div>
   </div>
 
-  <!-- Scrollable content: Asset Hierarchy page only -->
   <div class="content">
 
     <div class="ah-row">
 
-      <!-- LEFT: Tree -->
+      <!-- LEFT: Asset Hierarchy Tree with Search -->
       <div class="panel ah-tree-panel">
         <div class="ph">
           <span class="pt">Asset Hierarchy</span>
-          <span class="dim" style="font-size:10px;color:var(--muted)">Network structure</span>
+          <span class="dim">Network structure</span>
         </div>
         <div class="pb">
-          <div class="tree" id="asset-tree" style="flex:1"></div>
+          <div class="tree-wrapper">
+            <!-- Search -->
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="searchInput" placeholder="Search assets..." oninput="filterTree(this.value)">
+            </div>
+            <!-- Tree -->
+            <div class="tree" id="asset-tree"></div>
+          </div>
         </div>
       </div>
 
-      <!-- RIGHT: Details -->
+      <!-- RIGHT: Asset Details -->
       <div class="panel ah-details-panel">
         <div class="ph">
           <span class="pt">Asset Details</span>
-          <span class="dim" style="font-size:10px;color:var(--muted)">Selected asset information</span>
+          <span class="dim">Selected asset information</span>
         </div>
         <div class="pb">
-          <div id="asset-details-panel"></div>
+          <div class="details-wrapper" id="asset-details-panel"></div>
         </div>
       </div>
 
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</div>
+</div>
 
-<!-- ═══════════════ JAVASCRIPT (shared with index.html) ═══════════════ -->
-<script src="js/script.js"></script>
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+  lucide.createIcons();
+
+  /* ─── CLOCK ─── */
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  /* ─── THEME ─── */
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){ icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun'); lucide.createIcons(); }
+  }
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+    renderDetails();
+  }
+  applyTheme();
+
+  /* ─── NAVIGATION ─── */
+  function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+  function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+  function openOverview(){ window.location.href = 'index.html'; }
+  function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+  function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+  function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+  function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+  function openDevices(){ window.location.href = 'devices.html'; }
+  function doLogout(){ if(confirm('Are you sure?')){ window.location.href='Login.html'; } }
+
+  /* ─── DATA ─── */
+  const TREE_DATA = {
+    id:'rn', label:'Railway Network', icon:'network', children:[
+      { id:'wr', label:'Western Railway', icon:'railway', children:[
+        { id:'wr101', label:'Train 01 (WR-101)', badge:'Running', badgeClass:'running', status:'online', children:[
+          { id:'eng', label:'Engine Unit', icon:'engine', childId:'WR101-ENG', status:'online' },
+          { id:'c1', label:'Coach 1', icon:'coach', childId:'WR101-C1', status:'online' },
+          { id:'c2', label:'Coach 2', icon:'coach', childId:'WR101-C2', status:'online' },
+          { id:'c3', label:'Coach 3', icon:'coach', childId:'WR101-C3', status:'online' },
+          { id:'bs', label:'Brake System', icon:'brake', childId:'WR101-BRK', status:'online' },
+          { id:'gps', label:'GPS Unit', icon:'gps', childId:'WR101-GPS', status:'online' },
+        ]},
+        { id:'wr102', label:'Train 02 (WR-102)', badge:'Running', badgeClass:'running', status:'online', children:[
+          { id:'eng2', label:'Engine Unit', icon:'engine', childId:'WR102-ENG', status:'online' },
+          { id:'c21', label:'Coach 1', icon:'coach', childId:'WR102-C1', status:'online' },
+        ]},
+        { id:'wr103', label:'Train 03 (WR-103)', badge:'Stopped', badgeClass:'stopped', status:'offline', children:[
+          { id:'eng3', label:'Engine Unit', icon:'engine', childId:'WR103-ENG', status:'offline' },
+          { id:'c31', label:'Coach 1', icon:'coach', childId:'WR103-C1', status:'online' },
+          { id:'c32', label:'Coach 2', icon:'coach', childId:'WR103-C2', status:'online' },
+        ]},
+        { id:'wr104', label:'Train 04 (WR-104)', badge:'Running', badgeClass:'running', status:'online', children:[]},
+      ]},
+      { id:'cr', label:'Central Railway', icon:'railway', children:[]},
+    ]
+  };
+
+  const ASSET_DETAILS = {
+    wr101: { id:'WR-101', name:'Train 01', status:'Running', speed:'128', speedUnit:'km/h', health:'92', driver:'John Smith', zone:'Western Railway', parentZone:'Western Railway Region', lastUpdated:'10:51:34 pm', childAssets: [
+      { name:'Engine Unit', id:'WR101-ENG', icon:'engine', status:'online' },
+      { name:'Coach 1', id:'WR101-C1', icon:'coach', status:'online' },
+      { name:'Coach 2', id:'WR101-C2', icon:'coach', status:'online' },
+      { name:'Coach 3', id:'WR101-C3', icon:'coach', status:'online' },
+      { name:'Brake System', id:'WR101-BRK', icon:'brake', status:'online' },
+      { name:'GPS Unit', id:'WR101-GPS', icon:'gps', status:'online' },
+    ]},
+    wr102: { id:'WR-102', name:'Train 02', status:'Running', speed:'96', speedUnit:'km/h', health:'88', driver:'Asha Rao', zone:'Western Railway', parentZone:'Western Railway Region', lastUpdated:'10:44:10 pm', childAssets: [
+      { name:'Engine Unit', id:'WR102-ENG', icon:'engine', status:'online' },
+      { name:'Coach 1', id:'WR102-C1', icon:'coach', status:'online' },
+    ]},
+    wr103: { id:'WR-103', name:'Train 03', status:'Stopped', speed:'0', speedUnit:'km/h', health:'45', driver:'Vikram Singh', zone:'Western Railway', parentZone:'Western Railway Region', lastUpdated:'10:31:02 pm', childAssets: [
+      { name:'Engine Unit', id:'WR103-ENG', icon:'engine', status:'offline' },
+      { name:'Coach 1', id:'WR103-C1', icon:'coach', status:'online' },
+      { name:'Coach 2', id:'WR103-C2', icon:'coach', status:'online' },
+    ]},
+    wr104: { id:'WR-104', name:'Train 04', status:'Running', speed:'112', speedUnit:'km/h', health:'95', driver:'Priya Patel', zone:'Western Railway', parentZone:'Western Railway Region', lastUpdated:'10:48:15 pm', childAssets: [] },
+    eng: { id:'WR101-ENG', name:'Engine Unit', status:'Healthy', speed:'-', speedUnit:'', health:'98', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+    c1: { id:'WR101-C1', name:'Coach 1', status:'Healthy', speed:'-', speedUnit:'', health:'95', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+    c2: { id:'WR101-C2', name:'Coach 2', status:'Healthy', speed:'-', speedUnit:'', health:'93', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+    c3: { id:'WR101-C3', name:'Coach 3', status:'Healthy', speed:'-', speedUnit:'', health:'91', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+    bs: { id:'WR101-BRK', name:'Brake System', status:'Healthy', speed:'-', speedUnit:'', health:'89', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+    gps: { id:'WR101-GPS', name:'GPS Unit', status:'Healthy', speed:'-', speedUnit:'', health:'97', driver:'-', zone:'Train 01', parentZone:'Western Railway', lastUpdated:'10:51:34 pm', childAssets: [] },
+  };
+
+  let selectedAssetId = 'wr101';
+  const openNodes = new Set(['rn','wr','wr101']);
+
+  function findNode(node, id){
+    if(node.id===id) return node;
+    if(!node.children) return null;
+    for(const c of node.children){ const r=findNode(c,id); if(r) return r; }
+    return null;
+  }
+
+  function renderTree(filter=''){
+    const container = document.getElementById('asset-tree');
+    if(!container) return;
+    container.innerHTML = '';
+
+    const root = document.createElement('div');
+    root.className = 'tree-root-label';
+    root.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><path d="M12 3v6"/></svg> Railway Network`;
+    container.appendChild(root);
+
+    TREE_DATA.children.forEach(ch => {
+      const el = renderTreeNode(ch, 1, filter);
+      if(el) container.appendChild(el);
+    });
+  }
+
+  function renderTreeNode(node, depth, filter){
+    const hasChildren = node.children && node.children.length > 0;
+    const isOpen = openNodes.has(node.id);
+    const label = node.label || node.id;
+    const matchesFilter = filter === '' || label.toLowerCase().includes(filter.toLowerCase());
+
+    // For children, check if any child matches
+    let hasMatchingChild = false;
+    if(hasChildren && filter !== ''){
+      hasMatchingChild = node.children.some(c => 
+        (c.label || c.id).toLowerCase().includes(filter.toLowerCase()) ||
+        (c.children && c.children.some(gc => (gc.label || gc.id).toLowerCase().includes(filter.toLowerCase())))
+      );
+    }
+
+    if(!matchesFilter && !hasMatchingChild && filter !== '') return null;
+
+    const div = document.createElement('div');
+    div.style.paddingLeft = `${depth * 12 + 4}px`;
+
+    const row = document.createElement('div');
+    row.className = 'tree-item';
+    if(node.id === selectedAssetId) row.classList.add('active');
+
+    // Indent
+    const indent = document.createElement('span');
+    indent.className = 'indent';
+    row.appendChild(indent);
+
+    // Chevron for expandable
+    if(hasChildren && node.children.length > 0){
+      const chev = document.createElement('span');
+      chev.className = `chevron${isOpen ? ' open' : ''}`;
+      chev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+      chev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openNodes.has(node.id) ? openNodes.delete(node.id) : openNodes.add(node.id);
+        renderTree(document.getElementById('searchInput').value);
+      });
+      row.appendChild(chev);
+    } else {
+      const spacer = document.createElement('span');
+      spacer.style.width = '11px'; spacer.style.display = 'inline-block'; spacer.style.flexShrink = '0';
+      row.appendChild(spacer);
+    }
+
+    // Icon based on type
+    const iconMap = {
+      'network': '🏛️',
+      'railway': '🚂',
+      'engine': '⚙️',
+      'coach': '🚃',
+      'brake': '🛑',
+      'gps': '📍'
+    };
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'icon';
+    iconSpan.textContent = iconMap[node.icon] || '📌';
+    row.appendChild(iconSpan);
+
+    // Label
+    const lbl = document.createElement('span');
+    lbl.className = 'label';
+    lbl.textContent = label;
+    row.appendChild(lbl);
+
+    // Badge
+    if(node.badge){
+      const badge = document.createElement('span');
+      badge.className = `badge ${node.badgeClass || 'running'}`;
+      badge.textContent = node.badge;
+      row.appendChild(badge);
+    }
+
+    // Status dot
+    if(node.status){
+      const dot = document.createElement('span');
+      dot.className = `status-dot ${node.status === 'online' ? 'online' : 'offline'}`;
+      row.appendChild(dot);
+    }
+
+    // Child count
+    if(hasChildren && node.children.length > 0){
+      const count = document.createElement('span');
+      count.className = 'child-count';
+      count.textContent = node.children.length;
+      row.appendChild(count);
+    }
+
+    // Click to select
+    row.addEventListener('click', () => {
+      selectedAssetId = node.id;
+      renderTree(document.getElementById('searchInput').value);
+      renderDetails();
+    });
+
+    div.appendChild(row);
+
+    // Render children if open
+    if(hasChildren && isOpen){
+      const childContainer = document.createElement('div');
+      node.children.forEach(child => {
+        const childEl = renderTreeNode(child, depth + 1, filter);
+        if(childEl) childContainer.appendChild(childEl);
+      });
+      div.appendChild(childContainer);
+    }
+
+    return div;
+  }
+
+  function filterTree(value){
+    renderTree(value);
+  }
+
+  function renderDetails(){
+    const panel = document.getElementById('asset-details-panel');
+    if(!panel) return;
+    const node = findNode(TREE_DATA, selectedAssetId);
+    const d = ASSET_DETAILS[selectedAssetId];
+    
+    if(!d){
+      panel.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--muted);font-size:12px">Select an asset from the hierarchy to view details</div>`;
+      return;
+    }
+
+    const statusClass = d.status === 'Running' ? 'running' : (d.status === 'Stopped' ? 'stopped' : 'maintenance');
+    const childAssets = d.childAssets || [];
+    const hasChildren = childAssets.length > 0;
+
+    let html = `
+      <!-- Header -->
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="icon-box">${(d.name || d.id).charAt(0)}</div>
+          <div>
+            <div class="train-name">${d.name || d.id}</div>
+            <div class="train-id">${d.id}</div>
+          </div>
+        </div>
+        <span class="status-badge ${statusClass}">${d.status}</span>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="label">Current Speed</div>
+          <div class="value">${d.speed} <span class="unit">${d.speedUnit}</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Health Score</div>
+          <div class="value">${d.health}%</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">Driver</div>
+          <div class="value" style="font-size:13px">${d.driver}</div>
+        </div>
+      </div>
+    `;
+
+    // Child Assets
+    if(hasChildren){
+      const iconMap = { 'engine':'⚙️', 'coach':'🚃', 'brake':'🛑', 'gps':'📍' };
+      html += `
+        <div class="child-assets-section">
+          <div class="section-title">
+            Child Assets <span class="child-count">(${childAssets.length})</span>
+          </div>
+          <div class="child-list">
+      `;
+      childAssets.forEach(child => {
+        const statusCls = child.status === 'online' ? 'online' : 'offline';
+        const iconCls = child.icon || 'default';
+        html += `
+          <div class="child-item">
+            <div class="child-icon ${iconCls}">${iconMap[child.icon] || '📦'}</div>
+            <div class="child-info">
+              <div class="child-name">${child.name}</div>
+              <div class="child-id">${child.id}</div>
+            </div>
+            <span class="child-status ${statusCls}">${child.status.toUpperCase()}</span>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+    }
+
+    // Asset Info Grid
+    html += `
+      <div class="asset-info-grid">
+        <div class="asset-info-item">
+          <span class="info-label">Asset ID</span>
+          <span class="info-value">${d.id}</span>
+        </div>
+        <div class="asset-info-item">
+          <span class="info-label">Status</span>
+          <span class="info-value"><span class="live-dot"></span>${d.status}</span>
+        </div>
+        <div class="asset-info-item">
+          <span class="info-label">Parent Zone</span>
+          <span class="info-value">${d.parentZone || d.zone || '—'}</span>
+        </div>
+        <div class="asset-info-item">
+          <span class="info-label">Last Updated</span>
+          <span class="info-value">${d.lastUpdated}</span>
+        </div>
+      </div>
+    `;
+
+    panel.innerHTML = html;
+  }
+
+  // Initial render
+  renderTree('');
+  renderDetails();
+
+  // Re-render on theme change
+  document.addEventListener('themeChanged', () => { renderDetails(); });
+
+  lucide.createIcons();
+</script>
 
 </body>
 </html>
