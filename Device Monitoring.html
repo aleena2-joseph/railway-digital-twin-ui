@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Monitoring - Railway Digital Twin</title>
+  <style>
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #111827;
+  --panel-3: #0b1224;
+  --line: rgba(148, 163, 184, 0.22);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --dim: #64748b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --orange: #f97316;
+  --cyan: #06b6d4;
+  --yellow: #eab308;
+  --purple: #8b5cf6;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.88)),
+    url("https://images.unsplash.com/photo-1540804236945-b6ae24bfe0a9?auto=format&fit=crop&w=1600&q=80") center/cover;
+}
+
+.login-card {
+  width: min(430px, 100%);
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.brand-mark,
+.icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--blue);
+  color: white;
+  font-weight: 800;
+}
+
+.login .brand-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  margin: 0 auto 16px;
+}
+
+.login h1,
+.login p {
+  text-align: center;
+  margin: 0;
+}
+
+.login h1 {
+  font-size: 24px;
+  font-weight: 650;
+}
+
+.login p {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.field {
+  margin-top: 20px;
+}
+
+.field label {
+  display: block;
+  color: #cbd5e1;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 8px;
+  padding: 0 12px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.primary-btn,
+.ghost-btn {
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  padding: 11px 16px;
+  background: var(--blue);
+}
+
+.primary-btn {
+  width: 100%;
+}
+
+.ghost-btn {
+  background: rgba(100, 116, 139, 0.35);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+
+.sidebar {
+  width: 220px;
+  flex: 0 0 220px;
+  background: var(--panel-2);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  min-height: 58px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.logo .brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+}
+
+.logo strong {
+  display: block;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.logo span {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.nav {
+  padding: 12px 8px;
+  overflow: auto;
+  flex: 1;
+}
+
+.nav-title {
+  margin: 14px 10px 7px;
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.nav button {
+  width: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  justify-content: space-between;
+  padding: 9px 10px;
+  margin-bottom: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+}
+
+.nav button:hover,
+.nav button.active {
+  background: var(--blue);
+  color: white;
+}
+
+.nav-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.nav-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.badge {
+  min-width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+}
+
+.system-card {
+  margin: 0 12px 12px;
+  padding: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(30, 64, 175, 0.45), rgba(30, 41, 59, 0.35));
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.content-wrap {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 58px;
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 550;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.page {
+  flex: 1;
+  overflow: auto;
+  padding: 14px;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.cols-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.compact {
+  padding: 12px;
+}
+
+.card h3,
+.card h4 {
+  margin: 0 0 14px;
+  font-weight: 550;
+}
+
+.subtle {
+  color: var(--muted);
+}
+
+.dim {
+  color: var(--dim);
+}
+
+.kpi {
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kpi-title {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.kpi-value {
+  margin-top: 4px;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+
+.pill.green {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+.pill.red {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+}
+
+.pill.orange {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+}
+
+.gauge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.gauge {
+  text-align: center;
+}
+
+.gauge svg {
+  width: 86px;
+  max-width: 100%;
+}
+
+.donut-wrap {
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.donut {
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  background: conic-gradient(var(--green) 0 83%, var(--red) 83% 91%, var(--orange) 91% 100%);
+  position: relative;
+}
+
+.donut::after {
+  content: "";
+  position: absolute;
+  inset: 34px;
+  border-radius: inherit;
+  background: var(--panel);
+}
+
+.donut-center {
+  position: absolute;
+  text-align: center;
+}
+
+.legend {
+  margin-top: 12px;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.legend-row,
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.color-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 7px;
+}
+
+.alert-list {
+  display: grid;
+  gap: 8px;
+}
+
+.alert {
+  background: var(--bg);
+  border-left: 3px solid var(--orange);
+  border-radius: 6px;
+  padding: 9px;
+}
+
+.alert.crit {
+  border-left-color: var(--red);
+}
+
+.alert.info {
+  border-left-color: var(--blue);
+}
+
+.map-card {
+  min-height: 300px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel-head {
+  min-height: 42px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.map-area {
+  height: 100%;
+  min-height: 258px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    radial-gradient(circle at 35% 35%, rgba(59, 130, 246, 0.16), transparent 24%),
+    #0a1020;
+  background-size: 34px 34px, 34px 34px, auto, auto;
+}
+
+.route-line {
+  position: absolute;
+  height: 3px;
+  background: var(--orange);
+  transform-origin: left center;
+  opacity: 0.85;
+}
+
+.route-line.blue {
+  background: #60a5fa;
+}
+
+.route-line.purple {
+  background: #a78bfa;
+}
+
+.map-city,
+.train-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.map-city {
+  color: var(--muted);
+  font-size: 10px;
+  text-shadow: 0 0 4px #000;
+}
+
+.train-pin {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  font-size: 9px;
+}
+
+.train-pin::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: currentColor;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 12px currentColor;
+}
+
+.train-pin span {
+  color: currentColor;
+  background: rgba(30, 41, 59, 0.88);
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.metric-box {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.metric-box strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 18px;
+}
+
+.spark {
+  width: 100%;
+  height: 94px;
+}
+
+.asset-tree {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.tree-row {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #dbeafe;
+  padding: 8px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tree-row:hover,
+.tree-row.active {
+  background: rgba(100, 116, 139, 0.22);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.table th {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(100, 116, 139, 0.45);
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  width: var(--value, 50%);
+  background: var(--bar, var(--blue));
+}
+
+.route-vertical {
+  position: relative;
+  display: grid;
+  gap: 28px;
+  margin-top: 28px;
+}
+
+.route-vertical::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 31px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(var(--blue), var(--green), #475569);
+}
+
+.station-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.station-marker {
+  width: 66px;
+  height: 66px;
+  border: 5px solid var(--panel);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+  background: #475569;
+}
+
+.station-marker.done {
+  background: var(--blue);
+}
+
+.station-marker.current {
+  background: var(--green);
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.device-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.device-head,
+.device-body,
+.device-foot {
+  padding: 14px;
+}
+
+.device-head {
+  border-bottom: 1px solid var(--line);
+}
+
+.device-foot {
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 1180px) {
+  .cols-6,
+  .cols-5,
+  .cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-basis: auto;
+    max-height: 310px;
+  }
+
+  .cols-2,
+  .cols-3,
+  .cols-4,
+  .cols-5,
+  .cols-6,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    height: auto;
+    min-height: 58px;
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.__INITIAL_VIEW__ = "dashboard";
+    window.__INITIAL_PAGE__ = "devices";
+  </script>
+  <script>
+const state = {
+  view: window.__INITIAL_VIEW__ || "login",
+  page: window.__INITIAL_PAGE__ || "overview",
+  selectedAsset: null,
+  deviceSearch: "",
+  deviceStatus: "all"
+};
+
+const pages = [
+  ["overview", "Overview", "OD", "MONITORING"],
+  ["operations", "Operations", "OP", "MONITORING"],
+  ["asset-hierarchy", "Asset Hierarchy", "AH", "MONITORING"],
+  ["asset-details", "Asset Details", "AD", "MONITORING"],
+  ["live-telemetry", "Live Telemetry", "LT", "MONITORING"],
+  ["gis-monitoring", "GIS Monitoring", "GM", "MONITORING"],
+  ["google-earth", "Google Earth View", "GE", "MONITORING"],
+  ["route-visualization", "Route Visualization", "RV", "MONITORING"],
+  ["devices", "Devices", "DV", "MONITORING"],
+  ["api-cards", "API Cards", "API", "MANAGEMENT"],
+  ["credentials", "Credentials", "KEY", "MANAGEMENT"],
+  ["settings", "Settings", "ST", "MANAGEMENT"],
+  ["alerts", "Alerts", "AL", "SYSTEM", 6],
+  ["reports", "Reports", "RP", "SYSTEM"]
+];
+
+const kpis = [
+  ["Total Trains", "12", "All Trains", "TR", "blue", "+2"],
+  ["Online Trains", "10", "Running", "ON", "green", "+1"],
+  ["Offline Trains", "2", "Not Connected", "OF", "red", "-"],
+  ["Total Devices", "456", "Connected", "DV", "purple", "+18"],
+  ["Active Alerts", "8", "Requires Attention", "AL", "orange", ""],
+  ["Total Distance", "1,256 km", "Today", "KM", "cyan", ""]
+];
+
+const alerts = [
+  ["10:42", "Train 07", "Brake Pressure Low", "warn"],
+  ["10:31", "Train 03", "High Engine Temp", "crit"],
+  ["10:15", "Train 01", "GPS Signal Lost", "warn"],
+  ["09:58", "Train 05", "Door Sensor Fault", "info"]
+];
+
+const devices = [
+  ["RTU-001", "Remote Terminal Unit", "online", "2 mins ago", "Train 01", 95],
+  ["RTU-002", "Remote Terminal Unit", "offline", "25 mins ago", "Train 02", 0],
+  ["RTU-003", "Remote Terminal Unit", "online", "1 min ago", "Train 03", 88],
+  ["GPS-001", "GPS Tracker", "online", "30 secs ago", "Train 01", 100],
+  ["GPS-002", "GPS Tracker", "online", "45 secs ago", "Train 02", 92],
+  ["GPS-003", "GPS Tracker", "offline", "1 hour ago", "Train 03", 0],
+  ["SEN-001", "Temperature Sensor", "online", "1 min ago", "Train 01", 85],
+  ["SEN-002", "Temperature Sensor", "online", "2 mins ago", "Train 02", 90],
+  ["SEN-003", "Pressure Sensor", "online", "3 mins ago", "Train 01", 78]
+];
+
+const assets = [
+  { id: "root", name: "Railway Network", type: "network", status: "", parent: "", depth: 0 },
+  { id: "train-01", name: "Train 01", type: "train", status: "online", parent: "root", depth: 1 },
+  { id: "train-01-engine", name: "Engine", type: "engine", status: "online", parent: "train-01", depth: 2 },
+  { id: "train-01-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-01", depth: 2 },
+  { id: "train-01-coach-2", name: "Coach 2", type: "coach", status: "online", parent: "train-01", depth: 2 },
+  { id: "train-02", name: "Train 02", type: "train", status: "online", parent: "root", depth: 1 },
+  { id: "train-02-engine", name: "Engine", type: "engine", status: "online", parent: "train-02", depth: 2 },
+  { id: "train-02-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-02", depth: 2 },
+  { id: "train-03", name: "Train 03", type: "train", status: "offline", parent: "root", depth: 1 },
+  { id: "train-03-engine", name: "Engine", type: "engine", status: "offline", parent: "train-03", depth: 2 },
+  { id: "train-03-coach-1", name: "Coach 1", type: "coach", status: "online", parent: "train-03", depth: 2 },
+  { id: "train-03-coach-2", name: "Coach 2", type: "coach", status: "online", parent: "train-03", depth: 2 }
+];
+
+function $(selector) {
+  return document.querySelector(selector);
+}
+
+function color(name) {
+  return `var(--${name})`;
+}
+
+function render() {
+  if (state.view === "login") {
+    renderLogin();
+    return;
+  }
+  const pageMeta = pages.find((page) => page[0] === state.page) || pages[0];
+  document.title = `${pageMeta[1]} - Railway Digital Twin`;
+  $("#app").innerHTML = `
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="logo">
+          <div class="brand-mark">TR</div>
+          <div><strong>RAILWAY</strong><span>DIGITAL TWIN</span><span>MONITORING PLATFORM</span></div>
+        </div>
+        <nav class="nav">${renderNav()}</nav>
+        <div class="system-card"><div><span class="status-dot"></span> <span class="pill green">SYSTEM ONLINE</span></div><div class="dim" style="font-size:11px;margin-top:8px">All systems operational</div></div>
+      </aside>
+      <div class="content-wrap">
+        <header class="topbar">
+          <h2>${pageMeta[1] === "Operations" ? "Operations Overview" : pageMeta[1]}</h2>
+          <div class="top-actions"><span class="badge">1</span><span id="clock"></span><button class="ghost-btn" data-login>Admin</button></div>
+        </header>
+        <main class="page">${renderPage()}</main>
+      </div>
+    </div>`;
+  bindEvents();
+  updateClock();
+}
+
+function renderLogin() {
+  $("#app").innerHTML = `
+    <main class="login">
+      <section class="login-card">
+        <div class="brand-mark">TR</div>
+        <h1>Railway Digital Twin</h1>
+        <p>Monitoring Platform</p>
+        <form id="login-form">
+          <div class="field"><label>Username</label><input class="input" type="text" placeholder="Enter username"></div>
+          <div class="field"><label>Password</label><input class="input" type="password" placeholder="Enter password"></div>
+          <label class="check-row"><input type="checkbox"> Remember Me</label>
+          <button class="primary-btn" type="submit">Login</button>
+        </form>
+        <p class="dim" style="font-size:12px;margin-top:18px">Railway Operations Control Center v2.0</p>
+      </section>
+    </main>`;
+  $("#login-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    state.view = "dashboard";
+    state.page = "overview";
+    location.hash = "#overview";
+    render();
+  });
+}
+
+function renderNav() {
+  const groups = ["MONITORING", "MANAGEMENT", "SYSTEM"];
+  return groups.map((group) => `
+    <div>
+      <div class="nav-title">${group}</div>
+      ${pages.filter((page) => page[3] === group).map((page) => `
+        <button class="${state.page === page[0] ? "active" : ""}" data-page="${page[0]}">
+          <span class="nav-icon">${page[2]}</span><span class="nav-label">${page[1]}</span>
+          ${page[4] ? `<span class="badge">${page[4]}</span>` : "<span>></span>"}
+        </button>`).join("")}
+    </div>`).join("");
+}
+
+function bindEvents() {
+  document.querySelectorAll("[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.page = button.dataset.page;
+      location.hash = `#${state.page}`;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-login]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.view = "login";
+      location.hash = "";
+      render();
+    });
+  });
+  document.querySelectorAll("[data-asset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedAsset = button.dataset.asset;
+      render();
+    });
+  });
+  const search = $("#device-search");
+  if (search) {
+    search.addEventListener("input", (event) => {
+      state.deviceSearch = event.target.value;
+      render();
+    });
+  }
+  const status = $("#device-status");
+  if (status) {
+    status.addEventListener("change", (event) => {
+      state.deviceStatus = event.target.value;
+      render();
+    });
+  }
+}
+
+function updateClock() {
+  const clock = $("#clock");
+  if (!clock) return;
+  const now = new Date();
+  clock.textContent = `${now.toLocaleTimeString("en-US", { hour12: false })}  ${now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+}
+
+setInterval(updateClock, 1000);
+
+function renderPage() {
+  switch (state.page) {
+    case "asset-hierarchy": return renderAssetHierarchy();
+    case "asset-details": return renderAssetDetails();
+    case "live-telemetry": return renderLiveTelemetry();
+    case "gis-monitoring": return renderGIS();
+    case "google-earth": return renderEarth();
+    case "route-visualization": return renderRoute();
+    case "devices": return renderDevices();
+    case "settings": return renderSettings();
+    case "api-cards": return renderSimple("API Cards", "Manage railway integration cards and quotas.", ["REST Bridge", "Telemetry Stream", "GIS Tile Service"]);
+    case "credentials": return renderSimple("Credentials", "Rotate and audit platform access keys.", ["Primary API Key", "Map Provider Token", "Operations Webhook"]);
+    case "alerts": return renderSimple("Alerts", "Critical and warning events requiring operator attention.", alerts.map((a) => `${a[1]} - ${a[2]}`));
+    case "reports": return renderSimple("Reports", "Operational reports and system health snapshots.", ["Daily Movement Summary", "Asset Health Report", "Device Connectivity"]);
+    case "operations":
+    case "overview":
+    default: return renderOverview();
+  }
+}
+
+function renderOverview() {
+  return `
+    <div class="grid cols-6">${kpis.map((kpi) => card(`
+      <div class="kpi">
+        <div class="kpi-top"><div><div class="kpi-title">${kpi[0]}</div><div class="kpi-value">${kpi[1]}</div></div><div class="icon-box" style="background:${color(kpi[4])}">${kpi[3]}</div></div>
+        <div>${kpi[5] ? `<span class="pill ${kpi[4]}">${kpi[5]}</span>` : ""} <span class="dim" style="font-size:11px">${kpi[2]}</span></div>
+      </div>`, "compact")).join("")}</div>
+    <div class="grid cols-5" style="margin-top:12px">
+      ${card(`<h3>System Health</h3><div class="gauge-grid">${gauge(92, "Engine Status", "Healthy", "green")}${gauge(88, "Brake Status", "Healthy", "green")}${gauge(95, "Power System", "Healthy", "green")}${gauge(90, "Comm. Status", "Good", "cyan")}</div>`)}
+      ${card(`<h3>Train Status</h3><div class="donut-wrap"><div class="donut"></div><div class="donut-center"><div style="font-size:24px">12</div><div class="dim">Total</div></div></div>${legend([["Running", "10 (83%)", "green"], ["Stopped", "1 (8%)", "red"], ["Maintenance", "1 (8%)", "orange"]])}`)}
+      ${card(`<div class="row"><h3>Alerts</h3><button class="ghost-btn">View All</button></div><div class="alert-list">${alerts.map((a) => `<div class="alert ${a[3]}"><div class="dim" style="font-size:11px">${a[0]} <span class="pill">${a[1]}</span></div><div style="font-size:12px;margin-top:4px">${a[2]}</div></div>`).join("")}</div>`)}
+      ${card(`<div class="panel-head"><span>Live Train Tracking</span><span class="pill green"><span class="status-dot"></span>Live</span></div>${mapArea("dark")}`, "map-card", "grid-column:span 2")}
+    </div>
+    <div class="grid cols-4" style="margin-top:12px">
+      ${card(`<div class="row"><h3>Live Telemetry - Train 01</h3><span class="pill">Details</span></div><div class="mini-metrics">${metric("Speed", "128 km/h")}${metric("Voltage", "25.4 kV")}${metric("Current", "5.6 A")}${metric("Brake Pressure", "4.2 bar", "red")}</div>${sparkline([95,110,118,125,128], "blue")}`)}
+      ${card(`<h3>Asset Hierarchy</h3>${compactTree()}`)}
+      ${card(`<h3>Asset Details - Train 01</h3>${detailRows([["Train ID","WR-101"],["Type","E"],["Status","Running"],["Driver","John Smith"],["Location","142 km"],["Speed","128 km/h"],["Last Update","10:45:30 AM"]])}`)}
+      ${card(`<div class="row"><h3>Route Visualization</h3><span class="pill">Full Route</span></div>${routeStrip()}<div class="grid cols-3">${metric("Covered","356 km")}${metric("Remaining","142 km")}${metric("ETA","01:45")}</div>${sparkline([0,214,356,498], "cyan")}`)}
+    </div>`;
+}
+
+function renderAssetHierarchy() {
+  const selected = assets.find((asset) => asset.id === state.selectedAsset) || null;
+  return `<div class="grid cols-3">
+    ${card(`<h3>Asset Hierarchy</h3><p class="subtle">Network structure</p><div class="asset-tree">${assets.map((asset) => treeButton(asset)).join("")}</div>`)}
+    ${card(`<h3>Asset Details</h3><p class="subtle">Selected asset information</p>${selected ? assetInfo(selected) : `<div class="dim" style="padding:80px 0;text-align:center">Select an asset from the hierarchy to view details</div>`}`, "", "grid-column:span 2")}
+  </div>`;
+}
+
+function renderAssetDetails() {
+  return `
+    ${card(`<div class="row"><div class="row" style="justify-content:flex-start"><div class="icon-box">TR</div><div><h3 style="margin:0">Express Train 01</h3><div class="subtle">Train ID: TRN-2024-001</div></div></div><span class="pill green"><span class="status-dot"></span>ONLINE</span></div><div class="grid cols-2" style="margin-top:22px">${metric("Current Speed", "120 km/h")}${metric("Current Location", "Between Station B and Station C")}</div>`)}
+    <div style="height:14px"></div>
+    ${card(`<h3>Health Monitoring</h3><div class="grid cols-2">${health("Engine Health",98,"green")}${health("Brake Health",95,"green")}${health("Battery Health",82,"blue")}${health("Communication Status",100,"green")}</div>`)}
+    <div class="grid cols-3" style="margin-top:14px">${card(metric("Total Distance Traveled","1,245 km") + `<div class="dim">This month</div>`)}${card(metric("Operating Hours","342 hrs") + `<div class="dim">This month</div>`)}${card(metric("Last Maintenance","15 days") + `<div class="dim">ago</div>`)}</div>`;
+}
+
+function renderLiveTelemetry() {
+  const data = [["Speed",120,"km/h","blue",180],["Voltage",385,"V","yellow",500],["Current",245,"A","green",400],["Temperature",68,"C","red",100],["Brake Pressure",8.5,"bar","purple",10],["Fuel Level",75,"%","cyan",100]];
+  return `
+    <div class="grid cols-3">${data.map((m) => card(`<div class="row"><div class="icon-box" style="background:${color(m[3])}">${m[0].slice(0,2).toUpperCase()}</div><div><span style="font-size:30px">${m[1]}</span> <span class="subtle">${m[2]}</span></div></div><p class="subtle">${m[0]}</p>${progress((m[1] / m[4]) * 100, m[3])}`)).join("")}</div>
+    <div class="grid cols-2" style="margin-top:14px">${card(`<h3>Speed vs Time</h3>${chart([0,40,80,120,110,120,100], "blue")}`)}${card(`<h3>Temperature vs Time</h3>${chart([45,52,58,65,68,66,68], "red")}`)}</div>
+    <div style="height:14px"></div>${card(`<h3>Voltage vs Time</h3>${chart([380,385,390,385,380,385,385], "yellow")}`)}`;
+}
+
+function renderGIS() {
+  return `${infoCards([["Active Trains","2","green"],["Avg Speed","108 km/h","blue"],["GPS Accuracy","High","purple"]])}${card(`<div class="panel-head"><div><h3 style="margin:0">Live GIS Monitoring</h3><div class="subtle">Real-time train positions on map</div></div></div>${mapArea("dark", 600)}`, "map-card")}<div style="height:14px"></div>${trainTable()}`;
+}
+
+function renderEarth() {
+  return `${infoCards([["View Mode","Satellite","blue"],["Train Markers","3 Active","orange"],["Route Overlay","Enabled","green"]])}${card(`<div class="panel-head"><div><h3 style="margin:0">Google Earth View</h3><div class="subtle">Satellite-based train tracking with terrain visualization</div></div><div><button class="primary-btn" style="width:auto">Satellite</button> <button class="ghost-btn">3D View</button></div></div>${mapArea("satellite", 650)}`, "map-card")}<div style="height:14px"></div>${card(`<h3>Map Legend</h3><div class="grid cols-2"><div><span class="color-dot" style="background:var(--blue)"></span>Train Position Marker</div><div><span class="color-dot" style="background:var(--orange)"></span>Railway Route</div></div>`)}`;
+}
+
+function renderRoute() {
+  return `${infoCards([["Distance Covered","120 km","blue"],["Remaining Distance","60 km","orange"],["ETA","2 hours 30 minutes","green"],["Current Speed","120 km/h","purple"]], 4)}
+    ${card(`<h3>Express Train 01</h3><p class="subtle">Route: Station A -> Station D</p><div class="row"><span class="subtle">Overall Progress</span><span>67%</span></div>${progress(67, "green")}<div class="route-vertical">${["Station A|completed|0 km|Departed: 60 mins ago","Station B|completed|45 km|Departed: 40 mins ago","Station C|current|120 km|Train is here","Station D|upcoming|180 km|Platform 3"].map((item) => {
+      const [name, status, distance, extra] = item.split("|");
+      return `<div class="station-row"><div class="station-marker ${status === "completed" ? "done" : status === "current" ? "current" : ""}">ST</div><div class="card" style="flex:1;background:${status === "current" ? "rgba(34,197,94,.10)" : "var(--bg)"}"><div class="row"><h4 style="margin:0">${name}</h4><span class="pill ${status === "current" ? "green" : status === "completed" ? "blue" : ""}">${status.toUpperCase()}</span></div><div class="subtle">${distance} | ${extra}</div></div></div>`;
+    }).join("")}</div>`)}
+    <div class="grid cols-2" style="margin-top:14px">${card(`<h3>Journey Statistics</h3>${detailRows([["Total Stops","4"],["Completed Stops","2"],["Average Speed","110 km/h"],["Total Travel Time","4 hours"]])}`)}${card(`<h3>Next Station</h3>${detailRows([["Station","Station D"],["Distance","60 km"],["Estimated Arrival","2h 30min"],["Platform","Platform 3"]])}`)}</div>`;
+}
+
+function renderDevices() {
+  const filtered = devices.filter((d) => {
+    const haystack = d.join(" ").toLowerCase();
+    return haystack.includes(state.deviceSearch.toLowerCase()) && (state.deviceStatus === "all" || d[2] === state.deviceStatus);
+  });
+  const online = devices.filter((d) => d[2] === "online").length;
+  return `${infoCards([["Total Devices", devices.length, "blue"], ["Online Devices", online, "green"], ["Offline Devices", devices.length - online, "red"]])}
+    ${card(`<div class="toolbar"><input id="device-search" class="input" style="flex:1;min-width:220px" value="${escapeHtml(state.deviceSearch)}" placeholder="Search devices..."><select id="device-status" class="input" style="width:180px"><option value="all">All Status</option><option value="online" ${state.deviceStatus === "online" ? "selected" : ""}>Online</option><option value="offline" ${state.deviceStatus === "offline" ? "selected" : ""}>Offline</option></select></div>`)}
+    <div class="grid cols-3" style="margin-top:14px">${filtered.map((d) => card(`<div class="device-head"><div class="row"><h3 style="margin:0">${d[0]}</h3><span class="pill ${d[2] === "online" ? "green" : "red"}">${d[2].toUpperCase()}</span></div><div class="subtle">${d[1]}</div></div><div class="device-body">${detailRows([["Location", d[4]], ["Last Seen", d[3]], ["Signal Strength", `${d[5]}%`]])}${progress(d[5], d[5] > 80 ? "green" : d[5] > 0 ? "yellow" : "red")}</div><div class="device-foot"><button class="primary-btn">View Details</button></div>`, "device-card")).join("") || card(`<p class="subtle">No devices found matching your criteria</p>`)}</div>`;
+}
+
+function renderSettings() {
+  return `${card(`<h3>System Settings</h3><p class="subtle">Configure and manage your railway monitoring platform</p>`)}
+    <div class="settings-grid" style="margin-top:14px">
+      ${settingsPanel("General Settings", "Organization Name", "Railway Control Center", "Time Zone", "UTC +5:30 (IST)")}
+      ${settingsPanel("Notifications", "Critical Alerts", "Enabled", "Email Notifications", "Disabled")}
+      ${settingsPanel("Security", "Two-Factor Authentication", "Disabled", "Session Timeout", "30 minutes")}
+      ${settingsPanel("Data Management", "Data Retention Period", "30 days", "Export", "Available")}
+      ${settingsPanel("Display", "Theme", "Dark (SCADA)", "Chart Refresh Rate", "1 second")}
+      ${settingsPanel("API Configuration", "API Endpoint", "https://api.railway-twin.com/v1", "Connection", "Ready")}
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="ghost-btn">Reset to Defaults</button><button class="primary-btn" style="width:auto">Save Changes</button></div>`;
+}
+
+function renderSimple(title, subtitle, items) {
+  return `${card(`<h3>${title}</h3><p class="subtle">${subtitle}</p>`)}<div class="grid cols-3" style="margin-top:14px">${items.map((item) => card(`<h3>${item}</h3><p class="subtle">Status: active</p>${progress(76, "blue")}`)).join("")}</div>`;
+}
+
+function card(content, extraClass = "", style = "") {
+  return `<section class="card ${extraClass}" style="${style}">${content}</section>`;
+}
+
+function metric(label, value, tone = "") {
+  return `<div class="metric-box"><div class="dim" style="font-size:12px">${label}</div><strong class="${tone ? `pill ${tone}` : ""}">${value}</strong></div>`;
+}
+
+function gauge(value, label, status, tone) {
+  const circumference = 214;
+  const offset = circumference - (value / 100) * circumference;
+  return `<div class="gauge"><svg viewBox="0 0 86 86"><circle cx="43" cy="43" r="34" fill="none" stroke="#14532d" stroke-width="8"/><circle cx="43" cy="43" r="34" fill="none" stroke="${color(tone)}" stroke-width="8" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 43 43)"/><text x="43" y="40" text-anchor="middle" fill="white" font-size="13" font-weight="700">${value}%</text><text x="43" y="54" text-anchor="middle" fill="${color(tone)}" font-size="8">${status}</text></svg><div class="dim" style="font-size:11px">${label}</div></div>`;
+}
+
+function legend(rows) {
+  return `<div class="legend">${rows.map((r) => `<div class="legend-row"><span><span class="color-dot" style="background:${color(r[2])}"></span>${r[0]}</span><span>${r[1]}</span></div>`).join("")}</div>`;
+}
+
+function progress(value, tone) {
+  return `<div class="progress" style="--value:${value}%;--bar:${color(tone)}"><span></span></div>`;
+}
+
+function sparkline(values, tone) {
+  return chart(values, tone, "spark");
+}
+
+function chart(values, tone, cls = "") {
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const points = values.map((value, index) => {
+    const x = 10 + index * (280 / (values.length - 1));
+    const y = 110 - ((value - min) / Math.max(1, max - min)) * 86;
+    return `${x},${y}`;
+  }).join(" ");
+  return `<svg class="${cls || "spark"}" viewBox="0 0 310 120" preserveAspectRatio="none"><polyline points="10,110 300,110" stroke="#334155"/><polyline fill="none" stroke="${color(tone)}" stroke-width="3" points="${points}"/><polygon fill="${color(tone)}" opacity=".12" points="${points} 300,110 10,110"/></svg>`;
+}
+
+function mapArea(mode = "dark", height = 258) {
+  const bg = mode === "satellite" ? "background:linear-gradient(135deg,#1f3a2e,#0f172a 48%,#273c2f)" : "";
+  return `<div class="map-area" style="min-height:${height}px;${bg}">
+    <div class="route-line" style="left:12%;top:75%;width:66%;transform:rotate(-20deg)"></div>
+    <div class="route-line blue" style="left:50%;top:42%;width:22%;transform:rotate(-35deg)"></div>
+    <div class="route-line purple" style="left:30%;top:55%;width:24%;transform:rotate(20deg)"></div>
+    ${["Mumbai:14:76","Valsad:28:63","Surat:41:55","Bharuch:55:46","Vadodara:66:38","Ahmedabad:78:24","Rajkot:55:16","Bhavnagar:28:35"].map((item) => {
+      const [name, x, y] = item.split(":");
+      return `<span class="map-city" style="left:${x}%;top:${y}%">${name}</span>`;
+    }).join("")}
+    ${["Train 01:128 km/h:57:42:orange","Train 02:96 km/h:64:22:blue","Train 03:78 km/h:50:46:purple","Train 04:78 km/h:42:50:orange","Train 05:Stopped:31:64:red"].map((item) => {
+      const [name, speed, x, y, tone] = item.split(":");
+      return `<div class="train-pin" style="left:${x}%;top:${y}%;color:${color(tone)}"><span>${name}<br>${speed}</span></div>`;
+    }).join("")}
+  </div>`;
+}
+
+function routeStrip() {
+  return `<div class="row" style="gap:0;margin:12px 0">${["Mumbai","Surat","Vadodara","Ahmedabad"].map((stop, index) => `<div style="flex:1;text-align:center;color:${index === 1 ? color("blue") : "var(--dim)"}"><div class="status-dot" style="background:${index <= 1 ? color("blue") : "#64748b"}"></div><div style="font-size:10px;margin-top:4px">${stop}</div></div>`).join("")}</div>`;
+}
+
+function compactTree() {
+  return `<div class="asset-tree">${["Railway Network","Western Railway","WR-101  Running","Engine","Coach 1","Coach 2","Brake System","Train 03  Stopped"].map((name, index) => `<div class="tree-row" style="padding-left:${8 + Math.min(index, 3) * 10}px">${index < 3 ? ">" : "-"} ${name}</div>`).join("")}</div>`;
+}
+
+function treeButton(asset) {
+  return `<button class="tree-row ${state.selectedAsset === asset.id ? "active" : ""}" data-asset="${asset.id}" style="padding-left:${12 + asset.depth * 22}px"><span>${asset.depth < 2 ? ">" : "-"}</span><span>${asset.name}</span>${asset.status ? `<span class="status-dot" style="background:${asset.status === "online" ? color("green") : color("red")};margin-left:auto"></span>` : ""}</button>`;
+}
+
+function assetInfo(asset) {
+  const children = assets.filter((item) => item.parent === asset.id);
+  return `<div class="card" style="background:var(--bg);margin-top:16px"><div class="row"><div><h3 style="margin:0">${asset.name}</h3><p class="subtle">Type: ${asset.type.toUpperCase()}</p></div>${asset.status ? `<span class="pill ${asset.status === "online" ? "green" : "red"}">${asset.status.toUpperCase()}</span>` : ""}</div>${detailRows([["Asset ID", asset.id], ["Last Updated", new Date().toLocaleTimeString()]])}</div>${asset.type === "train" ? `<div class="grid cols-2" style="margin-top:14px">${metric("Current Speed","85 km/h")}${metric("Location","Station A")}${metric("Engine Health","98%")}${metric("Total Distance","1,245 km")}</div>` : ""}${children.length ? card(`<h3>Child Assets (${children.length})</h3>${children.map((child) => `<div class="row" style="padding:10px;background:var(--panel);border-radius:6px;margin-top:8px"><span>${child.name}</span><span class="status-dot" style="background:${child.status === "online" ? color("green") : color("red")}"></span></div>`).join("")}`, "", "background:var(--bg);margin-top:14px") : ""}`;
+}
+
+function detailRows(rows) {
+  return `<div>${rows.map((row) => `<div class="row" style="padding:9px 0;border-bottom:1px solid var(--line)"><span class="subtle">${row[0]}</span><span>${row[1]}</span></div>`).join("")}</div>`;
+}
+
+function health(label, value, tone) {
+  return `<div class="card" style="background:var(--bg)"><div class="row"><div><div class="subtle">${label}</div><div style="font-size:26px">${value}%</div></div><span class="pill ${tone}">${value > 96 ? "EXCELLENT" : "GOOD"}</span></div>${progress(value, tone)}</div>`;
+}
+
+function infoCards(rows, count = 3) {
+  return `<div class="grid cols-${count}">${rows.map((row) => card(`<div class="row"><div><div class="subtle">${row[0]}</div><div style="font-size:24px;margin-top:6px">${row[1]}</div></div><div class="icon-box" style="background:${color(row[2])}">${String(row[0]).slice(0,2).toUpperCase()}</div></div>`)).join("")}</div><div style="height:14px"></div>`;
+}
+
+function trainTable() {
+  return card(`<h3>Train Locations</h3><table class="table"><thead><tr><th>Train</th><th>Position</th><th>Speed</th><th>Status</th></tr></thead><tbody>${[["Train 01","28.6139, 77.2090","120 km/h","online"],["Train 02","28.7041, 77.1025","95 km/h","online"],["Train 03","28.5355, 77.3910","0 km/h","offline"]].map((row) => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td><span class="pill ${row[3] === "online" ? "green" : "red"}">${row[3].toUpperCase()}</span></td></tr>`).join("")}</tbody></table>`);
+}
+
+function settingsPanel(title, firstLabel, firstValue, secondLabel, secondValue) {
+  return card(`<h3>${title}</h3><div class="field"><label>${firstLabel}</label><input class="input" value="${escapeHtml(firstValue)}"></div><div class="field"><label>${secondLabel}</label><input class="input" value="${escapeHtml(secondValue)}"></div>`);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+}
+
+window.addEventListener("hashchange", () => {
+  const hash = location.hash.replace("#", "");
+  if (hash && pages.some((page) => page[0] === hash)) {
+    state.view = "dashboard";
+    state.page = hash;
+    render();
+  }
+});
+
+const initial = location.hash.replace("#", "");
+if (initial && pages.some((page) => page[0] === initial)) {
+  state.view = "dashboard";
+  state.page = initial;
+} else if (window.__INITIAL_PAGE__) {
+  state.view = window.__INITIAL_VIEW__ || "dashboard";
+  state.page = window.__INITIAL_PAGE__;
+}
+
+render();
+
+  </script>
+</body>
+</html>

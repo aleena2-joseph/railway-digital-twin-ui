@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overview - Railway Digital Twin</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+</head>
+<body>
+
+<!-- ═══════════════ GLOBAL TRAIN TOOLTIP ═══════════════ -->
+<div id="train-tt">
+  <div id="tt-title"></div>
+  <div id="tt-grid">
+    <div><div class="tt-l">Speed</div><div class="tt-v" id="tt-speed"></div></div>
+    <div><div class="tt-l">Status</div><div class="tt-v" id="tt-status"></div></div>
+    <div><div class="tt-l">Route</div><div class="tt-v" id="tt-route" style="font-size:10px"></div></div>
+    <div><div class="tt-l">Next Station</div><div class="tt-v" id="tt-next" style="font-size:10px"></div></div>
+  </div>
+  <div id="tt-upd"></div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+  <!-- Logo -->
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="13" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <circle cx="7.5" cy="18.5" r=".5" fill="currentColor"/>
+        <circle cx="16.5" cy="18.5" r=".5" fill="currentColor"/>
+        <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/>
+        <line x1="8" y1="14" x2="16" y2="14"/>
+      </svg>
+    </div>
+    <div class="sb-brand">
+      <div class="b1">RAILWAY</div>
+      <div class="b2">Digital Twin</div>
+      <div class="b3">Monitoring Platform</div>
+    </div>
+  </div>
+
+  <!-- Overview active button -->
+  <div class="sb-overview">
+    <button class="sb-overview-btn" onclick="openOverview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Overview</span>
+    </button>
+  </div>
+
+  <!-- MONITORING -->
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item" onclick="openAssetHierarchy()"><i data-lucide="layers"></i><span>Asset Hierarchy</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="info"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+
+  <!-- MANAGEMENT -->
+  <div class="sb-sec">Management</div>
+  <div class="sb-item"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+
+  <!-- MONITORING 2 -->
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
+
+  <!-- Logout -->
+  <div style="padding:6px 0 2px">
+    <button class="sb-logout" onclick="doLogout()">
+      <i data-lucide="log-out"></i><span>Logout</span>
+    </button>
+  </div>
+
+  <!-- SIDEBAR TRAIN IMAGE -->
+  <div class="sb-train-img">
+    <img src="assets/images/train_img.png" alt="Train" id="sidebar-train-img"/>
+  </div>
+
+  <div class="sb-footer">© 2026 Railway Systems</div>
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="layout-dashboard" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Operations Overview</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 12, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <!-- Theme toggle -->
+      <button class="ib" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark / Light mode">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <!-- Notification -->
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <!-- Admin -->
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="content">
+
+    <!-- ═══ ROW 1 — KPI CARDS ═══ -->
+    <div class="kpi-row">
+
+      <!-- Total Trains -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#eff6ff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            <circle cx="7.5" cy="18.5" r=".5" fill="#2563eb"/><circle cx="16.5" cy="18.5" r=".5" fill="#2563eb"/>
+            <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/>
+          </svg>
+        </div>
+        <div style="min-width:0">
+          <div class="kpi-lbl">Total Trains</div>
+          <div class="kpi-val">12</div>
+          <div class="kpi-sub">All Trains</div>
+        </div>
+      </div>
+
+      <!-- Online Trains -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#f0fdf4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#16a34a"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kpi-lbl">Online Trains</div>
+          <div class="kpi-val" style="color:#16a34a">10</div>
+          <div class="kpi-sub" style="color:#16a34a;font-weight:600">Running</div>
+        </div>
+      </div>
+
+      <!-- Offline Trains -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fef2f2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"/>
+            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+            <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kpi-lbl">Offline Trains</div>
+          <div class="kpi-val" style="color:#dc2626">2</div>
+          <div class="kpi-sub">Not Connected</div>
+        </div>
+      </div>
+
+      <!-- Total Devices -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#f5f3ff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/>
+            <path d="M15 2v2M9 2v2M2 15h2M2 9h2M22 15h-2M22 9h-2M15 22v-2M9 22v-2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kpi-lbl">Total Devices</div>
+          <div class="kpi-val">456</div>
+          <div class="kpi-sub">Connected</div>
+        </div>
+      </div>
+
+      <!-- Active Alerts -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fff7ed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kpi-lbl">Active Alerts</div>
+          <div class="kpi-val" style="color:#ea580c">8</div>
+          <div class="kpi-sub">Requires Attention</div>
+        </div>
+      </div>
+
+      <!-- Total Distance -->
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#f0fdfa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kpi-lbl">Total Distance</div>
+          <div class="kpi-val">1,256<span class="u"> km</span></div>
+          <div class="kpi-sub">Today</div>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- ═══ ROW 2 ═══ -->
+    <div class="row2">
+
+      <!-- System Health -->
+      <div class="panel">
+        <div class="ph"><span class="pt">System Health</span></div>
+        <div class="pb">
+          <div class="gauges-grid" id="gauges-grid"></div>
+        </div>
+      </div>
+
+      <!-- Train Status donut -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Train Status</span></div>
+        <div class="pb">
+          <div class="donut-wrap">
+            <canvas id="donut-chart" style="max-height:150px;max-width:150px"></canvas>
+            <div class="donut-ctr">
+              <div class="big">12</div><div class="sm">Total</div>
+            </div>
+          </div>
+          <div class="leg">
+            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#22c55e"></span><span class="leg-n">Running</span></span><span class="leg-v">10 (83%)</span></div>
+            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#ef4444"></span><span class="leg-n">Stopped</span></span><span class="leg-v">1 (8%)</span></div>
+            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#f97316"></span><span class="leg-n">Maintenance</span></span><span class="leg-v">1 (8%)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Route Visualization -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Route Visualization – Train 01</span>
+          <button class="bl">View Full Route <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="stop-row">
+            <div class="stop-w"><div class="stop-nd"><div class="stop-d done"></div><div class="stop-nm done">Mumbai</div></div><div class="stop-ln done"></div></div>
+            <div class="stop-w"><div class="stop-nd"><div class="stop-d active"></div><div class="stop-nm active">Surat ›</div></div><div class="stop-ln"></div></div>
+            <div class="stop-w"><div class="stop-nd"><div class="stop-d"></div><div class="stop-nm">Vadodara</div></div><div class="stop-ln"></div></div>
+            <div class="stop-w" style="flex:0"><div class="stop-nd"><div class="stop-d"></div><div class="stop-nm">Ahmedabad</div></div></div>
+          </div>
+          <div class="rpb"><div class="rpb-fill"></div></div>
+          <div class="rs-grid">
+            <div class="rs"><div class="rs-l">Distance Covered</div><div class="rs-v" style="color:var(--accent)">356<span class="u"> km</span></div></div>
+            <div class="rs"><div class="rs-l">Remaining</div><div class="rs-v">142<span class="u"> km</span></div></div>
+            <div class="rs"><div class="rs-l">ETA</div><div class="rs-v teal">01:45<span class="u"> min</span></div></div>
+          </div>
+          <div class="chart-wrap"><canvas id="route-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Alerts</span>
+          <button class="bl">View All</button>
+        </div>
+        <div class="pb">
+          <div class="al-list">
+            <div class="al-item" style="border-left-color:#f97316">
+              <div class="al-meta"><span class="al-t">10:42</span><span class="al-tr" style="background:#fff7ed;color:#ea580c">Train 07</span></div>
+              <div class="al-msg">Brake Pressure Low</div>
+            </div>
+            <div class="al-item" style="border-left-color:#dc2626">
+              <div class="al-meta"><span class="al-t">10:31</span><span class="al-tr" style="background:#fef2f2;color:#dc2626">Train 03</span></div>
+              <div class="al-msg">High Engine Temp</div>
+            </div>
+            <div class="al-item" style="border-left-color:#f97316">
+              <div class="al-meta"><span class="al-t">10:15</span><span class="al-tr" style="background:#fff7ed;color:#ea580c">Train 02</span></div>
+              <div class="al-msg">GPS Signal Lost</div>
+            </div>
+            <div class="al-item" style="border-left-color:#3b82f6">
+              <div class="al-meta"><span class="al-t">09:58</span><span class="al-tr" style="background:#eff6ff;color:#2563eb">Train 08</span></div>
+              <div class="al-msg">Door Sensor Fault</div>
+            </div>
+            <div class="al-item" style="border-left-color:#dc2626">
+              <div class="al-meta"><span class="al-t">09:40</span><span class="al-tr" style="background:#fef2f2;color:#dc2626">Train 03</span></div>
+              <div class="al-msg">Brake Pressure Low</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Train Tracking (Real Leaflet Map) -->
+      <div class="panel map-panel">
+        <div class="map-head">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="pt">Live Train Tracking</span>
+            <div class="live-badge">
+              <span class="live-dot"></span>
+              <span style="font-size:10px;color:#16a34a;font-weight:600">Live</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <select class="map-sel" id="train-filter" onchange="filterTrains(this.value)">
+              <option value="all">All Trains</option>
+              <option value="t1">Train 01</option>
+              <option value="t2">Train 02</option>
+              <option value="t3">Train 03</option>
+              <option value="t4">Train 04</option>
+              <option value="t5">Train 05</option>
+            </select>
+            <button class="ib"><i data-lucide="filter" style="width:13px;height:13px"></i></button>
+            <button class="ib" onclick="mapInstance && mapInstance.setView([22.0,72.5],7)"><i data-lucide="maximize-2" style="width:13px;height:13px"></i></button>
+          </div>
+        </div>
+
+        <!-- REAL LEAFLET MAP -->
+        <div id="leaflet-map" style="flex:1;min-height:0"></div>
+
+        <!-- Train 05 schedule strip -->
+        <div class="t05-strip">
+          <div class="t05-top">
+            <div style="display:flex;align-items:center;gap:7px">
+              <div class="t05-train-ico">🚆</div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text)">Train 05
+                  <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#dcfce7;color:#16a34a;font-weight:700;margin-left:4px">Running</span>
+                </div>
+                <div class="t05-s-l">Route: Surat – Ahmedabad &nbsp;·&nbsp; Last Update: 1 min ago
+                  <button style="color:var(--accent);font-size:9px">↻</button>
+                </div>
+              </div>
+            </div>
+            <div class="t05-stats">
+              <div><div class="t05-stat-l">Status</div><div class="t05-stat-v" style="color:#16a34a">Running</div></div>
+              <div><div class="t05-stat-l">Speed</div><div class="t05-stat-v">110 km/h</div></div>
+              <div><div class="t05-stat-l">Next Station</div><div class="t05-stat-v">Vadodara</div></div>
+              <div><div class="t05-stat-l">ETA</div><div class="t05-stat-v">10:45 AM</div></div>
+            </div>
+          </div>
+          <div class="t05-sch">
+            <div><div class="t05-s-l">Start: Surat</div><div class="t05-s-v">06:30 AM</div></div>
+            <div><div class="t05-s-l">Via: Vadodara</div><div class="t05-s-v">08:20 AM</div></div>
+            <div><div class="t05-s-l">Bharuch</div><div class="t05-s-v">09:10 AM</div></div>
+            <div><div class="t05-s-l">Anand</div><div class="t05-s-v">09:50 AM</div></div>
+            <div><div class="t05-s-l">Dest: Ahmedabad</div><div class="t05-s-v" style="color:var(--text);font-weight:700">11:15 AM</div></div>
+          </div>
+          <div class="t05-bottom">
+            <div><div class="t05-stat-l">Train No.</div><div class="t05-stat-v">12005</div></div>
+            <div><div class="t05-stat-l">Coach</div><div class="t05-stat-v">B2, B3, B4, B5</div></div>
+            <div><div class="t05-stat-l">Driver</div><div class="t05-stat-v">Rajesh Kumar</div></div>
+            <div><div class="t05-stat-l">Last Update</div><div class="t05-stat-v">30 sec ago</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /row2 -->
+
+    <!-- ═══ ROW 3 ═══ -->
+    <div class="row3">
+
+      <!-- Live Telemetry -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Live Telemetry – Train 01</span>
+          <button class="bl">View Details <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="m-grid">
+            <div class="mpill">
+              <div class="ml">Speed</div>
+              <div class="mv" id="live-speed">128</div>
+              <div class="mu">km/h</div>
+            </div>
+            <div class="mpill">
+              <div class="ml">Voltage</div>
+              <div class="mv">25.4</div>
+              <div class="mu">kV</div>
+            </div>
+            <div class="mpill">
+              <div class="ml">Current</div>
+              <div class="mv">132</div>
+              <div class="mu">A</div>
+            </div>
+            <div class="mpill warn">
+              <div class="mwl">Brake Pressure</div>
+              <div class="mv wv">5.6</div>
+              <div class="mu">bar</div>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="speed-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Asset Hierarchy -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Asset Hierarchy</span>
+          <button class="bl" onclick="openAssetHierarchy()">View Full <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="tree" id="asset-tree"></div>
+        </div>
+      </div>
+
+      <!-- Asset Details Panel -->
+      <div class="panel">
+        <div class="ph" >
+          <span class="pt" >Asset Details – Train 01</span>
+        </div>
+        <div class="pb" style="padding:0;">
+          <div class="asset-details-container">
+            <div class="asset-details-text">
+              <div class="det-row"><span class="det-k">Train ID</span><span class="det-v">WR-101</span></div>
+              <div class="det-row"><span class="det-k">Type</span><span class="det-v">Electric</span></div>
+              <div class="det-row"><span class="det-k">Status</span><span class="det-v"><span class="run-dot"></span>Running</span></div>
+              <div class="det-row"><span class="det-k">Driver</span><span class="det-v">John Smith</span></div>
+              <div class="det-row"><span class="det-k">Location</span><span class="det-v">Vadodara</span></div>
+              <div class="det-row"><span class="det-k">Speed</span><span class="det-v">128 km/h</span></div>
+              <div class="det-row" style="border:none;"><span class="det-k">Last Update</span><span class="det-v">10:45:30 AM</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /row3 -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script src="js/script.js"></script>
+
+</body>
+</html>
