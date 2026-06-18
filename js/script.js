@@ -57,7 +57,7 @@ function openOverview(){
 ───────────────────────────────────────────── */
 function doLogout(){
   if(confirm('Are you sure you want to logout?')){
-    window.location.href='login.html';
+    window.location.href='Login.html';
   }
 }
 
