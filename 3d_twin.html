@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Digital Twin - Railway Digital Twin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:1000;
+  position:relative;
+}
+
+.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.sb-overview-btn svg{width:15px;height:15px}
+
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
+.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
+.sb-train-img:hover img{opacity:.9}
+
+.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
+.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+.content{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* ══════════════════════════════════════════════════
+   3D DIGITAL TWIN VIEWER STYLES
+══════════════════════════════════════════════════ */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 7px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.pt{font-size:11.5px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}
+.dim{font-size:10px;color:var(--muted)}
+
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:999px;padding:2px 10px;font-size:9px;font-weight:600;
+}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.pill.orange{background:var(--orange-bg);color:var(--orange)}
+.pill.blue{background:#eff6ff;color:#2563eb}
+[data-theme="dark"] .pill.blue{background:rgba(59,130,246,.15);color:#60a5fa}
+.pill.gray{background:var(--card2);color:var(--muted)}
+.pill.purple{background:#f5f3ff;color:#7c3aed}
+[data-theme="dark"] .pill.purple{background:rgba(139,92,246,.15);color:#a78bfa}
+
+/* ─── Asset Selector ─── */
+.asset-selector{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0;
+}
+.asset-selector select{
+  background:var(--card2);color:var(--text);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;font-size:11px;font-family:inherit;outline:none;cursor:pointer;
+}
+.asset-selector select:focus{border-color:var(--accent)}
+.asset-selector .label{font-size:10px;color:var(--muted);font-weight:600}
+.asset-selector .view-badge{font-size:9px;padding:2px 10px;border-radius:4px;background:var(--accent);color:#fff;font-weight:600;margin-left:auto;}
+
+/* ─── 3D Viewport ─── */
+.viewport-container{
+  flex:1;
+  min-height:400px;
+  position:relative;
+  overflow:hidden;
+  border-radius:8px;
+  background:radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a1a 60%, #000000 100%);
+  border:1px solid var(--border);
+}
+
+.viewport-container .placeholder-3d{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:rgba(255,255,255,0.15);
+  pointer-events:none;
+}
+.viewport-container .placeholder-3d .icon{font-size:64px;display:block;margin-bottom:12px;}
+.viewport-container .placeholder-3d .title{font-size:18px;font-weight:700;color:rgba(255,255,255,0.25);}
+.viewport-container .placeholder-3d .sub{font-size:12px;color:rgba(255,255,255,0.12);margin-top:6px;}
+.viewport-container .placeholder-3d .badge-row{display:flex;justify-content:center;gap:8px;margin-top:16px;}
+.viewport-container .placeholder-3d .badge-row .badge{
+  padding:4px 14px;border-radius:4px;font-size:9px;font-weight:600;
+  background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.15);
+  color:rgba(255,255,255,0.4);
+}
+
+/* Viewport Controls */
+.viewport-controls{
+  position:absolute;
+  bottom:16px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  display:flex;
+  gap:6px;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(12px);
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.viewport-controls button{
+  padding:4px 12px;
+  border-radius:4px;
+  font-size:9px;
+  font-weight:600;
+  color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.04);
+  background:rgba(255,255,255,0.02);
+  transition:all .2s;
+  cursor:pointer;
+}
+.viewport-controls button:hover{
+  background:rgba(59,130,246,0.2);
+  border-color:rgba(59,130,246,0.2);
+  color:#fff;
+}
+.viewport-controls button.primary{
+  background:rgba(59,130,246,0.2);
+  border-color:rgba(59,130,246,0.2);
+  color:#60a5fa;
+}
+
+/* Status overlay on viewport */
+.viewport-status{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(8px);
+  padding:4px 12px;
+  border-radius:6px;
+  font-size:9px;
+  color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.04);
+}
+.viewport-status .dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#22c55e;
+  animation:pulse-dot 1.5s infinite;
+}
+@keyframes pulse-dot{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.3;transform:scale(0.7);}
+}
+
+/* ─── Twin Viewer Grid ─── */
+.twin-grid{
+  display:grid;
+  grid-template-columns:2.2fr 1fr;
+  gap:10px;
+  flex:1;
+  min-height:0;
+}
+
+/* ─── Asset Info Sidebar ─── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;}
+.info-item{display:flex;justify-content:space-between;padding:4px 0;font-size:10.5px;border-bottom:1px solid var(--border);}
+.info-item .lbl{color:var(--muted);}
+.info-item .val{font-weight:500;color:var(--text);}
+.info-item .val.green{color:var(--green);}
+.info-item .val.orange{color:var(--orange);}
+.info-item .val.blue{color:var(--accent);}
+
+.health-rings{display:flex;gap:10px;justify-content:space-around;padding:4px 0;}
+.health-ring{text-align:center;}
+.health-ring svg{width:40px;height:40px;transform:rotate(-90deg);}
+.health-ring .bg{fill:none;stroke:var(--border);stroke-width:4;}
+.health-ring .fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s;}
+.health-ring .val{font-size:10px;font-weight:700;color:var(--text);display:block;margin-top:-2px;}
+.health-ring .label{font-size:6.5px;color:var(--muted);display:block;}
+
+/* ─── Telemetry Bar ─── */
+.telemetry-bar{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+  flex-shrink:0;
+}
+.telemetry-item{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:6px;padding:6px 10px;text-align:center;
+}
+.telemetry-item .label{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.telemetry-item .value{font-size:14px;font-weight:700;color:var(--text);margin-top:1px;}
+.telemetry-item .value .unit{font-size:8px;font-weight:400;color:var(--muted);}
+
+/* ─── Responsive ─── */
+@media(max-width:1200px){:root{--sidebar-w:190px}.twin-grid{grid-template-columns:1.5fr 1fr;}}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+  .twin-grid{grid-template-columns:1fr;}
+  .telemetry-bar{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:768px){
+  .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .viewport-container{min-height:280px;}
+  .telemetry-bar{grid-template-columns:repeat(2,1fr);}
+  .info-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .topbar{padding:0 10px}
+  .content{padding:10px}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .telemetry-bar{grid-template-columns:1fr 1fr;}
+  .asset-selector{flex-direction:column;align-items:stretch;}
+  .asset-selector select{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+  
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="box" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>3D Digital Twin</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 18, 2026</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content">
+
+    <!-- Asset Selector -->
+    <div class="asset-selector">
+      <span class="label">🎯 Select Asset:</span>
+      <select id="assetSelect" onchange="changeAsset(this.value)">
+        <option value="train01">🚆 Train 01 - WR-101</option>
+        <option value="train02">🚆 Train 02 - WR-102</option>
+        <option value="train03">🚆 Train 03 - WR-103</option>
+        <option value="train04">🚆 Train 04 - WR-104</option>
+        <option value="station01">🏛️ Station - Mumbai Central</option>
+        <option value="station02">🏛️ Station - Ahmedabad Junction</option>
+        <option value="hvac01">❄️ HVAC System - Unit A</option>
+        <option value="engine01">⚙️ Engine - E-101</option>
+      </select>
+      <span class="view-badge">● Unreal Engine</span>
+    </div>
+
+    <!-- Twin Viewer Grid -->
+    <div class="twin-grid">
+
+      <!-- 3D Viewport -->
+      <div class="panel" style="height:100%;">
+        <div class="ph">
+          <span class="pt">3D Digital Twin Viewport</span>
+          <span class="pill purple">Unreal Engine</span>
+        </div>
+        <div class="pb" style="padding:4px;">
+          <div class="viewport-container" id="viewport">
+            <!-- Status -->
+            <div class="viewport-status">
+              <span class="dot"></span>
+              <span>Live</span>
+              <span style="color:rgba(255,255,255,0.2);margin-left:4px;">|</span>
+              <span style="color:rgba(255,255,255,0.2);">60 FPS</span>
+            </div>
+
+            <!-- 3D Placeholder -->
+            <div class="placeholder-3d">
+              <span class="icon">🧊</span>
+              <div class="title">3D Digital Twin</div>
+              <div class="sub">Unreal Engine 5 · Real-time Visualization</div>
+              <div class="badge-row">
+                <span class="badge">⚡ Live Telemetry</span>
+                <span class="badge">🎮 Interactive</span>
+                <span class="badge">🔄 Real-time Sync</span>
+              </div>
+              <div style="margin-top:20px;display:flex;justify-content:center;gap:12px;font-size:10px;color:rgba(255,255,255,0.1);">
+                <span>🔹 12,847 polygons</span>
+                <span>🔹 4K textures</span>
+                <span>🔹 PBR materials</span>
+              </div>
+            </div>
+
+            <!-- Viewport Controls -->
+            <div class="viewport-controls">
+              <button onclick="viewportAction('rotate')">🔄 Rotate</button>
+              <button onclick="viewportAction('pan')">✋ Pan</button>
+              <button onclick="viewportAction('zoom_in')">🔍 Zoom In</button>
+              <button onclick="viewportAction('zoom_out')">🔍 Zoom Out</button>
+              <button class="primary" onclick="viewportAction('reset')">⌂ Reset</button>
+              <button onclick="viewportAction('fullscreen')">⛶ Fullscreen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Information Sidebar -->
+      <div style="display:flex;flex-direction:column;gap:10px;overflow:hidden;">
+
+        <!-- Asset Info -->
+        <div class="panel" style="flex:1;min-height:0;">
+          <div class="ph">
+            <span class="pt">Asset Information</span>
+            <span class="pill green" id="asset-status">● Running</span>
+          </div>
+          <div class="pb" id="asset-info-panel">
+            <div class="info-grid">
+              <div class="info-item"><span class="lbl">Asset ID</span><span class="val" id="info-id">WR-101</span></div>
+              <div class="info-item"><span class="lbl">Type</span><span class="val" id="info-type">Electric Train</span></div>
+              <div class="info-item"><span class="lbl">Status</span><span class="val green" id="info-status">Running</span></div>
+              <div class="info-item"><span class="lbl">Location</span><span class="val" id="info-location">Vadodara</span></div>
+              <div class="info-item"><span class="lbl">Speed</span><span class="val blue" id="info-speed">128 km/h</span></div>
+              <div class="info-item"><span class="lbl">Temperature</span><span class="val orange" id="info-temp">35°C</span></div>
+              <div class="info-item"><span class="lbl">Pressure</span><span class="val" id="info-pressure">5.6 bar</span></div>
+              <div class="info-item"><span class="lbl">Health</span><span class="val green" id="info-health">92%</span></div>
+            </div>
+            <div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--muted);margin-bottom:4px;">Asset Health</div>
+              <div class="health-rings">
+                <div class="health-ring">
+                  <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke="#22c55e" stroke-dasharray="100.5" stroke-dashoffset="5.02"/></svg>
+                  <span class="val">95%</span><span class="label">Engine</span>
+                </div>
+                <div class="health-ring">
+                  <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke="#22c55e" stroke-dasharray="100.5" stroke-dashoffset="12.06"/></svg>
+                  <span class="val">88%</span><span class="label">Brake</span>
+                </div>
+                <div class="health-ring">
+                  <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke="#f59e0b" stroke-dasharray="100.5" stroke-dashoffset="30.15"/></svg>
+                  <span class="val">70%</span><span class="label">Power</span>
+                </div>
+                <div class="health-ring">
+                  <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke="#22c55e" stroke-dasharray="100.5" stroke-dashoffset="10.05"/></svg>
+                  <span class="val">90%</span><span class="label">Comm</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts Mini -->
+        <div class="panel" style="flex-shrink:0;max-height:120px;">
+          <div class="ph">
+            <span class="pt">Active Alerts</span>
+            <span class="pill red" id="alert-count-mini">2</span>
+          </div>
+          <div class="pb" style="padding:4px 10px;overflow-y:auto;">
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:var(--red-bg);font-size:9px;">
+                <span style="color:var(--red);font-weight:700;">⚠</span>
+                <span style="flex:1;color:var(--text);">Brake Pressure Low</span>
+                <span style="color:var(--dim);font-size:7px;">10:42</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:4px;background:var(--orange-bg);font-size:9px;">
+                <span style="color:var(--orange);font-weight:700;">⚠</span>
+                <span style="flex:1;color:var(--text);">High Engine Temperature</span>
+                <span style="color:var(--dim);font-size:7px;">10:31</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Telemetry Bar -->
+    <div class="telemetry-bar">
+      <div class="telemetry-item">
+        <div class="label">Speed</div>
+        <div class="value">128 <span class="unit">km/h</span></div>
+      </div>
+      <div class="telemetry-item">
+        <div class="label">Temperature</div>
+        <div class="value">35 <span class="unit">°C</span></div>
+      </div>
+      <div class="telemetry-item">
+        <div class="label">Voltage</div>
+        <div class="value">25.4 <span class="unit">kV</span></div>
+      </div>
+      <div class="telemetry-item">
+        <div class="label">Brake Pressure</div>
+        <div class="value">5.6 <span class="unit">bar</span></div>
+      </div>
+      <div class="telemetry-item">
+        <div class="label">Fuel Level</div>
+        <div class="value">72 <span class="unit">%</span></div>
+      </div>
+      <div class="telemetry-item">
+        <div class="label">Vibration</div>
+        <div class="value" style="color:var(--green);">0.4 <span class="unit">mm/s</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+lucide.createIcons();
+
+/* ─── CLOCK ─── */
+function updateClock(){
+  const n=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
+
+/* ─── THEME ─── */
+let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+function applyTheme(){
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const icon = document.getElementById('theme-icon');
+  if(icon){
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
+  }
+}
+
+function toggleTheme(){
+  isDark = !isDark;
+  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+applyTheme();
+
+/* ─── NAVIGATION ─── */
+function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+function openOverview(){ window.location.href = 'index.html'; }
+function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+function openDevices(){ window.location.href = 'devices.html'; }
+function openSettings(){ window.location.href = 'settings.html'; }
+function openAlerts(){ window.location.href = 'alerts.html'; }
+function open3DTwin(){ window.location.href = '3d_twin.html'; }
+function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
+
+/* ─── ASSET DATA ─── */
+const ASSET_DATA = {
+  train01: {
+    id: 'WR-101',
+    name: 'Train 01',
+    type: 'Electric Train',
+    status: 'Running',
+    location: 'Vadodara',
+    speed: '128 km/h',
+    temp: '35°C',
+    pressure: '5.6 bar',
+    health: '92%',
+    statusClass: 'green',
+    alerts: 2,
+    healthData: { engine: 95, brake: 88, power: 70, comm: 90 }
+  },
+  train02: {
+    id: 'WR-102',
+    name: 'Train 02',
+    type: 'Electric Train',
+    status: 'Running',
+    location: 'Anand',
+    speed: '96 km/h',
+    temp: '38°C',
+    pressure: '4.8 bar',
+    health: '88%',
+    statusClass: 'green',
+    alerts: 1,
+    healthData: { engine: 88, brake: 92, power: 85, comm: 78 }
+  },
+  train03: {
+    id: 'WR-103',
+    name: 'Train 03',
+    type: 'Electric Train',
+    status: 'Stopped',
+    location: 'Surat',
+    speed: '0 km/h',
+    temp: '42°C',
+    pressure: '3.2 bar',
+    health: '45%',
+    statusClass: 'orange',
+    alerts: 3,
+    healthData: { engine: 45, brake: 30, power: 20, comm: 65 }
+  },
+  train04: {
+    id: 'WR-104',
+    name: 'Train 04',
+    type: 'Electric Train',
+    status: 'Warning',
+    location: 'Ahmedabad',
+    speed: '78 km/h',
+    temp: '40°C',
+    pressure: '4.2 bar',
+    health: '72%',
+    statusClass: 'orange',
+    alerts: 2,
+    healthData: { engine: 72, brake: 65, power: 80, comm: 55 }
+  },
+  station01: {
+    id: 'STN-001',
+    name: 'Mumbai Central',
+    type: 'Station',
+    status: 'Operational',
+    location: 'Mumbai',
+    speed: '—',
+    temp: '28°C',
+    pressure: '—',
+    health: '95%',
+    statusClass: 'green',
+    alerts: 0,
+    healthData: { infrastructure: 95, power: 92, comm: 90, safety: 98 }
+  },
+  station02: {
+    id: 'STN-002',
+    name: 'Ahmedabad Junction',
+    type: 'Station',
+    status: 'Operational',
+    location: 'Ahmedabad',
+    speed: '—',
+    temp: '30°C',
+    pressure: '—',
+    health: '92%',
+    statusClass: 'green',
+    alerts: 1,
+    healthData: { infrastructure: 92, power: 88, comm: 85, safety: 95 }
+  },
+  hvac01: {
+    id: 'HVAC-001',
+    name: 'HVAC Unit A',
+    type: 'HVAC System',
+    status: 'Running',
+    location: 'Coach 2',
+    speed: '—',
+    temp: '22°C',
+    pressure: '4.2 bar',
+    health: '88%',
+    statusClass: 'green',
+    alerts: 0,
+    healthData: { compressor: 90, fan: 85, cooling: 88, control: 92 }
+  },
+  engine01: {
+    id: 'ENG-101',
+    name: 'Engine E-101',
+    type: 'Engine',
+    status: 'Running',
+    location: 'Train 01',
+    speed: '—',
+    temp: '68°C',
+    pressure: '6.2 bar',
+    health: '94%',
+    statusClass: 'green',
+    alerts: 1,
+    healthData: { performance: 94, vibration: 88, oil: 92, cooling: 90 }
+  }
+};
+
+/* ─── CHANGE ASSET ─── */
+function changeAsset(assetId){
+  const data = ASSET_DATA[assetId];
+  if(!data) return;
+
+  document.getElementById('info-id').textContent = data.id;
+  document.getElementById('info-type').textContent = data.type;
+  document.getElementById('info-status').textContent = data.status;
+  document.getElementById('info-status').className = 'val ' + data.statusClass;
+  document.getElementById('info-location').textContent = data.location;
+  document.getElementById('info-speed').textContent = data.speed;
+  document.getElementById('info-temp').textContent = data.temp;
+  document.getElementById('info-pressure').textContent = data.pressure;
+  document.getElementById('info-health').textContent = data.health;
+  document.getElementById('info-health').className = 'val ' + data.statusClass;
+
+  // Status badge
+  const statusBadge = document.getElementById('asset-status');
+  statusBadge.textContent = '● ' + data.status;
+  statusBadge.className = 'pill ' + data.statusClass;
+
+  // Alert count
+  document.getElementById('alert-count-mini').textContent = data.alerts;
+
+  // Health rings
+  const healthData = data.healthData;
+  const healthKeys = Object.keys(healthData);
+  const healthRings = document.querySelectorAll('.health-ring');
+  healthRings.forEach((ring, index) => {
+    if(index < healthKeys.length){
+      const key = healthKeys[index];
+      const val = healthData[key];
+      const label = ring.querySelector('.label');
+      const valSpan = ring.querySelector('.val');
+      const fill = ring.querySelector('.fill');
+      
+      if(label) label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      if(valSpan) valSpan.textContent = val + '%';
+      
+      const color = val > 80 ? '#22c55e' : val > 50 ? '#f59e0b' : '#ef4444';
+      const circumference = 100.5;
+      const offset = circumference - (val/100) * circumference;
+      
+      if(fill){
+        fill.setAttribute('stroke', color);
+        fill.setAttribute('stroke-dashoffset', offset);
+      }
+    }
+  });
+
+  // Update viewport label
+  const viewportTitle = document.querySelector('.placeholder-3d .title');
+  if(viewportTitle) viewportTitle.textContent = '🚆 ' + data.name;
+
+  // Show notification
+  showNotification('Loading 3D model: ' + data.name);
+}
+
+function showNotification(msg){
+  const notif = document.createElement('div');
+  notif.style.cssText = `
+    position:fixed;bottom:20px;right:20px;background:var(--card);
+    border:1px solid var(--border);border-radius:10px;padding:10px 18px;
+    box-shadow:var(--shadow-md);z-index:9999;font-size:11px;
+    color:var(--text);max-width:280px;animation:slideIn 0.3s ease;
+  `;
+  notif.textContent = '🔄 ' + msg;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.style.opacity = '0';
+    notif.style.transition = 'opacity 0.3s';
+    setTimeout(() => notif.remove(), 300);
+  }, 2500);
+}
+
+// Add animation style
+const notifStyle = document.createElement('style');
+notifStyle.textContent = `
+  @keyframes slideIn{
+    0%{transform:translateY(20px);opacity:0;}
+    100%{transform:translateY(0);opacity:1;}
+  }
+`;
+document.head.appendChild(notifStyle);
+
+/* ─── VIEWPORT ACTIONS ─── */
+function viewportAction(action){
+  const actions = {
+    rotate: '🔄 Rotating view...',
+    pan: '✋ Pan mode enabled',
+    zoom_in: '🔍 Zooming in...',
+    zoom_out: '🔍 Zooming out...',
+    reset: '⌂ Resetting view...',
+    fullscreen: '⛶ Entering fullscreen mode...'
+  };
+  showNotification(actions[action] || 'Action: ' + action);
+}
+
+/* ─── SIMULATE LIVE DATA ─── */
+setInterval(() => {
+  const assetId = document.getElementById('assetSelect').value;
+  const data = ASSET_DATA[assetId];
+  if(!data || data.status === 'Stopped') return;
+
+  // Update speed
+  if(data.speed && data.speed !== '—' && data.speed !== '0 km/h'){
+    const currentSpeed = parseInt(data.speed);
+    if(!isNaN(currentSpeed)){
+      const newSpeed = Math.min(160, Math.max(80, currentSpeed + (Math.random() - 0.47) * 4));
+      data.speed = Math.round(newSpeed) + ' km/h';
+      document.getElementById('info-speed').textContent = data.speed;
+    }
+  }
+
+  // Update temperature
+  if(data.temp && data.temp !== '—'){
+    const currentTemp = parseInt(data.temp);
+    if(!isNaN(currentTemp)){
+      const newTemp = Math.min(45, Math.max(28, currentTemp + (Math.random() - 0.48) * 1.5));
+      data.temp = Math.round(newTemp) + '°C';
+      document.getElementById('info-temp').textContent = data.temp;
+    }
+  }
+
+  // Update health
+  if(data.health && data.health !== '—'){
+    const currentHealth = parseInt(data.health);
+    if(!isNaN(currentHealth)){
+      const newHealth = Math.min(98, Math.max(40, currentHealth + (Math.random() - 0.5) * 0.8));
+      data.health = Math.round(newHealth) + '%';
+      document.getElementById('info-health').textContent = data.health;
+    }
+  }
+
+  // Update telemetry bar
+  const telemetryValues = document.querySelectorAll('.telemetry-item .value');
+  if(telemetryValues.length >= 6){
+    const speedVal = data.speed || '128 km/h';
+    const tempVal = data.temp || '35°C';
+    telemetryValues[0].innerHTML = speedVal.replace(' km/h', '') + ' <span class="unit">km/h</span>';
+    telemetryValues[1].innerHTML = tempVal.replace('°C', '') + ' <span class="unit">°C</span>';
+  }
+
+}, 3000);
+
+/* ─── INIT ─── */
+// Load default asset
+changeAsset('train01');
+
+lucide.createIcons();
+</script>
+<script src="sidebar.js"></script>
+</body>
+</html>

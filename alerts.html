@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alerts - Railway Digital Twin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:1000;
+  position:relative;
+}
+
+.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.sb-overview-btn svg{width:15px;height:15px}
+
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
+.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
+.sb-train-img:hover img{opacity:.9}
+
+.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
+.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+.content{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* ══════════════════════════════════════════════════
+   ALERTS PAGE STYLES
+══════════════════════════════════════════════════ */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 7px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.pt{font-size:11.5px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}
+.dim{font-size:10px;color:var(--muted)}
+
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:999px;padding:2px 10px;font-size:9px;font-weight:600;
+}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.pill.orange{background:var(--orange-bg);color:var(--orange)}
+.pill.blue{background:#eff6ff;color:#2563eb}
+[data-theme="dark"] .pill.blue{background:rgba(59,130,246,.15);color:#60a5fa}
+.pill.gray{background:var(--card2);color:var(--muted)}
+
+/* ─── KPI Cards ─── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;flex-shrink:0}
+.kpi{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;
+  box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;
+  transition:background .25s;
+}
+.kpi-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-ico svg{width:18px;height:18px}
+.kpi-lbl{font-size:9px;color:var(--muted)}
+.kpi-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;margin:2px 0}
+.kpi-sub{font-size:9px;color:var(--dim)}
+
+/* ─── Filters ─── */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;padding:4px 0}
+.filter-bar select{
+  background:var(--card2);color:var(--text);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;font-size:11px;font-family:inherit;outline:none;cursor:pointer;
+}
+.filter-bar select:focus{border-color:var(--accent)}
+.filter-bar .label{font-size:10px;color:var(--muted);font-weight:600}
+
+/* ─── Alerts Table ─── */
+.alerts-table-wrap{flex:1;overflow-y:auto;margin:-10px -12px;padding:0 12px;}
+.alerts-table{width:100%;border-collapse:collapse;font-size:11px;}
+.alerts-table th{
+  text-align:left;padding:8px 10px;font-weight:600;color:var(--muted);
+  border-bottom:2px solid var(--border);position:sticky;top:0;background:var(--card);z-index:5;
+}
+.alerts-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.alerts-table tr:hover{background:var(--nav-hover);cursor:pointer;}
+.alerts-table .severity{display:flex;align-items:center;gap:5px;}
+.alerts-table .severity .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.alerts-table .severity .dot.critical{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,0.4);}
+.alerts-table .severity .dot.warning{background:#f97316;box-shadow:0 0 8px rgba(249,115,22,0.3);}
+.alerts-table .severity .dot.info{background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,0.3);}
+.alerts-table .severity .dot.resolved{background:#22c55e;}
+.alerts-table .status-badge{font-size:8px;padding:2px 10px;border-radius:4px;font-weight:600;}
+.alerts-table .status-badge.open{background:var(--red-bg);color:var(--red);}
+.alerts-table .status-badge.acknowledged{background:var(--orange-bg);color:var(--orange);}
+.alerts-table .status-badge.resolved{background:var(--green-bg);color:var(--green);}
+.alerts-table .actions{display:flex;gap:4px;}
+.alerts-table .actions button{
+  padding:2px 8px;border-radius:4px;font-size:8px;font-weight:600;
+  border:1px solid var(--border);background:var(--card2);color:var(--muted);
+  transition:all .15s;cursor:pointer;
+}
+.alerts-table .actions button:hover{background:var(--nav-hover);color:var(--text);}
+.alerts-table .actions button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.alerts-table .actions button.primary:hover{opacity:.85;}
+
+/* ─── Alert Detail Panel ─── */
+.alert-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
+.alert-detail-item{display:flex;justify-content:space-between;padding:4px 0;font-size:10.5px;border-bottom:1px solid var(--border);}
+.alert-detail-item .lbl{color:var(--muted);}
+.alert-detail-item .val{font-weight:500;color:var(--text);}
+
+/* ─── Recent Activity Timeline ─── */
+.timeline{display:flex;flex-direction:column;gap:4px;flex:1;overflow-y:auto;}
+.timeline-item{display:flex;align-items:center;gap:10px;padding:4px 6px;border-left:2px solid var(--border);font-size:10px;}
+.timeline-item .time{color:var(--dim);font-size:8px;min-width:45px;}
+.timeline-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.timeline-item .dot.critical{background:#ef4444;}
+.timeline-item .dot.warning{background:#f97316;}
+.timeline-item .dot.info{background:#3b82f6;}
+.timeline-item .dot.resolved{background:#22c55e;}
+.timeline-item .msg{flex:1;color:var(--text);}
+.timeline-item .asset{color:var(--muted);font-size:8px;}
+
+/* ─── Responsive ─── */
+@media(max-width:1200px){:root{--sidebar-w:190px}.kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+  .kpi-row{grid-template-columns:1fr 1fr 1fr;}
+}
+@media(max-width:768px){
+  .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .alerts-table{font-size:10px;}
+  .alerts-table th,.alerts-table td{padding:4px 6px;}
+  .alerts-table .actions{flex-wrap:wrap;}
+}
+@media(max-width:600px){
+  .topbar{padding:0 10px}
+  .content{padding:10px}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .filter-bar select{font-size:10px;padding:3px 6px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+  <!-- Sidebar will be rendered by sidebar.js -->
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="bell" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Alerts</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 18, 2026</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot" id="topbar-badge">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content">
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#eff6ff"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><div class="kpi-lbl">Total Alerts</div><div class="kpi-val" id="total-alerts">24</div><div class="kpi-sub">All time</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fef2f2"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></div>
+        <div><div class="kpi-lbl">Critical</div><div class="kpi-val" style="color:#dc2626" id="critical-alerts">3</div><div class="kpi-sub">Immediate action</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fff7ed"><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></div>
+        <div><div class="kpi-lbl">Warning</div><div class="kpi-val" style="color:#ea580c" id="warning-alerts">8</div><div class="kpi-sub">Needs attention</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#ecfdf5"><svg viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></div>
+        <div><div class="kpi-lbl">Info</div><div class="kpi-val" style="color:#0d9488" id="info-alerts">5</div><div class="kpi-sub">For reference</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#f0fdf4"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div class="kpi-lbl">Resolved</div><div class="kpi-val" style="color:#16a34a" id="resolved-alerts">8</div><div class="kpi-sub">Closed</div></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <span class="label">Filters:</span>
+      <select id="severityFilter" onchange="filterAlerts()">
+        <option value="all">All Severity</option>
+        <option value="Critical">Critical</option>
+        <option value="Warning">Warning</option>
+        <option value="Info">Info</option>
+      </select>
+      <select id="statusFilter" onchange="filterAlerts()">
+        <option value="all">All Status</option>
+        <option value="Open">Open</option>
+        <option value="Acknowledged">Acknowledged</option>
+        <option value="Resolved">Resolved</option>
+      </select>
+      <select id="assetFilter" onchange="filterAlerts()">
+        <option value="all">All Assets</option>
+        <option value="Train 01">Train 01</option>
+        <option value="Train 02">Train 02</option>
+        <option value="Train 03">Train 03</option>
+        <option value="Train 04">Train 04</option>
+        <option value="Train 05">Train 05</option>
+        <option value="GPS System">GPS System</option>
+        <option value="Power System">Power System</option>
+      </select>
+      <button class="ib" onclick="resetFilters()" title="Reset"><i data-lucide="rotate-ccw" style="width:14px;height:14px"></i></button>
+      <span style="margin-left:auto;font-size:10px;color:var(--dim);" id="alert-count-display">12 active alerts</span>
+    </div>
+
+    <!-- Alerts Table + Detail Panel -->
+    <div style="display:grid;grid-template-columns:2.2fr 1fr;gap:10px;flex:1;min-height:0;">
+
+      <!-- Alerts Table -->
+      <div class="panel" style="height:100%;">
+        <div class="ph">
+          <span class="pt">Active Alerts</span>
+          <span class="pill blue" id="alert-count-pill">12 Open</span>
+        </div>
+        <div class="pb" style="padding:6px 0;">
+          <div class="alerts-table-wrap">
+            <table class="alerts-table" id="alerts-table">
+              <thead>
+                <tr>
+                  <th>Alert ID</th>
+                  <th>Asset</th>
+                  <th>Type</th>
+                  <th>Severity</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="alerts-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Details & Timeline -->
+      <div style="display:flex;flex-direction:column;gap:10px;overflow:hidden;">
+
+        <!-- Alert Details -->
+        <div class="panel" style="flex:1;min-height:0;">
+          <div class="ph">
+            <span class="pt">Alert Details</span>
+            <button class="bl" style="font-size:9px;color:var(--accent);cursor:pointer;" onclick="clearAlertSelection()">Clear</button>
+          </div>
+          <div class="pb" id="alert-details">
+            <div style="text-align:center;color:var(--muted);padding:30px 0;font-size:11px;">
+              <div style="font-size:32px;margin-bottom:8px;">🔔</div>
+              Select an alert from the list to view details
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Timeline -->
+        <div class="panel" style="flex-shrink:0;max-height:180px;">
+          <div class="ph">
+            <span class="pt">Recent Activity</span>
+            <span class="dim" style="font-size:9px;">Last 24 hours</span>
+          </div>
+          <div class="pb" style="padding:6px 10px;">
+            <div class="timeline" id="timeline">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+lucide.createIcons();
+
+/* ─── CLOCK ─── */
+function updateClock(){
+  const n=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
+
+/* ─── THEME ─── */
+let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+function applyTheme(){
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const icon = document.getElementById('theme-icon');
+  if(icon){
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
+  }
+}
+
+function toggleTheme(){
+  isDark = !isDark;
+  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+  applyTheme();
+}
+applyTheme();
+
+/* ─── NAVIGATION ─── */
+function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+function openOverview(){ window.location.href = 'index.html'; }
+function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+function openDevices(){ window.location.href = 'devices.html'; }
+function openSettings(){ window.location.href = 'settings.html'; }
+function openAlerts(){ window.location.href = 'alerts.html'; }
+function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
+
+/* ─── ALERT DATA ─── */
+const ALERTS = [
+  { id: 'ALT-001', asset: 'Train 03', type: 'Brake Pressure Low', severity: 'Critical', time: '10:42 AM', status: 'Open', description: 'Brake pressure dropped below 4.5 bar. Immediate inspection required.', assignedTo: 'Rajesh Kumar' },
+  { id: 'ALT-002', asset: 'Train 03', type: 'High Engine Temperature', severity: 'Warning', time: '10:35 AM', status: 'Open', description: 'Engine temperature exceeded 95°C. Monitor closely.', assignedTo: 'Priya Patel' },
+  { id: 'ALT-003', asset: 'Train 01', type: 'GPS Signal Lost', severity: 'Warning', time: '10:15 AM', status: 'Acknowledged', description: 'GPS signal lost for 5 minutes. Possible interference.', assignedTo: 'Amit Sharma' },
+  { id: 'ALT-004', asset: 'GPS System', type: 'Communication Failure', severity: 'Critical', time: '09:58 AM', status: 'Open', description: 'Communication link to GPS satellite failed. System in backup mode.', assignedTo: 'Vikram Singh' },
+  { id: 'ALT-005', asset: 'Train 01', type: 'Door Sensor Fault', severity: 'Info', time: '09:40 AM', status: 'Resolved', description: 'Door sensor reported fault. Auto-reset after 3 minutes.', assignedTo: 'John Smith' },
+  { id: 'ALT-006', asset: 'Train 04', type: 'Low Fuel Level', severity: 'Warning', time: '09:22 AM', status: 'Acknowledged', description: 'Fuel level below 15%. Schedule refueling at next station.', assignedTo: 'Asha Rao' },
+  { id: 'ALT-007', asset: 'Train 02', type: 'Battery Voltage Drop', severity: 'Critical', time: '09:05 AM', status: 'Open', description: 'Battery voltage dropped below 22V. Alternator may be failing.', assignedTo: 'Rajesh Kumar' },
+  { id: 'ALT-008', asset: 'Power System', type: 'Power Fluctuation', severity: 'Warning', time: '08:48 AM', status: 'Open', description: 'Power supply fluctuations detected in section 3.', assignedTo: 'Priya Patel' },
+  { id: 'ALT-009', asset: 'Train 05', type: 'Brake Wear Warning', severity: 'Warning', time: '08:30 AM', status: 'Open', description: 'Brake pads worn below 30%. Schedule maintenance.', assignedTo: 'Amit Sharma' },
+  { id: 'ALT-010', asset: 'Train 02', type: 'Fuel Level', severity: 'Info', time: '08:15 AM', status: 'Resolved', description: 'Fuel level reached 25%. Refueling completed.', assignedTo: 'Vikram Singh' },
+  { id: 'ALT-011', asset: 'Train 01', type: 'Speed Sensor Fault', severity: 'Critical', time: '07:55 AM', status: 'Acknowledged', description: 'Speed sensor reading erratic. Using GPS as backup.', assignedTo: 'John Smith' },
+  { id: 'ALT-012', asset: 'GPS System', type: 'Signal Weak', severity: 'Warning', time: '07:30 AM', status: 'Resolved', description: 'GPS signal strength low due to atmospheric conditions. Now restored.', assignedTo: 'Asha Rao' },
+];
+
+const TIMELINE = [
+  { time: '10:42', msg: 'Brake Pressure Low', type: 'critical', asset: 'Train 03' },
+  { time: '10:35', msg: 'High Engine Temperature', type: 'warning', asset: 'Train 03' },
+  { time: '10:15', msg: 'GPS Signal Lost', type: 'warning', asset: 'Train 01' },
+  { time: '09:58', msg: 'Communication Failure', type: 'critical', asset: 'GPS System' },
+  { time: '09:40', msg: 'Door Sensor Fault - Resolved', type: 'resolved', asset: 'Train 01' },
+  { time: '09:22', msg: 'Low Fuel Level', type: 'warning', asset: 'Train 04' },
+  { time: '09:05', msg: 'Battery Voltage Drop', type: 'critical', asset: 'Train 02' },
+  { time: '08:48', msg: 'Power Fluctuation', type: 'warning', asset: 'Power System' },
+  { time: '08:30', msg: 'Brake Wear Warning', type: 'warning', asset: 'Train 05' },
+  { time: '08:15', msg: 'Fuel Level - Resolved', type: 'resolved', asset: 'Train 02' },
+];
+
+let selectedAlertId = null;
+let currentFilteredAlerts = [...ALERTS];
+
+/* ─── RENDER ALERTS ─── */
+function renderAlerts(alerts){
+  const tbody = document.getElementById('alerts-body');
+  if(!tbody) return;
+
+  const filtered = alerts || ALERTS;
+  currentFilteredAlerts = filtered;
+
+  // Update counts
+  const total = filtered.length;
+  const critical = filtered.filter(a => a.severity === 'Critical').length;
+  const warning = filtered.filter(a => a.severity === 'Warning').length;
+  const info = filtered.filter(a => a.severity === 'Info').length;
+  const resolved = filtered.filter(a => a.status === 'Resolved').length;
+  const open = filtered.filter(a => a.status === 'Open' || a.status === 'Acknowledged').length;
+
+  // Update DOM elements - check if they exist first
+  const totalEl = document.getElementById('total-alerts');
+  const criticalEl = document.getElementById('critical-alerts');
+  const warningEl = document.getElementById('warning-alerts');
+  const infoEl = document.getElementById('info-alerts');
+  const resolvedEl = document.getElementById('resolved-alerts');
+  const displayEl = document.getElementById('alert-count-display');
+  const pillEl = document.getElementById('alert-count-pill');
+  const topbarEl = document.getElementById('topbar-badge');
+
+  if (totalEl) totalEl.textContent = total;
+  if (criticalEl) criticalEl.textContent = critical;
+  if (warningEl) warningEl.textContent = warning;
+  if (infoEl) infoEl.textContent = info;
+  if (resolvedEl) resolvedEl.textContent = resolved;
+  if (displayEl) displayEl.textContent = open + ' active alerts';
+  if (pillEl) pillEl.textContent = open + ' Open';
+  if (topbarEl) topbarEl.textContent = open;
+
+  // Try to update sidebar badge - may not exist yet
+  const sidebarBadge = document.getElementById('sidebar-badge');
+  if (sidebarBadge) sidebarBadge.textContent = open;
+
+  if(filtered.length === 0){
+    tbody.innerHTML = `
+      <tr><td colspan="7" style="text-align:center;padding:40px 0;color:var(--muted);font-size:12px;">
+        <div style="font-size:32px;margin-bottom:8px;">✅</div>
+        No alerts found matching your criteria
+      </td></tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(alert => {
+    const severityClass = alert.severity.toLowerCase();
+    const statusClass = alert.status.toLowerCase();
+    const isSelected = selectedAlertId === alert.id;
+
+    return `
+      <tr style="${isSelected ? 'background:var(--nav-hover);' : ''}" onclick="selectAlert('${alert.id}')">
+        <td><span style="font-weight:600;color:var(--text);">${alert.id}</span></td>
+        <td>${alert.asset}</td>
+        <td>${alert.type}</td>
+        <td>
+          <span class="severity">
+            <span class="dot ${severityClass}"></span>
+            ${alert.severity}
+          </span>
+        </td>
+        <td>${alert.time}</td>
+        <td><span class="status-badge ${statusClass}">${alert.status}</span></td>
+        <td>
+          <div class="actions">
+            ${alert.status === 'Open' ? `<button class="primary" onclick="event.stopPropagation();acknowledgeAlert('${alert.id}')">Ack</button>` : ''}
+            ${alert.status !== 'Resolved' ? `<button onclick="event.stopPropagation();resolveAlert('${alert.id}')">Resolve</button>` : ''}
+            <button onclick="event.stopPropagation();viewAsset('${alert.asset}')">View</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/* ─── SELECT ALERT ─── */
+function selectAlert(alertId){
+  selectedAlertId = alertId;
+  const alert = ALERTS.find(a => a.id === alertId);
+  if(!alert) return;
+
+  // Highlight row
+  document.querySelectorAll('#alerts-body tr').forEach(el => {
+    el.style.background = '';
+  });
+  const rows = document.querySelectorAll('#alerts-body tr');
+  rows.forEach(el => {
+    if(el.textContent.includes(alertId)){
+      el.style.background = 'var(--nav-hover)';
+    }
+  });
+
+  const panel = document.getElementById('alert-details');
+  const severityColors = { 'Critical': '#ef4444', 'Warning': '#f97316', 'Info': '#3b82f6' };
+  const color = severityColors[alert.severity] || '#64748b';
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:8px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${alert.id}</div>
+        <div style="font-size:10px;color:var(--dim);">${alert.asset} · ${alert.type}</div>
+      </div>
+      <span class="pill" style="background:${color}22;color:${color};padding:3px 12px;font-size:10px;">${alert.severity}</span>
+    </div>
+    <div class="alert-detail-grid">
+      <div class="alert-detail-item"><span class="lbl">Status</span><span class="val">${alert.status}</span></div>
+      <div class="alert-detail-item"><span class="lbl">Time</span><span class="val">${alert.time}</span></div>
+      <div class="alert-detail-item"><span class="lbl">Assigned To</span><span class="val">${alert.assignedTo || 'Unassigned'}</span></div>
+      <div class="alert-detail-item"><span class="lbl">Asset</span><span class="val">${alert.asset}</span></div>
+    </div>
+    <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;">
+      <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px;">Description</div>
+      <div style="font-size:11px;color:var(--text);line-height:1.5;">${alert.description}</div>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+      ${alert.status === 'Open' ? `<button class="pill blue" style="padding:4px 14px;cursor:pointer;background:var(--accent);color:#fff;border:none;" onclick="acknowledgeAlert('${alert.id}')">✓ Acknowledge</button>` : ''}
+      ${alert.status !== 'Resolved' ? `<button class="pill gray" style="padding:4px 14px;cursor:pointer;border:1px solid var(--border);" onclick="resolveAlert('${alert.id}')">✓ Mark Resolved</button>` : ''}
+      <button class="pill gray" style="padding:4px 14px;cursor:pointer;border:1px solid var(--border);" onclick="viewAsset('${alert.asset}')">📋 View Asset</button>
+    </div>
+  `;
+}
+
+function clearAlertSelection(){
+  selectedAlertId = null;
+  document.querySelectorAll('#alerts-body tr').forEach(el => {
+    el.style.background = '';
+  });
+  document.getElementById('alert-details').innerHTML = `
+    <div style="text-align:center;color:var(--muted);padding:30px 0;font-size:11px;">
+      <div style="font-size:32px;margin-bottom:8px;">🔔</div>
+      Select an alert from the list to view details
+    </div>
+  `;
+}
+
+/* ─── ALERT ACTIONS ─── */
+function acknowledgeAlert(alertId){
+  const alert = ALERTS.find(a => a.id === alertId);
+  if(alert && alert.status === 'Open'){
+    alert.status = 'Acknowledged';
+    renderAlerts(currentFilteredAlerts);
+    if(selectedAlertId === alertId) selectAlert(alertId);
+    showNotification('Alert acknowledged: ' + alertId);
+  }
+}
+
+function resolveAlert(alertId){
+  const alert = ALERTS.find(a => a.id === alertId);
+  if(alert && alert.status !== 'Resolved'){
+    alert.status = 'Resolved';
+    renderAlerts(currentFilteredAlerts);
+    if(selectedAlertId === alertId) selectAlert(alertId);
+    showNotification('Alert resolved: ' + alertId);
+  }
+}
+
+function viewAsset(asset){
+  showNotification('Viewing asset: ' + asset);
+}
+
+function showNotification(msg){
+  const notif = document.createElement('div');
+  notif.style.cssText = `
+    position:fixed;bottom:20px;right:20px;background:var(--card);
+    border:1px solid var(--border);border-radius:10px;padding:12px 20px;
+    box-shadow:var(--shadow-md);z-index:9999;font-size:12px;
+    color:var(--text);max-width:300px;animation:slideIn 0.3s ease;
+  `;
+  notif.textContent = '✅ ' + msg;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.style.opacity = '0';
+    notif.style.transition = 'opacity 0.3s';
+    setTimeout(() => notif.remove(), 300);
+  }, 3000);
+}
+
+const notifStyle = document.createElement('style');
+notifStyle.textContent = `
+  @keyframes slideIn{
+    0%{transform:translateY(20px);opacity:0;}
+    100%{transform:translateY(0);opacity:1;}
+  }
+`;
+document.head.appendChild(notifStyle);
+
+/* ─── FILTERS ─── */
+function filterAlerts(){
+  const severity = document.getElementById('severityFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  const asset = document.getElementById('assetFilter').value;
+
+  const filtered = ALERTS.filter(a => {
+    const matchSeverity = severity === 'all' || a.severity === severity;
+    const matchStatus = status === 'all' || a.status === status;
+    const matchAsset = asset === 'all' || a.asset === asset;
+    return matchSeverity && matchStatus && matchAsset;
+  });
+
+  renderAlerts(filtered);
+}
+
+function resetFilters(){
+  document.getElementById('severityFilter').value = 'all';
+  document.getElementById('statusFilter').value = 'all';
+  document.getElementById('assetFilter').value = 'all';
+  filterAlerts();
+}
+
+/* ─── RENDER TIMELINE ─── */
+function renderTimeline(){
+  const container = document.getElementById('timeline');
+  if(!container) return;
+
+  container.innerHTML = TIMELINE.map(item => `
+    <div class="timeline-item">
+      <span class="time">${item.time}</span>
+      <span class="dot ${item.type}"></span>
+      <span class="msg">${item.msg}</span>
+      <span class="asset">${item.asset}</span>
+    </div>
+  `).join('');
+}
+
+/* ─── SIMULATE NEW ALERTS ─── */
+let alertCounter = ALERTS.length + 1;
+
+function generateNewAlert(){
+  const assets = ['Train 01', 'Train 02', 'Train 03', 'Train 04', 'Train 05', 'GPS System', 'Power System'];
+  const types = ['Sensor Fault', 'Communication Error', 'Power Drop', 'Temperature Warning', 'Signal Lost', 'Brake Warning'];
+  const severities = ['Critical', 'Warning', 'Info'];
+  const statuses = ['Open', 'Open'];
+  const times = ['just now'];
+  const descriptions = ['Automated alert generated by system monitoring.'];
+
+  const newAlert = {
+    id: 'ALT-' + String(alertCounter).padStart(3, '0'),
+    asset: assets[Math.floor(Math.random() * assets.length)],
+    type: types[Math.floor(Math.random() * types.length)],
+    severity: severities[Math.floor(Math.random() * severities.length)],
+    time: 'just now',
+    status: 'Open',
+    description: descriptions[0],
+    assignedTo: 'System'
+  };
+
+  ALERTS.unshift(newAlert);
+  TIMELINE.unshift({
+    time: 'now',
+    msg: newAlert.type,
+    type: newAlert.severity.toLowerCase(),
+    asset: newAlert.asset
+  });
+  alertCounter++;
+
+  if(TIMELINE.length > 15) TIMELINE.pop();
+
+  renderAlerts(currentFilteredAlerts);
+  renderTimeline();
+
+  // Update badge
+  const openCount = ALERTS.filter(a => a.status === 'Open' || a.status === 'Acknowledged').length;
+  const sidebarBadge = document.getElementById('sidebar-badge');
+  if (sidebarBadge) sidebarBadge.textContent = openCount;
+  const topbarEl = document.getElementById('topbar-badge');
+  if (topbarEl) topbarEl.textContent = openCount;
+}
+
+// Simulate new alerts every 15-25 seconds
+setInterval(() => {
+  if(Math.random() > 0.4){
+    generateNewAlert();
+  }
+}, 15000);
+
+/* ─── INIT ─── */
+renderAlerts(ALERTS);
+renderTimeline();
+
+lucide.createIcons();
+</script>
+<script src="sidebar.js"></script>
+</body>
+</html>

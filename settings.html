@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Railway Digital Twin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:1000;
+  position:relative;
+}
+
+.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.sb-overview-btn svg{width:15px;height:15px}
+
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
+.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
+.sb-train-img:hover img{opacity:.9}
+
+.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
+.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+.content{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* ══════════════════════════════════════════════════
+   SETTINGS PAGE STYLES
+══════════════════════════════════════════════════ */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 7px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.pt{font-size:11.5px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}
+.dim{font-size:10px;color:var(--muted)}
+
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:999px;padding:2px 10px;font-size:9px;font-weight:600;
+}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.pill.orange{background:var(--orange-bg);color:var(--orange)}
+.pill.blue{background:#eff6ff;color:#2563eb}
+[data-theme="dark"] .pill.blue{background:rgba(59,130,246,.15);color:#60a5fa}
+.pill.gray{background:var(--card2);color:var(--muted)}
+
+/* ─── Settings Grid ─── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;align-content:start}
+
+.setting-group{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  overflow:hidden;transition:all .2s;
+}
+.setting-group:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.setting-group .header{
+  padding:10px 14px 6px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.setting-group .header .icon{
+  width:28px;height:28px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.setting-group .header .icon svg{width:14px;height:14px;}
+.setting-group .header .title{font-size:12px;font-weight:700;color:var(--text)}
+.setting-group .header .sub{font-size:9px;color:var(--muted);margin-left:auto}
+.setting-group .body{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 0;border-bottom:1px solid var(--border);
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-row .label{font-size:10.5px;color:var(--muted);}
+.setting-row .label .desc{font-size:8.5px;color:var(--dim);display:block;}
+.setting-row .control{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.setting-row .control input[type="text"],
+.setting-row .control input[type="password"],
+.setting-row .control select{
+  background:var(--card2);color:var(--text);border:1px solid var(--border);
+  border-radius:5px;padding:3px 8px;font-size:10.5px;font-family:inherit;outline:none;width:140px;
+}
+.setting-row .control input:focus,
+.setting-row .control select:focus{border-color:var(--accent);}
+.setting-row .control select{width:120px;cursor:pointer;}
+.setting-row .control .toggle{
+  width:36px;height:20px;border-radius:10px;background:var(--border);
+  position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;
+}
+.setting-row .control .toggle.active{background:var(--accent);}
+.setting-row .control .toggle .knob{
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  position:absolute;top:2px;left:2px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.setting-row .control .toggle.active .knob{transform:translateX(16px);}
+.setting-row .control .status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.setting-row .control .status-dot.green{background:var(--green);}
+.setting-row .control .status-dot.red{background:var(--red);}
+.setting-row .control .status-dot.orange{background:var(--orange);}
+
+/* ─── System Status ─── */
+.system-status-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+.system-status-item{
+  background:var(--card2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;text-align:center;
+}
+.system-status-item .label{font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.system-status-item .value{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
+.system-status-item .value .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;}
+
+/* ─── Responsive ─── */
+@media(max-width:1200px){:root{--sidebar-w:190px}.settings-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+  .settings-grid{grid-template-columns:1fr;}
+  .system-status-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .settings-grid{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .topbar{padding:0 10px}
+  .content{padding:10px}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .settings-grid{grid-template-columns:1fr;}
+  .system-status-grid{grid-template-columns:1fr;}
+  .setting-row{flex-wrap:wrap;gap:4px;}
+  .setting-row .control input[type="text"],
+  .setting-row .control select{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<aside class="sidebar">
+
+</aside>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="settings" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Settings</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 18, 2026</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="content">
+
+    <!-- System Status -->
+    <div class="panel" style="flex-shrink:0;">
+      <div class="ph">
+        <span class="pt">System Status</span>
+        <span class="pill green">● All Systems Operational</span>
+      </div>
+      <div class="pb" style="padding:8px 12px;">
+        <div class="system-status-grid">
+          <div class="system-status-item">
+            <div class="label">Platform Version</div>
+            <div class="value">v2.4.1</div>
+          </div>
+          <div class="system-status-item">
+            <div class="label">Server Status</div>
+            <div class="value"><span class="dot" style="background:var(--green);"></span>Online</div>
+          </div>
+          <div class="system-status-item">
+            <div class="label">Database</div>
+            <div class="value"><span class="dot" style="background:var(--green);"></span>Connected</div>
+          </div>
+          <div class="system-status-item">
+            <div class="label">Last Backup</div>
+            <div class="value" style="font-size:11px;">Today, 02:30 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Grid -->
+    <div class="settings-grid">
+
+      <!-- General Settings -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#eff6ff;color:#2563eb;"><i data-lucide="sliders" style="width:14px;height:14px;"></i></div>
+          <span class="title">General Settings</span>
+          <span class="sub">Platform configuration</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Platform Name <span class="desc">Name displayed in header</span></span>
+            <div class="control"><input type="text" value="Railway Digital Twin"></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Organization <span class="desc">Company or agency name</span></span>
+            <div class="control"><input type="text" value="Railway Operations Control"></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Time Zone <span class="desc">System time zone</span></span>
+            <div class="control">
+              <select>
+                <option>UTC +5:30 (IST)</option>
+                <option>UTC +0:00 (GMT)</option>
+                <option>UTC -5:00 (EST)</option>
+                <option>UTC +1:00 (CET)</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Default Language <span class="desc">UI language preference</span></span>
+            <div class="control">
+              <select>
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Spanish</option>
+                <option>French</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme & Appearance -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#f5f3ff;color:#7c3aed;"><i data-lucide="palette" style="width:14px;height:14px;"></i></div>
+          <span class="title">Theme & Appearance</span>
+          <span class="sub">UI customization</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Theme Mode <span class="desc">Dark or Light theme</span></span>
+            <div class="control">
+              <div class="toggle active" onclick="toggleThemeSwitch(this)" id="themeToggle">
+                <span class="knob"></span>
+              </div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Accent Color <span class="desc">Primary UI color</span></span>
+            <div class="control">
+              <select>
+                <option>Blue (Default)</option>
+                <option>Green</option>
+                <option>Purple</option>
+                <option>Orange</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Default Landing Page <span class="desc">Page after login</span></span>
+            <div class="control">
+              <select>
+                <option>Overview Dashboard</option>
+                <option>GIS Monitoring</option>
+                <option>Live Telemetry</option>
+                <option>Devices</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Compact Mode <span class="desc">Reduce spacing and padding</span></span>
+            <div class="control"><div class="toggle" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User & Security -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#fef2f2;color:#dc2626;"><i data-lucide="shield" style="width:14px;height:14px;"></i></div>
+          <span class="title">User & Security</span>
+          <span class="sub">Access control</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Current User <span class="desc">Signed in as</span></span>
+            <div class="control"><span style="font-size:11px;font-weight:600;color:var(--text);">Administrator</span></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Change Password <span class="desc">Update your password</span></span>
+            <div class="control"><button class="pill blue" onclick="alert('Password change dialog would open here')">Change</button></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Two-Factor Auth <span class="desc">Extra security layer</span></span>
+            <div class="control"><div class="toggle" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Session Timeout <span class="desc">Auto logout after inactivity</span></span>
+            <div class="control">
+              <select>
+                <option>15 minutes</option>
+                <option selected>30 minutes</option>
+                <option>1 hour</option>
+                <option>4 hours</option>
+                <option>Never</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#f0fdf4;color:#16a34a;"><i data-lucide="bell" style="width:14px;height:14px;"></i></div>
+          <span class="title">Notifications</span>
+          <span class="sub">Alert preferences</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Email Alerts <span class="desc">Send notifications via email</span></span>
+            <div class="control"><div class="toggle active" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Critical Alerts <span class="desc">Immediate notification for critical issues</span></span>
+            <div class="control"><div class="toggle active" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">SMS Alerts <span class="desc">Text message notifications</span></span>
+            <div class="control"><div class="toggle" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Alert Threshold <span class="desc">Minimum severity level</span></span>
+            <div class="control">
+              <select>
+                <option>Critical Only</option>
+                <option selected>Critical + Warning</option>
+                <option>All Alerts</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device & Asset Configuration -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#fff7ed;color:#ea580c;"><i data-lucide="cpu" style="width:14px;height:14px;"></i></div>
+          <span class="title">Device & Asset Config</span>
+          <span class="sub">Hardware settings</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Auto-Discovery <span class="desc">Automatically detect new devices</span></span>
+            <div class="control"><div class="toggle active" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Polling Interval <span class="desc">Device data refresh rate</span></span>
+            <div class="control">
+              <select>
+                <option>1 second</option>
+                <option selected>5 seconds</option>
+                <option>10 seconds</option>
+                <option>30 seconds</option>
+                <option>1 minute</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Default Protocol <span class="desc">Preferred communication protocol</span></span>
+            <div class="control">
+              <select>
+                <option>Modbus</option>
+                <option>MQTT</option>
+                <option selected>OPC UA</option>
+                <option>BACnet</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Register New Device <span class="desc">Add device to network</span></span>
+            <div class="control"><button class="pill blue" onclick="alert('Device registration dialog would open here')">+ Add Device</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data & Telemetry -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#ecfeff;color:#0d9488;"><i data-lucide="database" style="width:14px;height:14px;"></i></div>
+          <span class="title">Data & Telemetry</span>
+          <span class="sub">Data management</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Data Refresh Rate <span class="desc">Dashboard update frequency</span></span>
+            <div class="control">
+              <select>
+                <option>Real-time</option>
+                <option selected>1 second</option>
+                <option>5 seconds</option>
+                <option>10 seconds</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Historical Retention <span class="desc">How long to keep data</span></span>
+            <div class="control">
+              <select>
+                <option>7 days</option>
+                <option>30 days</option>
+                <option selected>90 days</option>
+                <option>1 year</option>
+                <option>Forever</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Telemetry Storage <span class="desc">Enable data persistence</span></span>
+            <div class="control"><div class="toggle active" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Export Format <span class="desc">Default data export format</span></span>
+            <div class="control">
+              <select>
+                <option selected>CSV</option>
+                <option>JSON</option>
+                <option>Excel</option>
+                <option>Parquet</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API & Integrations -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#f5f3ff;color:#7c3aed;"><i data-lucide="plug" style="width:14px;height:14px;"></i></div>
+          <span class="title">API & Integrations</span>
+          <span class="sub">External connections</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">MQTT Broker <span class="desc">Message queue status</span></span>
+            <div class="control"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--green);"><span class="status-dot green"></span>Connected</span></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Kafka Cluster <span class="desc">Stream processing status</span></span>
+            <div class="control"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--green);"><span class="status-dot green"></span>Connected</span></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">GraphQL API <span class="desc">API endpoint status</span></span>
+            <div class="control"><span style="display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--green);"><span class="status-dot green"></span>Active</span></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">API Key Management <span class="desc">Manage access keys</span></span>
+            <div class="control"><button class="pill blue" onclick="alert('API Key management dialog would open here')">Manage</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GIS & Map Settings -->
+      <div class="setting-group">
+        <div class="header">
+          <div class="icon" style="background:#ecfdf5;color:#0d9488;"><i data-lucide="map" style="width:14px;height:14px;"></i></div>
+          <span class="title">GIS & Map Settings</span>
+          <span class="sub">Map preferences</span>
+        </div>
+        <div class="body">
+          <div class="setting-row">
+            <span class="label">Default Map View <span class="desc">Initial map position</span></span>
+            <div class="control">
+              <select>
+                <option>India Region</option>
+                <option>Global View</option>
+                <option>Last Position</option>
+              </select>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Default Location <span class="desc">Default map coordinates</span></span>
+            <div class="control"><input type="text" value="22.0°N, 72.5°E" style="width:120px;"></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Marker Visibility <span class="desc">Show train markers</span></span>
+            <div class="control"><div class="toggle active" onclick="toggleSwitch(this)"><span class="knob"></span></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="label">Refresh Interval <span class="desc">Map update frequency</span></span>
+            <div class="control">
+              <select>
+                <option>1 second</option>
+                <option selected>5 seconds</option>
+                <option>10 seconds</option>
+                <option>30 seconds</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Save Button -->
+    <div style="display:flex;justify-content:flex-end;gap:10px;padding:4px 0;flex-shrink:0;">
+      <button class="pill gray" style="padding:6px 18px;font-size:11px;cursor:pointer;" onclick="alert('Settings reset to defaults')">Reset to Defaults</button>
+      <button class="pill blue" style="padding:6px 18px;font-size:11px;cursor:pointer;background:var(--accent);color:#fff;" onclick="alert('Settings saved successfully!')">Save Changes</button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+lucide.createIcons();
+
+/* ─── CLOCK ─── */
+function updateClock(){
+  const n=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
+
+/* ─── THEME ─── */
+let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+function applyTheme(){
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const icon = document.getElementById('theme-icon');
+  if(icon){
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
+  }
+}
+
+function toggleTheme(){
+  isDark = !isDark;
+  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+  applyTheme();
+  // Update theme toggle in settings
+  const toggle = document.getElementById('themeToggle');
+  if(toggle){
+    if(isDark){
+      toggle.classList.add('active');
+    } else {
+      toggle.classList.remove('active');
+    }
+  }
+}
+applyTheme();
+
+/* ─── NAVIGATION ─── */
+function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+function openOverview(){ window.location.href = 'index.html'; }
+function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+function openDevices(){ window.location.href = 'devices.html'; }
+function openSettings(){ window.location.href = 'settings.html'; }
+function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
+
+/* ─── TOGGLE SWITCH ─── */
+function toggleSwitch(el){
+  el.classList.toggle('active');
+}
+
+function toggleThemeSwitch(el){
+  el.classList.toggle('active');
+  const isActive = el.classList.contains('active');
+  if(isActive){
+    // Switch to dark
+    if(!isDark){
+      toggleTheme();
+    }
+  } else {
+    // Switch to light
+    if(isDark){
+      toggleTheme();
+    }
+  }
+}
+
+/* ─── SET ACTIVE THEME TOGGLE ─── */
+document.addEventListener('DOMContentLoaded', function(){
+  const toggle = document.getElementById('themeToggle');
+  if(toggle){
+    if(isDark){
+      toggle.classList.add('active');
+    } else {
+      toggle.classList.remove('active');
+    }
+  }
+});
+
+lucide.createIcons();
+</script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

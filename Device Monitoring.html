@@ -804,8 +804,6 @@ const pages = [
   ["google-earth", "Google Earth View", "GE", "MONITORING"],
   ["route-visualization", "Route Visualization", "RV", "MONITORING"],
   ["devices", "Devices", "DV", "MONITORING"],
-  ["api-cards", "API Cards", "API", "MANAGEMENT"],
-  ["credentials", "Credentials", "KEY", "MANAGEMENT"],
   ["settings", "Settings", "ST", "MANAGEMENT"],
   ["alerts", "Alerts", "AL", "SYSTEM", 6],
   ["reports", "Reports", "RP", "SYSTEM"]
@@ -985,9 +983,7 @@ function renderPage() {
     case "route-visualization": return renderRoute();
     case "devices": return renderDevices();
     case "settings": return renderSettings();
-    case "api-cards": return renderSimple("API Cards", "Manage railway integration cards and quotas.", ["REST Bridge", "Telemetry Stream", "GIS Tile Service"]);
-    case "credentials": return renderSimple("Credentials", "Rotate and audit platform access keys.", ["Primary API Key", "Map Provider Token", "Operations Webhook"]);
-    case "alerts": return renderSimple("Alerts", "Critical and warning events requiring operator attention.", alerts.map((a) => `${a[1]} - ${a[2]}`));
+   case "alerts": return renderSimple("Alerts", "Critical and warning events requiring operator attention.", alerts.map((a) => `${a[1]} - ${a[2]}`));
     case "reports": return renderSimple("Reports", "Operational reports and system health snapshots.", ["Daily Movement Summary", "Asset Health Report", "Device Connectivity"]);
     case "operations":
     case "overview":

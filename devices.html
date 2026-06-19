@@ -7,7 +7,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-
+<link rel="stylesheet" href="sidebar.css">
 <style>
   /* ══════════════════════════════════════════════════
    CSS VARIABLES  — LIGHT (default) + DARK overrides
@@ -298,57 +298,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 
 <!-- ════════ SIDEBAR ════════ -->
 <aside class="sidebar">
-  <div class="sb-logo">
-    <div class="sb-logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="13" rx="2"/>
-        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-        <circle cx="7.5" cy="18.5" r=".5" fill="currentColor"/>
-        <circle cx="16.5" cy="18.5" r=".5" fill="currentColor"/>
-        <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/>
-        <line x1="8" y1="14" x2="16" y2="14"/>
-      </svg>
-    </div>
-    <div class="sb-brand">
-      <div class="b1">RAILWAY</div>
-      <div class="b2">Digital Twin</div>
-      <div class="b3">Monitoring Platform</div>
-    </div>
-  </div>
 
-  <div class="sb-overview">
-    <button class="sb-overview-btn" onclick="openOverview()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      <span>Overview</span>
-    </button>
-  </div>
-
-  <div class="sb-sec">Monitoring</div>
-  <div class="sb-item" onclick="openAssetHierarchy()"><i data-lucide="layers"></i><span>Asset Hierarchy</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openAssetDetails()"><i data-lucide="layers"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openLiveTelemetry()"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openGisMonitoring()"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openGoogleEarthView()"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item" onclick="openRoutevisualization()"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-  <div class="sb-item active" onclick="openDevices()"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-
-  <div class="sb-sec">Management</div>
-  <div class="sb-item"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
-
-  <div class="sb-sec">Monitoring</div>
-  <div class="sb-item"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
-
-  <div style="padding:6px 0 2px">
-    <button class="sb-logout" onclick="doLogout()">
-      <i data-lucide="log-out"></i><span>Logout</span>
-    </button>
-  </div>
-
-  <div class="sb-train-img">
-    <img src="assets/images/train_img.png" alt="Train" id="sidebar-train-img"/>
-  </div>
-
-  <div class="sb-footer">© 2026 Railway Systems</div>
 </aside>
 
 <!-- ════════ MAIN ════════ -->
@@ -536,6 +486,8 @@ function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
 function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
 function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
 function openDevices(){ window.location.href = 'devices.html'; }
+function openSettings(){ window.location.href = 'settings.html'; }
+function openAlerts(){ window.location.href = 'alerts.html'; }
 function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
 
 /* ─── DEVICE DATA ─── */
@@ -837,6 +789,6 @@ setInterval(() => {
 
 lucide.createIcons();
 </script>
-
+<script src="sidebar.js"></script>
 </body>
 </html>
