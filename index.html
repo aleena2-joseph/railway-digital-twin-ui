@@ -3,21 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Overview - Railway Digital Twin</title>
+<title>Dashboard - Digital Twin Platform</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
 <link rel="stylesheet" href="sidebar.css">
 <style>
   /* ══════════════════════════════════════════════════
-   CSS VARIABLES  — LIGHT (default) + DARK overrides
+   CSS VARIABLES
 ══════════════════════════════════════════════════ */
 :root {
   --bg:           #f0f4f8;
@@ -87,7 +82,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* ══════════════════════════════════════════════════
-   SIDEBAR
+   SIDEBAR - imported from sidebar.css
 ══════════════════════════════════════════════════ */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
@@ -100,96 +95,6 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   position:relative;
 }
 
-/* Logo area */
-.sb-logo{
-  padding:14px 12px 12px;
-  border-bottom:1px solid var(--sidebar-bd);
-  display:flex;align-items:center;gap:10px;flex-shrink:0;
-}
-.sb-logo-icon{
-  width:38px;height:38px;border-radius:9px;flex-shrink:0;
-  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-  display:flex;align-items:center;justify-content:center;
-}
-.sb-logo-icon svg{width:20px;height:20px;color:#fff}
-.sb-brand{line-height:1.25}
-.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
-[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
-.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
-.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
-[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
-
-/* Overview active pill */
-.sb-overview{padding:10px 10px 4px}
-.sb-overview-btn{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:9px 14px;border-radius:8px;
-  background:#3b82f6;color:#fff;
-  font-size:12px;font-weight:600;
-  border:none;cursor:pointer;
-}
-.sb-overview-btn svg{width:15px;height:15px}
-
-/* Section label */
-.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
-
-/* Nav item */
-.sb-item{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 12px;cursor:pointer;
-  color:var(--nav-txt);font-size:11.5px;
-  transition:background .12s,color .12s;
-  border-right:2.5px solid transparent;
-}
-.sb-item:hover{background:var(--nav-hover);color:var(--text)}
-.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
-.sb-item svg{width:14px;height:14px;flex-shrink:0}
-.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
-.sb-badge{
-  margin-left:auto;min-width:17px;height:17px;
-  background:#ef4444;border-radius:8px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:flex;align-items:center;justify-content:center;padding:0 4px;
-}
-
-/* Train image in sidebar (train1.png) - BACKGROUND STYLE */
-.sb-train-img{
-  flex-shrink:0;
-
-  overflow:hidden;
-  height:160px;
-  position:relative;
- 
-  margin-top:auto;
-}
-.sb-train-img img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  opacity:.75;
-  transition:opacity .25s;
-  position:absolute;
-  top:0;
-  left:0;
-}
-.sb-train-img:hover img{opacity:.9}
-
-/* Logout btn */
-.sb-logout{
-  display:flex;align-items:center;gap:8px;
-  width:calc(100% - 20px);margin:6px 10px 4px;
-  padding:8px 14px;border-radius:8px;
-  background:var(--red-bg);color:var(--red);
-  font-size:11.5px;font-weight:600;
-  border:1px solid rgba(220,38,38,.2);
-  cursor:pointer;transition:background .15s;
-}
-.sb-logout:hover{background:rgba(220,38,38,.22)}
-.sb-logout svg{width:14px;height:14px}
-
-.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
-
 /* ══════════════════════════════════════════════════
    MAIN
 ══════════════════════════════════════════════════ */
@@ -201,16 +106,16 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   background:var(--topbar-bg);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 18px;box-shadow:var(--shadow);
-  transition:background .25s;
+  padding:0 20px;
+  box-shadow:var(--shadow);
 }
-.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left{display:flex;align-items:center;gap:10px}
 .tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
-.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .dt-pill{
   display:flex;align-items:center;gap:6px;
   background:var(--card2);border:1px solid var(--border);
-  border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
 }
 .dt-pill .dt-date{font-weight:600;color:var(--text)}
 .dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
@@ -230,9 +135,9 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   display:flex;align-items:center;justify-content:center;
 }
 .admin-chip{
-  display:flex;align-items:center;gap:7px;
+  display:flex;align-items:center;gap:8px;
   background:var(--card2);border:1px solid var(--border);
-  border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer;
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
 }
 .admin-av{
   width:28px;height:28px;border-radius:6px;
@@ -243,243 +148,483 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
 .admin-role{font-size:9px;color:var(--muted)}
 
-/* Scrollable content */
+/* Content */
 .content{
   flex:1;overflow-y:auto;
-  padding:12px 14px;
-  display:flex;flex-direction:column;gap:10px;
+  padding:16px 20px;
+  display:flex;flex-direction:column;
+  gap:14px;
 }
 
 /* ══════════════════════════════════════════════════
    KPI ROW
 ══════════════════════════════════════════════════ */
-.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;flex-shrink:0}
-.kpi{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:10px;padding:12px;
-  box-shadow:var(--shadow);
-  display:flex;align-items:center;gap:10px;
-  transition:background .25s,border-color .25s;
-  min-width:0;
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  flex-shrink:0;
 }
+.kpi{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px 20px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  transition:all .2s;
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
 .kpi-ico{
-  width:40px;height:40px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
 }
 .kpi-ico svg{width:20px;height:20px}
-.kpi-lbl{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi-val{font-size:20px;font-weight:800;color:var(--text);line-height:1;margin:1px 0}
-.kpi-val .u{font-size:11px;font-weight:500;color:var(--muted)}
-.kpi-sub{font-size:9.5px;color:var(--dim)}
+.kpi-info{min-width:0}
+.kpi-lbl{
+  font-size:10px;
+  color:var(--muted);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.kpi-val{
+  font-size:26px;
+  font-weight:800;
+  color:var(--text);
+  line-height:1.2;
+  margin-top:2px;
+}
+.kpi-sub{
+  font-size:10px;
+  color:var(--dim);
+  margin-top:1px;
+}
 
 /* ══════════════════════════════════════════════════
    PANEL BASE
 ══════════════════════════════════════════════════ */
 .panel{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:10px;box-shadow:var(--shadow);
-  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
   transition:background .25s,border-color .25s;
 }
-.ph{/* panel header */
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 12px 7px;flex-shrink:0;
+.ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  flex-shrink:0;
   border-bottom:1px solid var(--border);
+  background:var(--card2);
 }
-.pt{font-size:11.5px;font-weight:700;color:var(--text)}/* panel title */
-.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}/* panel body */
-.bl{font-size:10px;color:var(--accent);cursor:pointer;display:flex;align-items:center;gap:3px}
+.pt{font-size:12px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column}
+.bl{
+  font-size:10px;color:var(--accent);cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+}
 .bl:hover{text-decoration:underline}
 .bl svg{width:9px;height:9px}
 
 /* ══════════════════════════════════════════════════
-   ROW 2  (5-col grid)
+   ROW 2
 ══════════════════════════════════════════════════ */
 .row2{
   display:grid;
-  grid-template-columns:1fr 1fr 1.1fr 0.85fr 2.15fr;
-  gap:9px;height:305px;flex-shrink:0;
+  grid-template-columns:1fr 1.2fr 1.2fr;
+  gap:14px;
+  height:230px;
+  flex-shrink:0;
 }
 
-/* System Health gauges */
-.gauges-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1;place-items:center}
-.gw{display:flex;flex-direction:column;align-items:center;gap:3px}
-.gl{font-size:8.5px;color:var(--muted);text-align:center;line-height:1.3;max-width:66px}
-
-/* Donut */
-.donut-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
-.donut-ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
-.donut-ctr .big{font-size:20px;font-weight:800;color:var(--text);line-height:1}
-.donut-ctr .sm{font-size:9px;color:var(--muted)}
-.leg{display:flex;flex-direction:column;gap:3px;margin-top:5px}
-.leg-row{display:flex;align-items:center;justify-content:space-between}
-.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.leg-n{font-size:9.5px;color:var(--muted);flex:1;margin-left:5px}
-.leg-v{font-size:9.5px;color:var(--muted);font-weight:600}
-
-/* Route in row2 */
-.stop-row{display:flex;align-items:center;margin-bottom:6px}
-.stop-w{display:flex;align-items:center;flex:1}
-.stop-w:last-child{flex:0}
-.stop-nd{display:flex;flex-direction:column;align-items:center;gap:2px}
-.stop-d{width:8px;height:8px;border-radius:50%;background:var(--dim)}
-.stop-d.done{background:var(--accent)}
-.stop-d.active{background:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.25)}
-.stop-nm{font-size:7.5px;color:var(--dim);white-space:nowrap}
-.stop-nm.done,.stop-nm.active{color:var(--accent);font-weight:700}
-.stop-ln{flex:1;height:2px;background:var(--border)}
-.stop-ln.done{background:var(--accent)}
-.rpb{height:3px;background:var(--border);border-radius:2px;margin-bottom:6px;overflow:visible;position:relative}
-.rpb-fill{height:100%;width:71.5%;background:linear-gradient(90deg,#3b82f6,#06b6d4);border-radius:2px;position:relative}
-.rpb-fill::after{content:'🚆';position:absolute;right:-10px;top:-8px;font-size:11px;animation:tmov 1.8s ease-in-out infinite alternate}
-@keyframes tmov{0%{transform:translateX(0)}100%{transform:translateX(3px)}}
-.rs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:5px}
-.rs{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:5px 7px}
-.rs-l{font-size:8.5px;color:var(--muted);margin-bottom:1px}
-.rs-v{font-size:12px;font-weight:800;color:var(--text);line-height:1.1}
-.rs-v .u{font-size:8.5px;font-weight:400;color:var(--muted)}
-.rs-v.teal{color:#06b6d4}
-
-/* Alerts */
-.al-list{display:flex;flex-direction:column;gap:4px;overflow-y:auto;flex:1}
-.al-item{background:var(--card2);border-left:3px solid;border-radius:0 5px 5px 0;padding:5px 7px}
-.al-meta{display:flex;align-items:center;gap:4px;margin-bottom:2px}
-.al-t{font-size:8.5px;color:var(--dim)}
-.al-tr{font-size:8.5px;padding:1px 5px;border-radius:3px;font-weight:600}
-.al-msg{font-size:9.5px;color:var(--muted)}
-
-/* ══════════════════════════════════════════════════
-   MAP PANEL
-══════════════════════════════════════════════════ */
-.map-panel{display:flex;flex-direction:column}
-.map-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:7px 11px;border-bottom:1px solid var(--border);flex-shrink:0;
-}
-.live-badge{display:flex;align-items:center;gap:5px}
-.live-dot{width:7px;height:7px;background:#16a34a;border-radius:50%;animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.map-sel{
-  background:var(--card2);color:var(--muted);
-  font-size:10px;border:1px solid var(--border);border-radius:6px;
-  padding:3px 7px;outline:none;font-family:inherit;cursor:pointer;
-}
-/* Leaflet map container */
-#leaflet-map{flex:1;min-height:0}
-
-/* Train 05 info strip below map */
-.t05-strip{
-  flex-shrink:0;border-top:1px solid var(--border);
-  padding:6px 11px;
-}
-.t05-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.t05-train-ico{
-  width:26px;height:26px;border-radius:6px;
-  background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:13px;
-}
-.t05-stats{display:flex;gap:14px}
-.t05-stat-l{font-size:8.5px;color:var(--dim);margin-bottom:1px}
-.t05-stat-v{font-size:11px;font-weight:700;color:var(--text)}
-.t05-sch{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;border-top:1px solid var(--border);padding-top:4px;margin-bottom:3px}
-.t05-s-l{font-size:8px;color:var(--dim)}
-.t05-s-v{font-size:8.5px;font-weight:600;color:var(--muted)}
-.t05-bottom{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-
-/* ══════════════════════════════════════════════════
-   ROW 3  (3 panels)
-══════════════════════════════════════════════════ */
-.row3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:9px;height:252px;flex-shrink:0}
-
-/* Metric pills */
-.m-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px}
-.mpill{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;text-align:center}
-.mpill.warn{border-color:rgba(220,38,38,.4);background:var(--red-bg)}
-.ml{font-size:8.5px;color:var(--muted);margin-bottom:2px}
-.mv{font-size:17px;font-weight:800;color:var(--accent);line-height:1}
-.mv.wv{color:var(--red)}
-.mu{font-size:8.5px;color:var(--muted)}
-.mwl{font-size:8.5px;color:var(--red);font-weight:600;margin-bottom:2px}
-.chart-wrap{flex:1;min-height:0;position:relative}
-
-/* Asset tree */
-.tree{flex:1;overflow-y:auto}
-.t-root{display:flex;align-items:center;gap:5px;padding:4px 3px;cursor:pointer;border-radius:4px}
-.t-root:hover{background:var(--nav-hover)}
-.t-node{display:flex;align-items:center;gap:5px;padding:3px 3px;cursor:pointer;border-radius:4px}
-.t-node:hover{background:var(--nav-hover)}
-.t-chev{width:11px;height:11px;color:var(--muted);flex-shrink:0;transition:transform .15s}
-.t-chev.open{transform:rotate(90deg)}
-.t-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.t-lbl{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.t-badge{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:600}
-
-/* Asset details */
-.det-tbl{flex:1;overflow-y:auto}
-.det-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border:none}
-.det-row:last-child{border:none;padding-bottom:8px}
-.det-k{font-size:11px;color:var(--muted);font-weight:500;flex:0 0 auto}
-.det-v{font-size:11px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;text-align:right;flex:0 0 auto}
-.run-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-
-/* Asset Details Panel - IMPROVED LAYOUT */
-.asset-details-container {
+/* ─── SYSTEM HEALTH ─── */
+.health-container{
   display:flex;
-  gap:30px;
-  align-items:stretch;
-  height:100%;
-  padding:0 12px 0 12px;
-}
-
-.asset-details-text {
+  gap:16px;
   flex:1;
-  overflow-y:auto;
-  min-width:0;
+  align-items:center;
+}
+.health-circle{
+  position:relative;
+  width:90px;
+  height:90px;
+  flex-shrink:0;
+}
+.health-circle svg{transform:rotate(-90deg)}
+.health-circle .bg{
+  fill:none;
+  stroke:var(--border);
+  stroke-width:7;
+}
+.health-circle .progress{
+  fill:none;
+  stroke:var(--green);
+  stroke-width:7;
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s ease;
+}
+.health-circle .center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.health-circle .center .big{
+  font-size:20px;
+  font-weight:800;
+  color:var(--text);
+}
+.health-circle .center .sm{
+  font-size:9px;
+  color:var(--muted);
+}
+.health-bars{
+  flex:1;
   display:flex;
   flex-direction:column;
-  padding-right:20px;
+  gap:6px;
+  justify-content:center;
+}
+.health-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.health-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.health-dot.green{background:var(--green)}
+.health-dot.yellow{background:var(--orange)}
+.health-dot.red{background:var(--red)}
+.health-label{
+  font-size:11px;
+  color:var(--text);
+  flex:0 0 56px;
+}
+.health-count{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  flex:0 0 32px;
+  text-align:right;
+}
+.health-bar-wrap{
+  flex:1;
+  height:5px;
+  background:var(--border);
+  border-radius:3px;
+  overflow:hidden;
+}
+.health-bar{
+  height:100%;
+  border-radius:3px;
+  transition:width .8s ease;
+}
+.health-bar.green{background:var(--green)}
+.health-bar.yellow{background:var(--orange)}
+.health-bar.red{background:var(--red)}
+.health-percent{
+  font-size:10px;
+  color:var(--muted);
+  flex:0 0 34px;
+  text-align:right;
 }
 
-.asset-details-image {
-  flex-shrink:0;
-  width:160px;
-  height:100%;
-  border-radius:12px;
+/* ─── ALERTS ─── */
+.al-list{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  flex:1;
+  overflow-y:auto;
+}
+.al-item{
+  background:var(--card2);
+  border-left:3px solid;
+  border-radius:0 6px 6px 0;
+  padding:5px 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:all .2s;
+}
+.al-item:hover{background:var(--border)}
+.al-item .al-icon{font-size:14px;flex-shrink:0}
+.al-item .al-content{flex:1;min-width:0}
+.al-item .al-msg{
+  font-size:11px;
+  color:var(--text);
+  white-space:nowrap;
   overflow:hidden;
-  background:linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  text-overflow:ellipsis;
+}
+.al-item .al-meta{
+  font-size:9px;
+  color:var(--muted);
+  display:flex;
+  gap:8px;
+  margin-top:1px;
+}
+.al-item .al-badge{
+  font-size:8px;
+  padding:1px 6px;
+  border-radius:3px;
+  font-weight:600;
+}
+.al-item.critical{border-left-color:var(--red)}
+.al-item.warning{border-left-color:var(--orange)}
+.al-item.info{border-left-color:var(--accent)}
+.al-footer{
+  display:flex;
+  gap:14px;
+  padding-top:6px;
+  border-top:1px solid var(--border);
+  margin-top:6px;
+  font-size:10px;
+  color:var(--muted);
+}
+.al-footer span{display:flex;align-items:center;gap:4px}
+
+/* ─── ASSET SUMMARY ─── */
+.summary-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  flex:1;
+  align-content:center;
+}
+.summary-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:6px 12px;
+  background:var(--card2);
+  border-radius:6px;
+  border:1px solid var(--border);
+  transition:all .2s;
+}
+.summary-item:hover{border-color:var(--accent);background:var(--nav-hover)}
+.summary-item .summary-label{
+  font-size:11px;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.summary-item .summary-label .summary-icon{font-size:15px}
+.summary-item .summary-count{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+
+/* ══════════════════════════════════════════════════
+   ROW 3
+══════════════════════════════════════════════════ */
+.row3{
+  display:grid;
+  grid-template-columns:1.8fr 1.2fr;
+  gap:14px;
+  height:200px;
+  flex-shrink:0;
+}
+
+/* ─── LIVE ASSET STATUS ─── */
+.status-table{width:100%;border-collapse:collapse}
+.status-table th{
+  text-align:left;
+  font-size:9px;
+  font-weight:600;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  padding:4px 8px;
+  border-bottom:1px solid var(--border);
+}
+.status-table td{
+  padding:6px 8px;
+  font-size:11px;
+  color:var(--text);
+  border-bottom:1px solid var(--border);
+}
+.status-table tr:last-child td{border-bottom:none}
+.status-table .status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  display:inline-block;
+  margin-right:6px;
+}
+.status-table .status-dot.green{background:var(--green)}
+.status-table .status-dot.yellow{background:var(--orange)}
+.status-table .status-dot.red{background:var(--red)}
+.status-table .health-bar-mini{
+  width:60px;
+  height:4px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+  display:inline-block;
+  vertical-align:middle;
+}
+.status-table .health-bar-mini .fill{
+  height:100%;
+  border-radius:2px;
+  transition:width .8s ease;
+}
+.status-table .health-bar-mini .fill.green{background:var(--green)}
+.status-table .health-bar-mini .fill.yellow{background:var(--orange)}
+.status-table .health-bar-mini .fill.red{background:var(--red)}
+.status-table .status-val{font-weight:600}
+
+/* ─── QUICK ACTIONS ─── */
+.quick-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+  flex:1;
+  align-content:center;
+}
+.quick-btn{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:10px 6px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .2s;
+  gap:4px;
+}
+.quick-btn:hover{
+  background:var(--nav-hover);
+  border-color:var(--accent);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-md);
+}
+.quick-btn svg{
+  width:22px;
+  height:22px;
+  color:var(--accent);
+}
+.quick-btn .qb-label{
+  font-size:9px;
+  color:var(--muted);
+  font-weight:500;
+}
+
+/* ══════════════════════════════════════════════════
+   ROW 4
+══════════════════════════════════════════════════ */
+.row4{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  height:110px;
+  flex-shrink:0;
+}
+
+/* ─── RECENT ACTIVITY ─── */
+.activity-list{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  flex:1;
+  overflow-y:auto;
+}
+.activity-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:3px 4px;
+  font-size:10px;
+  color:var(--muted);
+}
+.activity-item .act-time{
+  color:var(--dim);
+  font-weight:500;
+  flex:0 0 50px;
+}
+.activity-item .act-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.activity-item .act-dot.green{background:var(--green)}
+.activity-item .act-dot.orange{background:var(--orange)}
+.activity-item .act-dot.blue{background:var(--accent)}
+.activity-item .act-dot.red{background:var(--red)}
+.activity-item .act-msg{
+  color:var(--text);
+  flex:1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ─── DIGITAL TWIN STATUS ─── */
+.twin-status{display:flex;align-items:center;gap:16px;flex:1}
+.twin-icon{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25);
- 
+  flex-shrink:0;
 }
-
-.asset-details-image img {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  
+.twin-icon svg{width:22px;height:22px;color:#fff}
+.twin-info{flex:1}
+.twin-info .twin-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
 }
+.twin-info .twin-stats{
+  display:flex;
+  gap:16px;
+  margin-top:3px;
+}
+.twin-info .twin-stats span{
+  font-size:10px;
+  color:var(--muted);
+}
+.twin-info .twin-stats strong{color:var(--text)}
+.twin-btn{
+  padding:6px 16px;
+  border-radius:6px;
+  background:var(--accent);
+  color:#fff;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  border:none;
+  flex-shrink:0;
+}
+.twin-btn:hover{opacity:.85;transform:scale(1.02)}
 
 /* ══════════════════════════════════════════════════
-   ASSET HIERARCHY PAGE LAYOUT
+   GLOBAL TOOLTIP
 ══════════════════════════════════════════════════ */
-.ah-row{
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:10px;
-  flex:1;
-  min-height:0;
-}
-.ah-tree-panel,.ah-details-panel{height:100%}
-.ah-tree-panel .pb{padding:6px 8px}
-.ah-details-panel .pb{padding:4px 12px}
-.ah-empty{padding:60px 0;text-align:center;color:var(--muted);font-size:12px}
-
-/* ══════════════════════════════════════════════════
-   GLOBAL TRAIN TOOLTIP
-══════════════════════════════════════════════════ */
-#train-tt{
+#asset-tt{
   display:none;position:fixed;
   background:var(--card);border:1px solid var(--border);
   border-radius:10px;padding:10px 13px;
@@ -496,124 +641,48 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 /* ══════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════ */
-@media(max-width:1400px){
-  .row2{grid-template-columns:1fr 1fr 1fr 0.85fr 2fr}
-  .kpi-row{gap:7px}
-}
-
 @media(max-width:1200px){
-  :root{--sidebar-w:190px}
-  .kpi-row{grid-template-columns:repeat(3,1fr);gap:7px}
-  .row2{grid-template-columns:1fr 1fr 2fr;height:auto;min-height:280px}
-  .row2 > .panel:nth-child(4){grid-column:1;grid-row:2}
-  .row2 > .panel:nth-child(5){grid-column:2/4;grid-row:2;height:260px}
-  .row3{grid-template-columns:1fr 1fr;height:auto}
-  .row3 > .panel:last-child{grid-column:1/3}
-  .asset-details-image{width:120px}
-  .ah-row{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr 1fr;height:auto;min-height:230px}
+  .row2>.panel:nth-child(3){grid-column:1/3;height:180px}
+  .row3{grid-template-columns:1fr;height:auto}
+  .row3>.panel:last-child{grid-column:1;height:180px}
+  .row4{grid-template-columns:1fr;height:auto}
 }
-
-@media(max-width:1024px){
-  .asset-details-container {
-    flex-direction:column;
-    gap:20px;
-    padding:0 12px;
-  }
-  
-  .asset-details-image {
-    width:100%;
-    height:200px;
-  }
-}
-
 @media(max-width:900px){
   :root{--sidebar-w:56px}
-  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
-  .sb-item{justify-content:center;padding:10px}
-  .sb-overview-btn{justify-content:center;padding:10px}
-  .sb-overview-btn span{display:none}
-  .sb-train-img{height:100px}
-  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
-  .kpi-row{grid-template-columns:repeat(2,1fr)}
-  .row2{grid-template-columns:1fr 1fr;height:auto}
-  .row2 > .panel:nth-child(5){grid-column:1/3;height:260px}
-  .row3{grid-template-columns:1fr}
-  .row3 > .panel:last-child{grid-column:1}
-  .asset-details-container {
-    flex-direction:column;
-    gap:15px;
-    padding:0 10px;
-  }
-  .asset-details-image {
-    width:100%;
-    height:160px;
-  }
-  body{overflow:auto}
-  html,body{height:auto}
-  .app{height:auto;flex-direction:column}
-  .main{overflow:auto}
-  .content{overflow:visible}
+  .content{padding:12px 14px}
+  .kpi-row{gap:10px}
+  .row2,.row3,.row4{gap:10px}
 }
-
 @media(max-width:768px){
-  .row3{grid-template-columns:1fr}
-  .row3 > .panel:last-child{grid-column:1}
-  .asset-details-image {
-    height:140px;
-  }
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .row2{grid-template-columns:1fr}
+  .row2>.panel:nth-child(3){grid-column:1}
   .topbar{padding:0 12px}
-  .tb-left h2{font-size:14px}
   .dt-pill .dt-date{display:none}
   .admin-role{display:none}
 }
-
 @media(max-width:600px){
-  .kpi-row{grid-template-columns:1fr 1fr}
-  .row2{grid-template-columns:1fr}
-  .row2>*{height:auto!important}
-  .row3{grid-template-columns:1fr}
-  .topbar{padding:0 10px}
+  .kpi-row{grid-template-columns:1fr}
   .content{padding:10px}
-  .dt-pill .dt-date{display:none}
-  .admin-role,.admin-name~*{display:none}
-  .asset-details-container {
-    flex-direction:column;
-    gap:12px;
-    padding:0 8px;
-  }
-  .asset-details-image {
-    height:120px;
-  }
-  .ph{padding:7px 10px 6px}
-  .pb{padding:8px 10px}
-}
-
-@media(max-width:480px){
-  .kpi{padding:10px}
-  .kpi-ico{width:35px;height:35px}
-  .kpi-val{font-size:18px}
-  .asset-details-image {
-    height:100px;
-  }
+  .kpi{padding:12px 16px}
+  .kpi-val{font-size:22px}
 }
 
 /* Leaflet dark tile filter */
-[data-theme="dark"] #leaflet-map .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
-[data-theme="dark"] #leaflet-map .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
-[data-theme="dark"] #leaflet-map .leaflet-popup-content-wrapper{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
-[data-theme="dark"] #leaflet-map .leaflet-popup-tip{background:#1e293b}
+[data-theme="dark"] .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
+[data-theme="dark"] .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ GLOBAL TRAIN TOOLTIP ═══════════════ -->
-<div id="train-tt">
+<!-- ═══════════════ GLOBAL TOOLTIP ═══════════════ -->
+<div id="asset-tt">
   <div id="tt-title"></div>
   <div id="tt-grid">
-    <div><div class="tt-l">Speed</div><div class="tt-v" id="tt-speed"></div></div>
     <div><div class="tt-l">Status</div><div class="tt-v" id="tt-status"></div></div>
-    <div><div class="tt-l">Route</div><div class="tt-v" id="tt-route" style="font-size:10px"></div></div>
-    <div><div class="tt-l">Next Station</div><div class="tt-v" id="tt-next" style="font-size:10px"></div></div>
+    <div><div class="tt-l">Type</div><div class="tt-v" id="tt-location"></div></div>
   </div>
   <div id="tt-upd"></div>
 </div>
@@ -622,9 +691,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 <div class="app">
 
 <!-- ════════ SIDEBAR ════════ -->
-<aside class="sidebar">
- 
-</aside>
+<div class="sidebar"></div>
 
 <!-- ════════ MAIN ════════ -->
 <div class="main">
@@ -633,24 +700,21 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   <div class="topbar">
     <div class="tb-left">
       <i data-lucide="layout-dashboard" style="width:17px;height:17px;color:var(--muted)"></i>
-      <h2>Operations Overview</h2>
+      <h2>Dashboard</h2>
     </div>
     <div class="tb-right">
       <div class="dt-pill">
-        <span class="dt-date" id="clock-date">June 12, 2025</span>
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
         <span style="color:var(--border)">|</span>
         <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
-      <!-- Theme toggle -->
-      <button class="ib" id="theme-btn" onclick="toggleTheme()" title="Toggle Dark / Light mode">
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
         <i data-lucide="sun" id="theme-icon"></i>
       </button>
-      <!-- Notification -->
       <div class="notif-wrap">
         <button class="ib"><i data-lucide="bell"></i></button>
         <span class="notif-dot">8</span>
       </div>
-      <!-- Admin -->
       <div class="admin-chip">
         <div class="admin-av">A</div>
         <div>
@@ -662,105 +726,52 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     </div>
   </div>
 
-  <!-- Scrollable content -->
+  <!-- Content -->
   <div class="content">
 
     <!-- ═══ ROW 1 — KPI CARDS ═══ -->
     <div class="kpi-row">
-
-      <!-- Total Trains -->
       <div class="kpi">
         <div class="kpi-ico" style="background:#eff6ff">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-            <circle cx="7.5" cy="18.5" r=".5" fill="#2563eb"/><circle cx="16.5" cy="18.5" r=".5" fill="#2563eb"/>
-            <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
         </div>
-        <div style="min-width:0">
-          <div class="kpi-lbl">Total Trains</div>
-          <div class="kpi-val">12</div>
-          <div class="kpi-sub">All Trains</div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Total Assets</div>
+          <div class="kpi-val">456</div>
+          <div class="kpi-sub">+12 this month</div>
         </div>
       </div>
-
-      <!-- Online Trains -->
       <div class="kpi">
         <div class="kpi-ico" style="background:#f0fdf4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#16a34a"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
         </div>
-        <div>
-          <div class="kpi-lbl">Online Trains</div>
-          <div class="kpi-val" style="color:#16a34a">10</div>
-          <div class="kpi-sub" style="color:#16a34a;font-weight:600">Running</div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Active Assets</div>
+          <div class="kpi-val" style="color:#16a34a">421</div>
+          <div class="kpi-sub" style="color:#16a34a">92% online</div>
         </div>
       </div>
-
-      <!-- Offline Trains -->
-      <div class="kpi">
-        <div class="kpi-ico" style="background:#fef2f2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="1" y1="1" x2="23" y2="23"/>
-            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
-            <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
-            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-          </svg>
-        </div>
-        <div>
-          <div class="kpi-lbl">Offline Trains</div>
-          <div class="kpi-val" style="color:#dc2626">2</div>
-          <div class="kpi-sub">Not Connected</div>
-        </div>
-      </div>
-
-      <!-- Total Devices -->
       <div class="kpi">
         <div class="kpi-ico" style="background:#f5f3ff">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/>
-            <path d="M15 2v2M9 2v2M2 15h2M2 9h2M22 15h-2M22 9h-2M15 22v-2M9 22v-2"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
         </div>
-        <div>
-          <div class="kpi-lbl">Total Devices</div>
-          <div class="kpi-val">456</div>
-          <div class="kpi-sub">Connected</div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Sensors</div>
+          <div class="kpi-val">2,450</div>
+          <div class="kpi-sub">Connected sensors</div>
         </div>
       </div>
-
-      <!-- Active Alerts -->
       <div class="kpi">
         <div class="kpi-ico" style="background:#fff7ed">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
-        <div>
+        <div class="kpi-info">
           <div class="kpi-lbl">Active Alerts</div>
           <div class="kpi-val" style="color:#ea580c">8</div>
-          <div class="kpi-sub">Requires Attention</div>
+          <div class="kpi-sub">3 critical, 5 warning</div>
         </div>
       </div>
-
-      <!-- Total Distance -->
-      <div class="kpi">
-        <div class="kpi-ico" style="background:#f0fdfa">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-          </svg>
-        </div>
-        <div>
-          <div class="kpi-lbl">Total Distance</div>
-          <div class="kpi-val">1,256<span class="u"> km</span></div>
-          <div class="kpi-sub">Today</div>
-        </div>
-      </div>
-
-    </div><!-- /kpi-row -->
+    </div>
 
     <!-- ═══ ROW 2 ═══ -->
     <div class="row2">
@@ -769,804 +780,296 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
       <div class="panel">
         <div class="ph"><span class="pt">System Health</span></div>
         <div class="pb">
-          <div class="gauges-grid" id="gauges-grid"></div>
-        </div>
-      </div>
-
-      <!-- Train Status donut -->
-      <div class="panel">
-        <div class="ph"><span class="pt">Train Status</span></div>
-        <div class="pb">
-          <div class="donut-wrap">
-            <canvas id="donut-chart" style="max-height:150px;max-width:150px"></canvas>
-            <div class="donut-ctr">
-              <div class="big">12</div><div class="sm">Total</div>
+          <div class="health-container">
+            <div class="health-circle">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle class="bg" cx="45" cy="45" r="36"/>
+                <circle class="progress" id="health-progress" cx="45" cy="45" r="36" stroke-dasharray="226.2" stroke-dashoffset="18.1"/>
+              </svg>
+              <div class="center">
+                <div class="big">92%</div>
+                <div class="sm">Overall</div>
+              </div>
+            </div>
+            <div class="health-bars">
+              <div class="health-row">
+                <span class="health-dot green"></span>
+                <span class="health-label">Healthy</span>
+                <span class="health-count">412</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar green" style="width:90.4%"></div>
+                </div>
+                <span class="health-percent">90.4%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-dot yellow"></span>
+                <span class="health-label">Warning</span>
+                <span class="health-count">28</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar yellow" style="width:6.1%"></div>
+                </div>
+                <span class="health-percent">6.1%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-dot red"></span>
+                <span class="health-label">Critical</span>
+                <span class="health-count">16</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar red" style="width:3.5%"></div>
+                </div>
+                <span class="health-percent">3.5%</span>
+              </div>
             </div>
           </div>
-          <div class="leg">
-            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#22c55e"></span><span class="leg-n">Running</span></span><span class="leg-v">10 (83%)</span></div>
-            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#ef4444"></span><span class="leg-n">Stopped</span></span><span class="leg-v">1 (8%)</span></div>
-            <div class="leg-row"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#f97316"></span><span class="leg-n">Maintenance</span></span><span class="leg-v">1 (8%)</span></div>
-          </div>
         </div>
       </div>
 
-      <!-- Route Visualization -->
+      <!-- Recent Alerts -->
       <div class="panel">
         <div class="ph">
-          <span class="pt">Route Visualization – Train 01</span>
-          <button class="bl">View Full Route <i data-lucide="external-link"></i></button>
-        </div>
-        <div class="pb">
-          <div class="stop-row">
-            <div class="stop-w"><div class="stop-nd"><div class="stop-d done"></div><div class="stop-nm done">Mumbai</div></div><div class="stop-ln done"></div></div>
-            <div class="stop-w"><div class="stop-nd"><div class="stop-d active"></div><div class="stop-nm active">Surat ›</div></div><div class="stop-ln"></div></div>
-            <div class="stop-w"><div class="stop-nd"><div class="stop-d"></div><div class="stop-nm">Vadodara</div></div><div class="stop-ln"></div></div>
-            <div class="stop-w" style="flex:0"><div class="stop-nd"><div class="stop-d"></div><div class="stop-nm">Ahmedabad</div></div></div>
-          </div>
-          <div class="rpb"><div class="rpb-fill"></div></div>
-          <div class="rs-grid">
-            <div class="rs"><div class="rs-l">Distance Covered</div><div class="rs-v" style="color:var(--accent)">356<span class="u"> km</span></div></div>
-            <div class="rs"><div class="rs-l">Remaining</div><div class="rs-v">142<span class="u"> km</span></div></div>
-            <div class="rs"><div class="rs-l">ETA</div><div class="rs-v teal">01:45<span class="u"> min</span></div></div>
-          </div>
-          <div class="chart-wrap"><canvas id="route-chart"></canvas></div>
-        </div>
-      </div>
-
-      <!-- Alerts -->
-      <div class="panel">
-        <div class="ph">
-          <span class="pt">Alerts</span>
-          <button class="bl">View All</button>
+          <span class="pt">Recent Alerts</span>
+          <button class="bl" onclick="location.href='alerts.html'">View All <i data-lucide="external-link"></i></button>
         </div>
         <div class="pb">
           <div class="al-list">
-            <div class="al-item" style="border-left-color:#f97316">
-              <div class="al-meta"><span class="al-t">10:42</span><span class="al-tr" style="background:#fff7ed;color:#ea580c">Train 07</span></div>
-              <div class="al-msg">Brake Pressure Low</div>
-            </div>
-            <div class="al-item" style="border-left-color:#dc2626">
-              <div class="al-meta"><span class="al-t">10:31</span><span class="al-tr" style="background:#fef2f2;color:#dc2626">Train 03</span></div>
-              <div class="al-msg">High Engine Temp</div>
-            </div>
-            <div class="al-item" style="border-left-color:#f97316">
-              <div class="al-meta"><span class="al-t">10:15</span><span class="al-tr" style="background:#fff7ed;color:#ea580c">Train 02</span></div>
-              <div class="al-msg">GPS Signal Lost</div>
-            </div>
-            <div class="al-item" style="border-left-color:#3b82f6">
-              <div class="al-meta"><span class="al-t">09:58</span><span class="al-tr" style="background:#eff6ff;color:#2563eb">Train 08</span></div>
-              <div class="al-msg">Door Sensor Fault</div>
-            </div>
-            <div class="al-item" style="border-left-color:#dc2626">
-              <div class="al-meta"><span class="al-t">09:40</span><span class="al-tr" style="background:#fef2f2;color:#dc2626">Train 03</span></div>
-              <div class="al-msg">Brake Pressure Low</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Train Tracking (Real Leaflet Map) -->
-      <div class="panel map-panel">
-        <div class="map-head">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="pt">Live Train Tracking</span>
-            <div class="live-badge">
-              <span class="live-dot"></span>
-              <span style="font-size:10px;color:#16a34a;font-weight:600">Live</span>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <select class="map-sel" id="train-filter" onchange="filterTrains(this.value)">
-              <option value="all">All Trains</option>
-              <option value="t1">Train 01</option>
-              <option value="t2">Train 02</option>
-              <option value="t3">Train 03</option>
-              <option value="t4">Train 04</option>
-              <option value="t5">Train 05</option>
-            </select>
-            <button class="ib"><i data-lucide="filter" style="width:13px;height:13px"></i></button>
-            <button class="ib" onclick="mapInstance && mapInstance.setView([22.0,72.5],7)"><i data-lucide="maximize-2" style="width:13px;height:13px"></i></button>
-          </div>
-        </div>
-
-        <!-- REAL LEAFLET MAP -->
-        <div id="leaflet-map" style="flex:1;min-height:0"></div>
-
-        <!-- Train 05 schedule strip -->
-        <div class="t05-strip">
-          <div class="t05-top">
-            <div style="display:flex;align-items:center;gap:7px">
-              <div class="t05-train-ico">🚆</div>
-              <div>
-                <div style="font-size:11px;font-weight:700;color:var(--text)">Train 05
-                  <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:#dcfce7;color:#16a34a;font-weight:700;margin-left:4px">Running</span>
-                </div>
-                <div class="t05-s-l">Route: Surat – Ahmedabad &nbsp;·&nbsp; Last Update: 1 min ago
-                  <button style="color:var(--accent);font-size:9px">↻</button>
-                </div>
+            <div class="al-item critical">
+              <span class="al-icon">🔴</span>
+              <div class="al-content">
+                <div class="al-msg">Compressor-02 — High Temperature</div>
+                <div class="al-meta"><span>10:45 AM</span><span class="al-badge" style="background:#fef2f2;color:#dc2626">Critical</span></div>
               </div>
             </div>
-            <div class="t05-stats">
-              <div><div class="t05-stat-l">Status</div><div class="t05-stat-v" style="color:#16a34a">Running</div></div>
-              <div><div class="t05-stat-l">Speed</div><div class="t05-stat-v">110 km/h</div></div>
-              <div><div class="t05-stat-l">Next Station</div><div class="t05-stat-v">Vadodara</div></div>
-              <div><div class="t05-stat-l">ETA</div><div class="t05-stat-v">10:45 AM</div></div>
+            <div class="al-item warning">
+              <span class="al-icon">🟡</span>
+              <div class="al-content">
+                <div class="al-msg">AHU-03 — Maintenance Due</div>
+                <div class="al-meta"><span>10:30 AM</span><span class="al-badge" style="background:#fff7ed;color:#ea580c">Warning</span></div>
+              </div>
+            </div>
+            <div class="al-item critical">
+              <span class="al-icon">🔴</span>
+              <div class="al-content">
+                <div class="al-msg">Sensor-14 — Connection Lost</div>
+                <div class="al-meta"><span>10:12 AM</span><span class="al-badge" style="background:#fef2f2;color:#dc2626">Critical</span></div>
+              </div>
+            </div>
+            <div class="al-item info">
+              <span class="al-icon">ℹ️</span>
+              <div class="al-content">
+                <div class="al-msg">Gateway-01 — Firmware Update Available</div>
+                <div class="al-meta"><span>09:58 AM</span><span class="al-badge" style="background:#eff6ff;color:#3b82f6">Info</span></div>
+              </div>
             </div>
           </div>
-          <div class="t05-sch">
-            <div><div class="t05-s-l">Start: Surat</div><div class="t05-s-v">06:30 AM</div></div>
-            <div><div class="t05-s-l">Via: Vadodara</div><div class="t05-s-v">08:20 AM</div></div>
-            <div><div class="t05-s-l">Bharuch</div><div class="t05-s-v">09:10 AM</div></div>
-            <div><div class="t05-s-l">Anand</div><div class="t05-s-v">09:50 AM</div></div>
-            <div><div class="t05-s-l">Dest: Ahmedabad</div><div class="t05-s-v" style="color:var(--text);font-weight:700">11:15 AM</div></div>
-          </div>
-          <div class="t05-bottom">
-            <div><div class="t05-stat-l">Train No.</div><div class="t05-stat-v">12005</div></div>
-            <div><div class="t05-stat-l">Coach</div><div class="t05-stat-v">B2, B3, B4, B5</div></div>
-            <div><div class="t05-stat-l">Driver</div><div class="t05-stat-v">Rajesh Kumar</div></div>
-            <div><div class="t05-stat-l">Last Update</div><div class="t05-stat-v">30 sec ago</div></div>
+          <div class="al-footer">
+            <span>🔴 Critical: <strong>3</strong></span>
+            <span>🟡 Warning: <strong>4</strong></span>
+            <span>ℹ️ Info: <strong>1</strong></span>
           </div>
         </div>
       </div>
 
-    </div><!-- /row2 -->
+      <!-- Asset Summary -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Asset Summary</span></div>
+        <div class="pb">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label"><span class="summary-icon">📦</span> Assets</span>
+              <span class="summary-count">456</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label"><span class="summary-icon">🏷️</span> Properties</span>
+              <span class="summary-count">1,280</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label"><span class="summary-icon">🌡️</span> Sensors</span>
+              <span class="summary-count">2,450</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label"><span class="summary-icon">⚙️</span> Controllers</span>
+              <span class="summary-count">45</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     <!-- ═══ ROW 3 ═══ -->
     <div class="row3">
 
-      <!-- Live Telemetry -->
+      <!-- Live Asset Status -->
       <div class="panel">
         <div class="ph">
-          <span class="pt">Live Telemetry – Train 01</span>
-          <button class="bl">View Details <i data-lucide="external-link"></i></button>
+          <span class="pt">Live Asset Status</span>
+          <button class="bl" onclick="location.href='asset_explorer.html'">View Assets <i data-lucide="external-link"></i></button>
         </div>
+        <div class="pb" style="padding:8px 16px;">
+          <table class="status-table">
+            <thead>
+              <tr><th>Asset</th><th>Status</th><th>Health</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>COMP-01</strong></td>
+                <td><span class="status-dot green"></span>Running</td>
+                <td><span class="health-bar-mini"><span class="fill green" style="width:96%"></span></span> 96%</td>
+              </tr>
+              <tr>
+                <td><strong>AHU-03</strong></td>
+                <td><span class="status-dot yellow"></span>Warning</td>
+                <td><span class="health-bar-mini"><span class="fill yellow" style="width:72%"></span></span> 72%</td>
+              </tr>
+              <tr>
+                <td><strong>Sensor-14</strong></td>
+                <td><span class="status-dot red"></span>Offline</td>
+                <td><span class="health-bar-mini"><span class="fill red" style="width:0%"></span></span> 0%</td>
+              </tr>
+              <tr>
+                <td><strong>Gateway-01</strong></td>
+                <td><span class="status-dot green"></span>Running</td>
+                <td><span class="health-bar-mini"><span class="fill green" style="width:100%"></span></span> 100%</td>
+              </tr>
+              <tr>
+                <td><strong>Controller-05</strong></td>
+                <td><span class="status-dot green"></span>Running</td>
+                <td><span class="health-bar-mini"><span class="fill green" style="width:88%"></span></span> 88%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Quick Actions</span></div>
         <div class="pb">
-          <div class="m-grid">
-            <div class="mpill">
-              <div class="ml">Speed</div>
-              <div class="mv" id="live-speed">128</div>
-              <div class="mu">km/h</div>
+          <div class="quick-grid">
+            <div class="quick-btn" onclick="location.href='asset_explorer.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/></svg>
+              <span class="qb-label">Assets</span>
             </div>
-            <div class="mpill">
-              <div class="ml">Voltage</div>
-              <div class="mv">25.4</div>
-              <div class="mu">kV</div>
+            <div class="quick-btn" onclick="location.href='telemetry_center.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span class="qb-label">Telemetry</span>
             </div>
-            <div class="mpill">
-              <div class="ml">Current</div>
-              <div class="mv">132</div>
-              <div class="mu">A</div>
+            <div class="quick-btn" onclick="location.href='gis_monitoring.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span class="qb-label">GIS</span>
             </div>
-            <div class="mpill warn">
-              <div class="mwl">Brake Pressure</div>
-              <div class="mv wv">5.6</div>
-              <div class="mu">bar</div>
+            <div class="quick-btn" onclick="location.href='3d_twin.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><box x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/></svg>
+              <span class="qb-label">Digital Twin</span>
+            </div>
+            <div class="quick-btn" onclick="location.href='alerts.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span class="qb-label">Alerts</span>
+            </div>
+            <div class="quick-btn" onclick="location.href='reports.html'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+              <span class="qb-label">Reports</span>
             </div>
           </div>
-          <div class="chart-wrap"><canvas id="speed-chart"></canvas></div>
         </div>
       </div>
 
-      <!-- Asset Hierarchy -->
+    </div>
+
+    <!-- ═══ ROW 4 ═══ -->
+    <div class="row4">
+
+      <!-- Recent Activity -->
       <div class="panel">
-        <div class="ph">
-          <span class="pt">Asset Hierarchy</span>
-          <button class="bl" onclick="openAssetHierarchy()">View Full <i data-lucide="external-link"></i></button>
-        </div>
+        <div class="ph"><span class="pt">Recent Activity</span></div>
         <div class="pb">
-          <div class="tree" id="asset-tree"></div>
-        </div>
-      </div>
-
-      <!-- Asset Details Panel -->
-      <div class="panel">
-        <div class="ph" >
-          <span class="pt" >Asset Details – Train 01</span>
-        </div>
-        <div class="pb" style="padding:0;">
-          <div class="asset-details-container">
-            <div class="asset-details-text">
-              <div class="det-row"><span class="det-k">Train ID</span><span class="det-v">WR-101</span></div>
-              <div class="det-row"><span class="det-k">Type</span><span class="det-v">Electric</span></div>
-              <div class="det-row"><span class="det-k">Status</span><span class="det-v"><span class="run-dot"></span>Running</span></div>
-              <div class="det-row"><span class="det-k">Driver</span><span class="det-v">John Smith</span></div>
-              <div class="det-row"><span class="det-k">Location</span><span class="det-v">Vadodara</span></div>
-              <div class="det-row"><span class="det-k">Speed</span><span class="det-v">128 km/h</span></div>
-              <div class="det-row" style="border:none;"><span class="det-k">Last Update</span><span class="det-v">10:45:30 AM</span></div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <span class="act-time">10:45</span>
+              <span class="act-dot red"></span>
+              <span class="act-msg">Compressor-02 alert generated</span>
+            </div>
+            <div class="activity-item">
+              <span class="act-time">10:32</span>
+              <span class="act-dot blue"></span>
+              <span class="act-msg">Metadata updated for AHU-03</span>
+            </div>
+            <div class="activity-item">
+              <span class="act-time">10:15</span>
+              <span class="act-dot green"></span>
+              <span class="act-msg">Sensor-14 reconnected</span>
+            </div>
+            <div class="activity-item">
+              <span class="act-time">09:58</span>
+              <span class="act-dot green"></span>
+              <span class="act-msg">User Admin logged in</span>
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /row3 -->
+      <!-- Digital Twin Status -->
+      <div class="panel">
+        <div class="pb" style="flex-direction:row;align-items:center;gap:16px;padding:12px 16px;">
+          <div class="twin-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><box x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
+          </div>
+          <div class="twin-info">
+            <div class="twin-title">Digital Twin Status</div>
+            <div class="twin-stats">
+              <span>Connected: <strong>421</strong></span>
+              <span>3D Models: <strong>145</strong></span>
+              <span>Sync: <strong>12s</strong></span>
+            </div>
+          </div>
+          <button class="twin-btn" onclick="location.href='3d_twin.html'">Open Viewer</button>
+        </div>
+      </div>
+
+    </div>
 
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /app -->
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
 <script>
-  /* ─────────────────────────────────────────────
-   INIT ICONS
-───────────────────────────────────────────── */
-lucide.createIcons();
-
-/* ─────────────────────────────────────────────
-   CLOCK
-───────────────────────────────────────────── */
-function updateClock(){
-  const n=new Date();
-  const dateEl=document.getElementById('clock-date');
-  const timeEl=document.getElementById('clock-time');
-  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-}
-updateClock(); setInterval(updateClock,1000);
-
-/* ─────────────────────────────────────────────
-   THEME TOGGLE (persisted across pages via localStorage)
-───────────────────────────────────────────── */
-let isDark = localStorage.getItem('rdt-theme') === 'dark';
-
-function applyTheme(){
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-  const icon = document.getElementById('theme-icon');
-  if(icon){
-    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
-    lucide.createIcons();
-  }
-}
-
-function toggleTheme(){
-  isDark = !isDark;
-  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
-  applyTheme();
-  if(typeof buildGauges === 'function') buildGauges();
-  if(typeof updateChartTheme === 'function') updateChartTheme();
-  if(typeof rebuildTree === 'function') rebuildTree();
-  // Leaflet dark tile swap is handled by CSS filter (see [data-theme="dark"] #leaflet-map)
-}
-
-// Apply saved theme immediately on every page load
-applyTheme();
-
-/* ─────────────────────────────────────────────
-   NAVIGATION (sidebar links across pages)
-───────────────────────────────────────────── */
-function openAssetHierarchy(){
-  window.location.href = 'asset_hierarchy.html';
-}
-function openAssetDetails(){
-  window.location.href = 'asset_details.html';
-}
-function openOverview(){
-  window.location.href = 'index.html';
-}
-function openLiveTelemetry(){
-  window.location.href = 'live_telemetry.html';
-}
-function openGisMonitoring(){
-  window.location.href = 'gis_monitoring.html';
-}
-function openGoogleEarthView(){
-  window.location.href = 'googleEarthView.html';
-}
-function openRoutevisualization(){
-  window.location.href = 'route_visualization.html';
-}
-function openDevices(){
-  window.location.href = 'devices.html';
-}
-
+  // ─── SIDEBAR LOAD ───
  
-function openSettings(){ window.location.href = 'settings.html'; }
-function openAlerts(){ window.location.href = 'alerts.html'; }
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
 
-/* ─────────────────────────────────────────────
-   LOGOUT
-───────────────────────────────────────────── */
-function doLogout(){
-  if(confirm('Are you sure you want to logout?')){
-    window.location.href='Login.html';
-  }
-}
-
-/* ─────────────────────────────────────────────
-   SYSTEM HEALTH GAUGES (SVG circular)
-   Only runs if #gauges-grid exists on the page
-───────────────────────────────────────────── */
-const gaugesData=[
-  {label:'Engine Status', value:92, status:'Healthy', color:'#22c55e', trackL:'#dcfce7', trackD:'#14532d'},
-  {label:'Brake Status',  value:88, status:'Healthy', color:'#f59e0b', trackL:'#fef3c7', trackD:'#451a03'},
-  {label:'Power Status',  value:95, status:'Healthy', color:'#22c55e', trackL:'#dcfce7', trackD:'#14532d'},
-  {label:'Comm. Status',  value:90, status:'Good',    color:'#06b6d4', trackL:'#cffafe', trackD:'#164e63'},
-];
-function buildGauges(){
-  const grid=document.getElementById('gauges-grid');
-  if(!grid) return;
-  grid.innerHTML='';
-  gaugesData.forEach(g=>{
-    const R=30,circ=2*Math.PI*R;
-    const offset=circ-(g.value/100)*circ;
-    const track=isDark?g.trackD:g.trackL;
-    const txtFill=isDark?'#f1f5f9':'#0f172a';
-    const w=document.createElement('div');
-    w.className='gw';
-    w.innerHTML=`
-      <svg width="76" height="76" viewBox="0 0 76 76">
-        <circle cx="38" cy="38" r="${R}" fill="none" stroke="${track}" stroke-width="7"/>
-        <circle cx="38" cy="38" r="${R}" fill="none" stroke="${g.color}"
-          stroke-width="7"
-          stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
-          stroke-linecap="round" transform="rotate(-90 38 38)"
-          style="transition:stroke-dashoffset .9s ease"/>
-        <text x="38" y="35" text-anchor="middle" fill="${txtFill}"
-          font-size="12" font-weight="800" font-family="Inter,sans-serif">${g.value}%</text>
-        <text x="38" y="47" text-anchor="middle" fill="${g.color}"
-          font-size="7.5" font-family="Inter,sans-serif">${g.status}</text>
-      </svg>
-      <p class="gl">${g.label}</p>`;
-    grid.appendChild(w);
-  });
-}
-buildGauges();
-
-/* ─────────────────────────────────────────────
-   DONUT CHART — Train Status
-   Only runs if #donut-chart exists on the page
-───────────────────────────────────────────── */
-let donutChart=null;
-const donutEl=document.getElementById('donut-chart');
-if(donutEl){
-  const donutCtx=donutEl.getContext('2d');
-  donutChart=new Chart(donutCtx,{
-    type:'doughnut',
-    data:{
-      labels:['Running','Stopped','Maintenance'],
-      datasets:[{data:[10,1,1],backgroundColor:['#22c55e','#ef4444','#f97316'],borderWidth:0,hoverOffset:5}]
-    },
-    options:{
-      cutout:'70%',
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#1e293b',borderColor:'#475569',borderWidth:1,
-          titleColor:'#f1f5f9',bodyColor:'#e2e8f0',
-          titleFont:{size:11},bodyFont:{size:10},
-          callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} trains`}
-        }
-      },
-      animation:{animateRotate:true,duration:1000},
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      lucide.createIcons();
     }
-  });
-}
-
-/* ─────────────────────────────────────────────
-   SPEED CHART — Live Telemetry
-   Only runs if #speed-chart exists on the page
-───────────────────────────────────────────── */
-let speedChart=null;
-const speedEl=document.getElementById('speed-chart');
-if(speedEl){
-  const sCtx=speedEl.getContext('2d');
-  const sGrad=sCtx.createLinearGradient(0,0,0,100);
-  sGrad.addColorStop(0,'rgba(59,130,246,.35)');
-  sGrad.addColorStop(1,'rgba(59,130,246,0)');
-  const speedLabels=['09:41','09:46','09:51','09:56','10:01','10:06','10:11','10:16','10:21','10:26','10:31','10:36','10:41'];
-  const speedVals=[88,102,115,120,118,125,130,128,122,132,128,135,128];
-  speedChart=new Chart(sCtx,{
-    type:'line',
-    data:{
-      labels:speedLabels,
-      datasets:[{
-        label:'Speed (km/h)',data:speedVals,
-        borderColor:'#3b82f6',borderWidth:2,backgroundColor:sGrad,
-        fill:true,tension:.45,pointRadius:1.5,pointBackgroundColor:'#3b82f6',pointHoverRadius:4,
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',borderColor:'#475569',borderWidth:1,titleColor:'#f1f5f9',bodyColor:'#60a5fa',callbacks:{label:ctx=>` ${ctx.parsed.y} km/h`}}},
-      scales:{
-        x:{ticks:{color:'#94a3b8',font:{size:7},maxRotation:0},grid:{color:'rgba(148,163,184,.12)'},border:{display:false}},
-        y:{ticks:{color:'#94a3b8',font:{size:7},stepSize:50},grid:{color:'rgba(148,163,184,.12)'},border:{display:false},min:0,max:200}
-      },
-      animation:{duration:600},responsive:true,maintainAspectRatio:false,
-    }
-  });
-}
-
-/* ─────────────────────────────────────────────
-   ROUTE CHART
-   Only runs if #route-chart exists on the page
-───────────────────────────────────────────── */
-let routeChart=null;
-const routeEl=document.getElementById('route-chart');
-if(routeEl){
-  const rCtx=routeEl.getContext('2d');
-  const rGrad=rCtx.createLinearGradient(0,0,0,70);
-  rGrad.addColorStop(0,'rgba(6,182,212,.35)');
-  rGrad.addColorStop(1,'rgba(6,182,212,0)');
-  routeChart=new Chart(rCtx,{
-    type:'line',
-    data:{
-      labels:['Mumbai','Surat','Vadodara','Ahmedabad'],
-      datasets:[{label:'km',data:[0,214,356,498],borderColor:'#06b6d4',borderWidth:2,backgroundColor:rGrad,fill:true,tension:.4,pointRadius:2.5,pointBackgroundColor:'#06b6d4',pointHoverRadius:5}]
-    },
-    options:{
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',borderColor:'#475569',borderWidth:1,titleColor:'#f1f5f9',bodyColor:'#06b6d4',callbacks:{label:ctx=>` ${ctx.parsed.y} km from origin`}}},
-      scales:{
-        x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'rgba(148,163,184,.12)'},border:{display:false}},
-        y:{ticks:{color:'#94a3b8',font:{size:7},stepSize:150},grid:{color:'rgba(148,163,184,.12)'},border:{display:false},min:0,max:550}
-      },
-      animation:{duration:600},responsive:true,maintainAspectRatio:false,
-    }
-  });
-}
-
-function updateChartTheme(){
-  const tc=isDark?'#64748b':'#94a3b8';
-  const gc=isDark?'rgba(71,85,105,.18)':'rgba(148,163,184,.12)';
-  [speedChart,routeChart].forEach(ch=>{
-    if(!ch) return;
-    ch.options.scales.x.ticks.color=tc;
-    ch.options.scales.y.ticks.color=tc;
-    ch.options.scales.x.grid.color=gc;
-    ch.options.scales.y.grid.color=gc;
-    ch.update('none');
-  });
-}
-
-/* ─────────────────────────────────────────────
-   REAL LEAFLET MAP — Western India railway network
-   Only runs if #leaflet-map exists on the page
-───────────────────────────────────────────── */
-
-const CITIES={
-  Mumbai:   [19.076, 72.877],
-  Valsad:   [20.599, 72.934],
-  Navsari:  [20.946, 72.952],
-  Surat:    [21.170, 72.831],
-  Bharuch:  [21.705, 72.996],
-  Ankleshwar:[21.627, 73.001],
-  Vadodara: [22.307, 73.181],
-  Anand:    [22.557, 72.954],
-  Ahmedabad:[23.022, 72.571],
-  Rajkot:   [22.303, 70.802],
-  Bhavnagar:[21.764, 72.152],
-  Junagadh: [21.519, 70.457],
-  Gandhidham:[23.083,70.133],
-  Saurashtra:[22.200,71.000],
-};
-
-const TRAINS=[
-  {id:'t1',name:'Train 01',lat:21.95, lng:73.09, speed:128, color:'#f59e0b',status:'Running',route:'Mumbai→Ahmedabad',next:'Vadodara'},
-  {id:'t2',name:'Train 02',lat:22.44, lng:71.80, speed:96,  color:'#60a5fa',status:'Running',route:'Rajkot→Ahmedabad',next:'Ahmedabad'},
-  {id:'t3',name:'Train 03',lat:21.50, lng:73.05, speed:0,   color:'#ef4444',status:'Stopped', route:'Mumbai→Surat',   next:'Surat'},
-  {id:'t4',name:'Train 04',lat:22.75, lng:72.85, speed:78,  color:'#f59e0b',status:'Running',route:'Vadodara→Ahmedabad',next:'Ahmedabad'},
-  {id:'t5',name:'Train 05',lat:22.19, lng:72.63, speed:110, color:'#22c55e',status:'Running',route:'Surat→Ahmedabad', next:'Vadodara'},
-];
-
-const ROUTES=[
-  {color:'#f59e0b',weight:3, points:[
-    [19.076,72.877],[20.599,72.934],[20.946,72.952],[21.170,72.831],
-    [21.627,73.001],[21.705,72.996],[22.307,73.181],[22.557,72.954],[23.022,72.571]
-  ]},
-  {color:'#60a5fa',weight:3, points:[
-    [22.303,70.802],[22.680,71.350],[22.900,71.880],[23.022,72.571]
-  ]},
-  {color:'#a78bfa',weight:2.5,points:[
-    [21.764,72.152],[22.100,72.550],[22.307,73.181]
-  ]},
-  {color:'#34d399',weight:2.5,points:[
-    [21.519,70.457],[21.900,70.620],[22.303,70.802]
-  ]},
-  {color:'#fb923c',weight:2.5,dashed:true,points:[
-    [23.083,70.133],[23.040,70.500],[23.022,72.571]
-  ]},
-];
-
-let mapInstance=null;
-const markerLayers={};
-
-function initLeafletMap(){
-  if(!document.getElementById('leaflet-map')) return;
-  mapInstance=L.map('leaflet-map',{
-    center:[22.0,72.5],zoom:7,
-    zoomControl:false,
-    attributionControl:true,
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, © <a href="https://carto.com/">CARTO</a>',
-    subdomains:'abcd',maxZoom:19,
-  }).addTo(mapInstance);
-
-  L.control.zoom({position:'topright'}).addTo(mapInstance);
-
-  ROUTES.forEach(r=>{
-    const opts={color:r.color,weight:r.weight||2.5,opacity:.85,lineJoin:'round'};
-    if(r.dashed) opts.dashArray='8,5';
-    L.polyline(r.points,opts).addTo(mapInstance);
-  });
-
-  Object.entries(CITIES).forEach(([name,coords])=>{
-    const icon=L.divIcon({
-      className:'',
-      html:`<div style="
-        width:8px;height:8px;border-radius:50%;
-        background:#64748b;border:2px solid #fff;
-        box-shadow:0 1px 4px rgba(0,0,0,.3);">
-      </div>`,
-      iconAnchor:[4,4],
-    });
-    const marker=L.marker(coords,{icon,interactive:false}).addTo(mapInstance);
-    marker.bindTooltip(name,{
-      permanent:true,direction:'right',offset:[6,0],
-      className:'leaflet-city-label',
-      opacity:.85,
-    });
-  });
-
-  TRAINS.forEach(train=>{
-    const icon=createTrainIcon(train);
-    const m=L.marker([train.lat,train.lng],{icon,zIndexOffset:100})
-      .addTo(mapInstance)
-      .on('click',(e)=>{
-        showGlobalTooltip(e.originalEvent,train.name,`${train.speed>0?train.speed+' km/h':'Stopped'}`,train.status,train.route,train.next,train.color);
-      });
-    markerLayers[train.id]=m;
-  });
-}
-
-function createTrainIcon(train){
-  const stopped=train.status==='Stopped';
-  return L.divIcon({
-    className:'',
-    html:`
-      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-        <div style="
-          width:16px;height:16px;border-radius:50%;
-          background:${train.color};border:2.5px solid #fff;
-          box-shadow:0 0 8px ${train.color}88,0 2px 6px rgba(0,0,0,.3);
-          display:flex;align-items:center;justify-content:center;
-          font-size:8px;">
-          ${stopped?'✖':'▶'}
-        </div>
-        <div style="
-          background:rgba(15,23,42,.85);backdrop-filter:blur(4px);
-          color:${train.color};font-size:8.5px;font-weight:700;
-          padding:2px 5px;border-radius:4px;white-space:nowrap;
-          border:1px solid ${train.color}55;line-height:1.3;
-          font-family:Inter,sans-serif;">
-          ${train.name}<br>
-          <span style="color:${stopped?'#ef4444':'#94a3b8'};font-weight:400">
-            ${stopped?'Stopped':train.speed+' km/h'}
-          </span>
-        </div>
-      </div>`,
-    iconSize:[80,44],
-    iconAnchor:[8,8],
-    popupAnchor:[0,-12],
-  });
-}
-
-const mapStyle=document.createElement('style');
-mapStyle.textContent=`
-  .leaflet-city-label{
-    background:none!important;border:none!important;box-shadow:none!important;
-    padding:0!important;font-size:9px!important;font-weight:600!important;
-    color:#475569!important;font-family:Inter,sans-serif!important;
-    white-space:nowrap!important;
-  }
-  [data-theme="dark"] .leaflet-city-label{color:#94a3b8!important}
-  .leaflet-control-attribution{font-size:8px}
-`;
-document.head.appendChild(mapStyle);
-
-window.addEventListener('load',()=>{
-  setTimeout(initLeafletMap, 50);
-});
-
-function filterTrains(val){
-  TRAINS.forEach(t=>{
-    const m=markerLayers[t.id];
-    if(!m) return;
-    if(val==='all'||t.id===val){
-      mapInstance&&m.addTo(mapInstance);
-    } else {
-      m.remove();
-    }
-  });
-}
-
-/* ─────────────────────────────────────────────
-   GLOBAL TOOLTIP (outside map)
-───────────────────────────────────────────── */
-const tt=document.getElementById('train-tt');
-let ttVisible=false;
-function showGlobalTooltip(ev,name,speed,status,route,next,color){
-  if(!tt) return;
-  document.getElementById('tt-title').textContent=name;
-  document.getElementById('tt-title').style.color=color;
-  document.getElementById('tt-speed').textContent=speed;
-  document.getElementById('tt-status').textContent=status;
-  document.getElementById('tt-status').style.color=status==='Stopped'?'#ef4444':'#16a34a';
-  document.getElementById('tt-route').textContent=route;
-  document.getElementById('tt-next').textContent=next;
-  document.getElementById('tt-upd').textContent='Last updated: just now';
-  tt.style.left=Math.min(ev.clientX+14,window.innerWidth-200)+'px';
-  tt.style.top=Math.max(ev.clientY-32,8)+'px';
-  tt.style.display='block';
-  ttVisible=true;
-}
-document.addEventListener('click',()=>{if(ttVisible){tt.style.display='none';ttVisible=false}});
-
-/* ─────────────────────────────────────────────
-   ASSET TREE (Asset Hierarchy page)
-   Only runs if #asset-tree exists on the page
-───────────────────────────────────────────── */
-const TREE_DATA={
-  id:'rn',label:'Railway Network',children:[
-    {id:'wr',label:'Western Railway',children:[
-      {id:'wr101',label:'Train 01 (WR-101)',badge:'Running',bClr:'#16a34a',bBg:'#dcfce7',bBgD:'rgba(34,197,94,.15)',children:[
-        {id:'eng',label:'Engine',dot:'#22c55e'},
-        {id:'c1', label:'Coach 1',dot:'#22c55e'},
-        {id:'c2', label:'Coach 2',dot:'#22c55e'},
-        {id:'bs', label:'Brake System',dot:'#22c55e'},
-      ]},
-      {id:'wr102',label:'Train 02 (WR-102)',badge:'Running',bClr:'#16a34a',bBg:'#dcfce7',bBgD:'rgba(34,197,94,.15)',children:[
-        {id:'eng2',label:'Engine',dot:'#22c55e'},
-        {id:'c21', label:'Coach 1',dot:'#22c55e'},
-      ]},
-      {id:'wr103',label:'Train 03 (WR-103)',badge:'Stopped',bClr:'#dc2626',bBg:'#fee2e2',bBgD:'rgba(220,38,38,.15)',children:[
-        {id:'eng3',label:'Engine',dot:'#ef4444'},
-        {id:'c31', label:'Coach 1',dot:'#22c55e'},
-        {id:'c32', label:'Coach 2',dot:'#22c55e'},
-      ]},
-    ]}
-  ]
-};
-const openNodes=new Set(['rn','wr','wr101']);
-
-// Asset details shown to the right when a tree node is clicked
-const ASSET_DETAILS={
-  wr101:{id:'WR-101',type:'Electric',status:'Running',driver:'John Smith',location:'Vadodara',speed:'128 km/h',update:'10:45:30 AM'},
-  wr102:{id:'WR-102',type:'Electric',status:'Running',driver:'Asha Rao',location:'Anand',speed:'96 km/h',update:'10:44:10 AM'},
-  wr103:{id:'WR-103',type:'Diesel',  status:'Stopped', driver:'Vikram Singh',location:'Surat',speed:'0 km/h',update:'10:31:02 AM'},
-  eng:{id:'WR-101-ENG',type:'Engine',status:'Healthy',driver:'-',location:'Vadodara',speed:'-',update:'10:45:30 AM'},
-  c1:{id:'WR-101-C1',type:'Coach',status:'Healthy',driver:'-',location:'Vadodara',speed:'-',update:'10:45:30 AM'},
-  c2:{id:'WR-101-C2',type:'Coach',status:'Healthy',driver:'-',location:'Vadodara',speed:'-',update:'10:45:30 AM'},
-  bs:{id:'WR-101-BS',type:'Brake System',status:'Healthy',driver:'-',location:'Vadodara',speed:'-',update:'10:45:30 AM'},
-};
-let selectedAssetId='wr101';
-
-function findNode(node,id){
-  if(node.id===id) return node;
-  if(!node.children) return null;
-  for(const c of node.children){
-    const r=findNode(c,id);
-    if(r) return r;
-  }
-  return null;
-}
-
-function renderNode(node,depth){
-  const has=node.children&&node.children.length>0;
-  const open=openNodes.has(node.id);
-  const div=document.createElement('div');
-  const row=document.createElement('div');
-  row.className=depth===0?'t-root':'t-node';
-  row.style.paddingLeft=`${depth*13}px`;
-  if(has){
-    const chevSVG=`<svg class="t-chev${open?' open':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
-    row.innerHTML+=chevSVG;
-    row.addEventListener('click',e=>{
-      e.stopPropagation();
-      openNodes.has(node.id)?openNodes.delete(node.id):openNodes.add(node.id);
-      rebuildTree();
-    });
-  } else if(node.dot){
-    const d=document.createElement('span');
-    d.className='t-dot';d.style.background=node.dot;d.style.marginLeft='2px';
-    row.appendChild(d);
-  } else {
-    row.innerHTML+='<span style="width:13px;display:inline-block;flex-shrink:0"></span>';
-  }
-  const lbl=document.createElement('span');lbl.className='t-lbl';lbl.textContent=node.label;
-  row.appendChild(lbl);
-  if(node.badge){
-    const b=document.createElement('span');b.className='t-badge';b.textContent=node.badge;
-    b.style.color=node.bClr;
-    b.style.background=isDark?node.bBgD:node.bBg;
-    row.appendChild(b);
-  }
-  if(ASSET_DETAILS[node.id]){
-    row.style.cursor='pointer';
-    if(node.id===selectedAssetId) row.style.background='var(--nav-hover)';
-    row.addEventListener('click',e=>{
-      if(has) return; // chevron click already handled above for parent nodes
-      selectedAssetId=node.id;
-      rebuildTree();
-      renderAssetDetailsPanel();
-    });
-  }
-  div.appendChild(row);
-  if(has&&open){
-    const kids=document.createElement('div');
-    node.children.forEach(c=>kids.appendChild(renderNode(c,depth+1)));
-    div.appendChild(kids);
-  }
-  return div;
-}
-
-function rebuildTree(){
-  const c=document.getElementById('asset-tree');
-  if(!c) return;
-  c.innerHTML='';
-  const h=document.createElement('div');h.className='t-root';
-  h.style.cursor='pointer';
-  h.innerHTML=`<svg style="width:11px;height:11px;color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg><span class="t-lbl" style="font-weight:600">Railway Network</span>`;
-  c.appendChild(h);
-  TREE_DATA.children.forEach(ch=>c.appendChild(renderNode(ch,1)));
-}
-rebuildTree();
-
-function renderAssetDetailsPanel(){
-  const panel=document.getElementById('asset-details-panel');
-  if(!panel) return;
-  const node=findNode(TREE_DATA,selectedAssetId);
-  const d=ASSET_DETAILS[selectedAssetId];
-  if(!node||!d){
-    panel.innerHTML=`<div style="padding:40px 0;text-align:center;color:var(--muted)">Select an asset from the hierarchy to view details</div>`;
-    return;
-  }
-  const statusColor = d.status==='Running'||d.status==='Healthy' ? 'var(--green)' : (d.status==='Stopped' ? 'var(--red)' : 'var(--orange)');
-  panel.innerHTML=`
-    <div class="det-row"><span class="det-k">Asset ID</span><span class="det-v">${d.id}</span></div>
-    <div class="det-row"><span class="det-k">Name</span><span class="det-v">${node.label}</span></div>
-    <div class="det-row"><span class="det-k">Type</span><span class="det-v">${d.type}</span></div>
-    <div class="det-row"><span class="det-k">Status</span><span class="det-v"><span class="run-dot" style="background:${statusColor}"></span>${d.status}</span></div>
-    <div class="det-row"><span class="det-k">Driver</span><span class="det-v">${d.driver}</span></div>
-    <div class="det-row"><span class="det-k">Location</span><span class="det-v">${d.location}</span></div>
-    <div class="det-row"><span class="det-k">Speed</span><span class="det-v">${d.speed}</span></div>
-    <div class="det-row" style="border:none"><span class="det-k">Last Update</span><span class="det-v">${d.update}</span></div>
-  `;
-}
-renderAssetDetailsPanel();
-
-/* ─────────────────────────────────────────────
-   LIVE SPEED SIMULATION (updates every 2s)
-   Only runs if speed chart + map exist
-───────────────────────────────────────────── */
-setInterval(()=>{
-  if(speedChart){
-    const d=speedChart.data.datasets[0].data;
-    const prev=d[d.length-1];
-    const next=Math.min(160,Math.max(80,Math.round(prev+(Math.random()-.47)*10)));
-    d.push(next);
-    const now=new Date();
-    speedChart.data.labels.push(now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}));
-    if(d.length>14){d.shift();speedChart.data.labels.shift();}
-    speedChart.update('none');
-    const liveSpeedEl=document.getElementById('live-speed');
-    if(liveSpeedEl) liveSpeedEl.textContent=next;
   }
 
-  if(mapInstance){
-    TRAINS.filter(t=>t.status==='Running').forEach(t=>{
-      t.lat+=( Math.random()-.5)*0.001;
-      t.lng+=( Math.random()-.5)*0.001;
-      if(markerLayers[t.id]) markerLayers[t.id].setLatLng([t.lat,t.lng]);
-    });
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
   }
-},2000);
 
-/* ─────────────────────────────────────────────
-   FINAL ICON INIT (after dynamic content)
-───────────────────────────────────────────── */
-lucide.createIcons();
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  lucide.createIcons();
 </script>
+
 <script src="sidebar.js"></script>
 </body>
 </html>

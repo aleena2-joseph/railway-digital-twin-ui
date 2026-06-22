@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Explorer - Digital Twin Platform</title>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR - from sidebar.css
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* ══════════════════════════════════════════════════
+   BREADCRUMB
+══════════════════════════════════════════════════ */
+.breadcrumb{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 0;
+  font-size:12px;
+  color:var(--muted);
+  flex-shrink:0;
+  flex-wrap:wrap;
+}
+.breadcrumb .crumb{
+  color:var(--muted);
+  cursor:pointer;
+  transition:color .2s;
+}
+.breadcrumb .crumb:hover{color:var(--accent)}
+.breadcrumb .crumb.active{
+  color:var(--text);
+  font-weight:600;
+}
+.breadcrumb .separator{
+  color:var(--dim);
+  font-size:10px;
+}
+
+/* ══════════════════════════════════════════════════
+   SEARCH BAR
+══════════════════════════════════════════════════ */
+.search-bar{
+  display:flex;
+  gap:10px;
+  flex-shrink:0;
+  align-items:center;
+}
+.search-wrapper{
+  flex:1;
+  position:relative;
+  max-width:500px;
+}
+.search-wrapper .search-icon{
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  width:16px;
+  height:16px;
+}
+.search-wrapper input{
+  width:100%;
+  height:38px;
+  padding:0 12px 0 38px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-wrapper input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.search-wrapper input::placeholder{color:var(--dim)}
+.search-results{
+  position:absolute;
+  top:42px;
+  left:0;
+  right:0;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:var(--shadow-md);
+  max-height:200px;
+  overflow-y:auto;
+  display:none;
+  z-index:50;
+}
+.search-results.show{display:block}
+.search-results .result-item{
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:12px;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transition:background .15s;
+}
+.search-results .result-item:hover{background:var(--nav-hover)}
+.search-results .result-item .result-icon{font-size:14px}
+.search-results .result-item .result-path{
+  font-size:10px;
+  color:var(--muted);
+  margin-left:auto;
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN CONTENT - Tree + Details
+══════════════════════════════════════════════════ */
+.main-content{
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:14px;
+  flex:1;
+  min-height:0;
+}
+
+/* ─── TREE PANEL ─── */
+.tree-panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.tree-panel .ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+  flex-shrink:0;
+}
+.tree-panel .ph .pt{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.tree-panel .ph .pt .count{
+  font-size:10px;
+  font-weight:400;
+  color:var(--muted);
+}
+.tree-container{
+  flex:1;
+  overflow-y:auto;
+  padding:8px 4px 8px 8px;
+}
+
+/* ─── TREE NODES ─── */
+.tree-node{
+  user-select:none;
+}
+.tree-node .node-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  border-radius:6px;
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+}
+.tree-node .node-row:hover{background:var(--nav-hover)}
+.tree-node .node-row.selected{
+  background:rgba(59,130,246,.12);
+  border-left:3px solid var(--accent);
+}
+.tree-node .node-row .toggle{
+  width:16px;
+  height:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  color:var(--muted);
+  transition:transform .2s;
+}
+.tree-node .node-row .toggle.open{transform:rotate(90deg)}
+.tree-node .node-row .toggle.leaf{visibility:hidden}
+.tree-node .node-row .node-icon{
+  font-size:16px;
+  flex-shrink:0;
+}
+.tree-node .node-row .node-label{
+  font-size:12px;
+  color:var(--text);
+  flex:1;
+}
+.tree-node .node-row .node-status{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.tree-node .node-row .node-status.green{background:var(--green)}
+.tree-node .node-row .node-status.yellow{background:var(--orange)}
+.tree-node .node-row .node-status.red{background:var(--red)}
+.tree-node .node-row .node-status.gray{background:var(--dim)}
+.tree-node .node-row .node-badge{
+  font-size:8px;
+  padding:1px 6px;
+  border-radius:3px;
+  background:var(--card2);
+  color:var(--muted);
+  border:1px solid var(--border);
+}
+.tree-node .children{
+  padding-left:20px;
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .25s ease;
+}
+.tree-node .children.open{max-height:2000px}
+
+/* ─── DETAILS PANEL ─── */
+.details-panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.details-panel .ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+  flex-shrink:0;
+}
+.details-panel .ph .pt{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+.details-panel .ph .pt .sub{
+  font-size:10px;
+  font-weight:400;
+  color:var(--muted);
+  margin-left:8px;
+}
+.details-content{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+}
+.details-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  color:var(--muted);
+  text-align:center;
+  gap:8px;
+}
+.details-empty .empty-icon{
+  font-size:48px;
+  opacity:.3;
+}
+.details-empty .empty-text{font-size:13px}
+.details-empty .empty-sub{font-size:11px;color:var(--dim)}
+
+/* ─── ASSET DETAILS CARD ─── */
+.asset-detail-card{margin-bottom:14px}
+.asset-detail-card:last-child{margin-bottom:0}
+.asset-detail-card .ad-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+.asset-detail-card .ad-header .ad-icon{
+  width:40px;
+  height:40px;
+  border-radius:8px;
+  background:var(--card2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+.asset-detail-card .ad-header .ad-title{
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+}
+.asset-detail-card .ad-header .ad-status{
+  font-size:11px;
+  padding:2px 10px;
+  border-radius:12px;
+  font-weight:600;
+}
+.asset-detail-card .ad-header .ad-status.green{background:var(--green-bg);color:var(--green)}
+.asset-detail-card .ad-header .ad-status.yellow{background:var(--orange-bg);color:var(--orange)}
+.asset-detail-card .ad-header .ad-status.red{background:var(--red-bg);color:var(--red)}
+.asset-detail-card .ad-header .ad-status.gray{background:var(--card2);color:var(--muted)}
+.asset-detail-card .ad-meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px 16px;
+  font-size:12px;
+  color:var(--muted);
+  padding:6px 0;
+}
+.asset-detail-card .ad-meta .am-label{color:var(--dim)}
+.asset-detail-card .ad-meta .am-value{color:var(--text);font-weight:500}
+
+.health-bar-section{margin:10px 0}
+.health-bar-section .hb-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:4px;
+}
+.health-bar-section .hb-row .hb-label{
+  font-size:11px;
+  color:var(--muted);
+  flex:0 0 70px;
+}
+.health-bar-section .hb-row .hb-track{
+  flex:1;
+  height:6px;
+  background:var(--border);
+  border-radius:3px;
+  overflow:hidden;
+}
+.health-bar-section .hb-row .hb-track .hb-fill{
+  height:100%;
+  border-radius:3px;
+  transition:width .8s ease;
+}
+.health-bar-section .hb-row .hb-track .hb-fill.green{background:var(--green)}
+.health-bar-section .hb-row .hb-track .hb-fill.yellow{background:var(--orange)}
+.health-bar-section .hb-row .hb-track .hb-fill.red{background:var(--red)}
+.health-bar-section .hb-row .hb-pct{
+  font-size:11px;
+  font-weight:600;
+  color:var(--text);
+  flex:0 0 36px;
+  text-align:right;
+}
+
+.detail-section-title{
+  font-size:11px;
+  font-weight:600;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  margin:12px 0 6px;
+  padding-bottom:4px;
+  border-bottom:1px solid var(--border);
+}
+.detail-props{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px 16px;
+  font-size:12px;
+}
+.detail-props .dp-label{color:var(--dim)}
+.detail-props .dp-value{color:var(--text);font-weight:500}
+
+.detail-sensors{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.detail-sensors .sensor-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 8px;
+  background:var(--card2);
+  border-radius:4px;
+  font-size:12px;
+}
+.detail-sensors .sensor-item .s-icon{font-size:14px}
+.detail-sensors .sensor-item .s-name{color:var(--text);flex:1}
+.detail-sensors .sensor-item .s-status{font-size:10px}
+
+.detail-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.detail-actions .action-btn{
+  padding:5px 12px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:500;
+  border:1px solid var(--border);
+  color:var(--muted);
+  transition:all .2s;
+  background:var(--card2);
+}
+.detail-actions .action-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:rgba(59,130,246,.08);
+}
+.detail-actions .action-btn.primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+.detail-actions .action-btn.primary:hover{opacity:.85}
+
+/* ══════════════════════════════════════════════════
+   FOOTER STATS
+══════════════════════════════════════════════════ */
+.footer-stats{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:8px 16px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--muted);
+}
+.footer-stats .fs-item{display:flex;align-items:center;gap:6px}
+.footer-stats .fs-item .fs-dot{
+  width:8px;height:8px;border-radius:50%;
+}
+.footer-stats .fs-item .fs-dot.green{background:var(--green)}
+.footer-stats .fs-item .fs-dot.yellow{background:var(--orange)}
+.footer-stats .fs-item .fs-dot.red{background:var(--red)}
+.footer-stats .fs-item strong{color:var(--text)}
+.footer-stats .fs-divider{color:var(--dim)}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .main-content{grid-template-columns:1fr}
+  .details-panel{max-height:400px}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:12px 14px}
+}
+@media(max-width:768px){
+  .main-content{grid-template-columns:1fr}
+  .details-panel{max-height:350px}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .detail-props{grid-template-columns:1fr}
+  .asset-detail-card .ad-meta{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .content{padding:10px}
+  .search-wrapper{max-width:100%}
+  .footer-stats{flex-wrap:wrap;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="layers" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Asset Explorer</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="crumb" onclick="selectNode('root')">🏠 Home</span>
+      <span class="separator">›</span>
+      <span class="crumb" onclick="selectNode('metro')">METRO-001</span>
+      <span class="separator">›</span>
+      <span class="crumb" onclick="selectNode('kerala')">Kerala Region</span>
+      <span class="separator">›</span>
+      <span class="crumb active">Kochi Metro Station</span>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search assets..." oninput="handleSearch(this.value)">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- Tree Panel -->
+      <div class="tree-panel">
+        <div class="ph">
+          <span class="pt">Asset Hierarchy <span class="count">(2,450 assets)</span></span>
+          <button class="bl" onclick="toggleAll()">Expand All <i data-lucide="chevrons-down"></i></button>
+        </div>
+        <div class="tree-container" id="treeContainer"></div>
+      </div>
+
+      <!-- Details Panel -->
+      <div class="details-panel">
+        <div class="ph">
+          <span class="pt">Asset Information <span class="sub" id="selectedName">No selection</span></span>
+        </div>
+        <div class="details-content" id="detailsContent">
+          <div class="details-empty">
+            <div class="empty-icon">📂</div>
+            <div class="empty-text">Select an asset from the tree</div>
+            <div class="empty-sub">Click on any asset to view its details</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Stats -->
+    <div class="footer-stats">
+      <span class="fs-item">📊 Total Assets: <strong>2,450</strong></span>
+      <span class="fs-divider">|</span>
+      <span class="fs-item"><span class="fs-dot green"></span> Healthy: <strong>2,250</strong></span>
+      <span class="fs-item"><span class="fs-dot yellow"></span> Warning: <strong>140</strong></span>
+      <span class="fs-item"><span class="fs-dot red"></span> Critical: <strong>60</strong></span>
+      <span class="fs-divider">|</span>
+      <span class="fs-item">🟢 System: <strong>Online</strong></span>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
+<script>
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
+
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
+
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── ASSET DATA ───
+  const assetIcons = {
+    'region': '🏢',
+    'station': '🚉',
+    'compressor': '⚙',
+    'ahu': '💨',
+    'sensor': '🌡',
+    'gateway': '📡',
+    'controller': '🔌',
+    'property': '📊',
+    'default': '📦'
+  };
+
+  const assetTree = {
+    id: 'root',
+    label: 'METRO-001',
+    type: 'region',
+    status: 'healthy',
+    children: [
+      {
+        id: 'kerala',
+        label: 'Kerala Region',
+        type: 'region',
+        status: 'healthy',
+        children: [
+          {
+            id: 'kochi',
+            label: 'Kochi Metro Station',
+            type: 'station',
+            status: 'healthy',
+            children: [
+              {
+                id: 'hvac1',
+                label: 'HVAC-SYS-001',
+                type: 'ahu',
+                status: 'healthy',
+                children: [
+                  {
+                    id: 'comp1',
+                    label: 'COMP-001',
+                    type: 'compressor',
+                    status: 'healthy',
+                    children: [
+                      {
+                        id: 'prop_temp',
+                        label: 'Temperature',
+                        type: 'property',
+                        status: 'healthy',
+                        children: [
+                          { id: 'sensor_temp', label: 'Temp Sensor', type: 'sensor', status: 'healthy', children: [] }
+                        ]
+                      },
+                      {
+                        id: 'prop_pressure',
+                        label: 'Pressure',
+                        type: 'property',
+                        status: 'healthy',
+                        children: [
+                          { id: 'sensor_pressure', label: 'Pressure Sensor', type: 'sensor', status: 'healthy', children: [] }
+                        ]
+                      },
+                      {
+                        id: 'prop_vibration',
+                        label: 'Vibration',
+                        type: 'property',
+                        status: 'warning',
+                        children: [
+                          { id: 'sensor_vibration', label: 'Vibration Sensor', type: 'sensor', status: 'warning', children: [] }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    id: 'cond1',
+                    label: 'COND-001',
+                    type: 'compressor',
+                    status: 'healthy',
+                    children: [
+                      {
+                        id: 'prop_temp2',
+                        label: 'Temperature',
+                        type: 'property',
+                        status: 'healthy',
+                        children: [
+                          { id: 'sensor_temp2', label: 'Temp Sensor', type: 'sensor', status: 'healthy', children: [] }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    id: 'evap1',
+                    label: 'EVAP-001',
+                    type: 'compressor',
+                    status: 'warning',
+                    children: []
+                  }
+                ]
+              },
+              {
+                id: 'hvac2',
+                label: 'HVAC-SYS-002',
+                type: 'ahu',
+                status: 'warning',
+                children: [
+                  {
+                    id: 'comp2',
+                    label: 'COMP-002',
+                    type: 'compressor',
+                    status: 'critical',
+                    children: [
+                      {
+                        id: 'prop_temp3',
+                        label: 'Temperature',
+                        type: 'property',
+                        status: 'critical',
+                        children: [
+                          { id: 'sensor_temp3', label: 'Temp Sensor', type: 'sensor', status: 'critical', children: [] }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'trivandrum',
+            label: 'Trivandrum Metro Station',
+            type: 'station',
+            status: 'healthy',
+            children: [
+              {
+                id: 'hvac3',
+                label: 'HVAC-SYS-003',
+                type: 'ahu',
+                status: 'healthy',
+                children: [
+                  {
+                    id: 'comp3',
+                    label: 'COMP-003',
+                    type: 'compressor',
+                    status: 'healthy',
+                    children: []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'tamilnadu',
+        label: 'Tamil Nadu Region',
+        type: 'region',
+        status: 'healthy',
+        children: [
+          {
+            id: 'chennai',
+            label: 'Chennai Metro Station',
+            type: 'station',
+            status: 'healthy',
+            children: [
+              {
+                id: 'hvac4',
+                label: 'HVAC-SYS-004',
+                type: 'ahu',
+                status: 'healthy',
+                children: []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  // ─── ASSET DETAILS DATA ───
+  const assetDetailsData = {
+    'comp1': {
+      name: 'COMP-001',
+      type: 'Compressor',
+      status: 'healthy',
+      location: 'Platform-1',
+      health: 95,
+      availability: 98,
+      manufacturer: 'Carrier',
+      model: 'XR-200',
+      installed: '2024',
+      warranty: '2029',
+      properties: [
+        { name: 'Temperature', value: '24°C' },
+        { name: 'Pressure', value: '1.8 Bar' },
+        { name: 'Vibration', value: '0.2 mm/s' },
+        { name: 'Current', value: '12.4 A' }
+      ],
+      sensors: ['Temp Sensor', 'Pressure Sensor', 'Vibration Sensor']
+    },
+    'comp2': {
+      name: 'COMP-002',
+      type: 'Compressor',
+      status: 'critical',
+      location: 'Platform-2',
+      health: 45,
+      availability: 60,
+      manufacturer: 'Carrier',
+      model: 'XR-300',
+      installed: '2023',
+      warranty: '2028',
+      properties: [
+        { name: 'Temperature', value: '68°C' },
+        { name: 'Pressure', value: '2.4 Bar' },
+        { name: 'Vibration', value: '1.8 mm/s' },
+        { name: 'Current', value: '18.6 A' }
+      ],
+      sensors: ['Temp Sensor']
+    },
+    'comp3': {
+      name: 'COMP-003',
+      type: 'Compressor',
+      status: 'healthy',
+      location: 'Platform-3',
+      health: 92,
+      availability: 97,
+      manufacturer: 'Carrier',
+      model: 'XR-200',
+      installed: '2024',
+      warranty: '2029',
+      properties: [
+        { name: 'Temperature', value: '22°C' },
+        { name: 'Pressure', value: '1.6 Bar' },
+        { name: 'Vibration', value: '0.1 mm/s' },
+        { name: 'Current', value: '11.2 A' }
+      ],
+      sensors: ['Temp Sensor']
+    },
+    'cond1': {
+      name: 'COND-001',
+      type: 'Compressor',
+      status: 'healthy',
+      location: 'Platform-1',
+      health: 88,
+      availability: 94,
+      manufacturer: 'Carrier',
+      model: 'XR-150',
+      installed: '2024',
+      warranty: '2029',
+      properties: [
+        { name: 'Temperature', value: '28°C' },
+        { name: 'Pressure', value: '2.1 Bar' },
+        { name: 'Vibration', value: '0.3 mm/s' }
+      ],
+      sensors: ['Temp Sensor']
+    },
+    'evap1': {
+      name: 'EVAP-001',
+      type: 'Compressor',
+      status: 'warning',
+      location: 'Platform-1',
+      health: 72,
+      availability: 80,
+      manufacturer: 'Carrier',
+      model: 'XR-180',
+      installed: '2023',
+      warranty: '2028',
+      properties: [
+        { name: 'Temperature', value: '35°C' },
+        { name: 'Pressure', value: '2.8 Bar' }
+      ],
+      sensors: []
+    }
+  };
+
+  // ─── STATE ───
+  let selectedNodeId = null;
+  let expandedNodes = new Set();
+
+  // ─── FIND NODE ───
+  function findNode(tree, id) {
+    if (tree.id === id) return tree;
+    if (tree.children) {
+      for (let child of tree.children) {
+        const found = findNode(child, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  }
+
+  // ─── GET ICON ───
+  function getIcon(type) {
+    return assetIcons[type] || assetIcons.default;
+  }
+
+  // ─── GET STATUS COLOR ───
+  function getStatusClass(status) {
+    return status || 'gray';
+  }
+
+  // ─── RENDER TREE ───
+  function renderTree(node, depth = 0) {
+    const hasChildren = node.children && node.children.length > 0;
+    const isExpanded = expandedNodes.has(node.id);
+    const isSelected = selectedNodeId === node.id;
+    const icon = getIcon(node.type);
+    const statusClass = getStatusClass(node.status);
+
+    let html = `<div class="tree-node" data-id="${node.id}">`;
+    html += `<div class="node-row ${isSelected ? 'selected' : ''}" onclick="toggleNode('${node.id}')" style="padding-left:${depth * 16 + 8}px">`;
+    
+    // Toggle
+    if (hasChildren) {
+      html += `<span class="toggle ${isExpanded ? 'open' : ''}">▶</span>`;
+    } else {
+      html += `<span class="toggle leaf">▶</span>`;
+    }
+    
+    // Icon
+    html += `<span class="node-icon">${icon}</span>`;
+    
+    // Label
+    html += `<span class="node-label">${node.label}</span>`;
+    
+    // Status dot
+    html += `<span class="node-status ${statusClass}"></span>`;
+    
+    // Badge for children count
+    if (hasChildren) {
+      html += `<span class="node-badge">${node.children.length}</span>`;
+    }
+    
+    html += `</div>`;
+    
+    // Children
+    if (hasChildren && isExpanded) {
+      html += `<div class="children open">`;
+      for (let child of node.children) {
+        html += renderTree(child, depth + 1);
+      }
+      html += `</div>`;
+    } else if (hasChildren) {
+      html += `<div class="children">`;
+      html += `</div>`;
+    }
+    
+    html += `</div>`;
+    return html;
+  }
+
+  // ─── TOGGLE NODE ───
+  function toggleNode(nodeId) {
+    const node = findNode(assetTree, nodeId);
+    if (!node) return;
+    
+    if (expandedNodes.has(nodeId)) {
+      expandedNodes.delete(nodeId);
+    } else {
+      expandedNodes.add(nodeId);
+    }
+    
+    selectedNodeId = nodeId;
+    renderTreeView();
+    renderDetails(nodeId);
+    updateBreadcrumb(nodeId);
+  }
+
+  // ─── SELECT NODE ───
+  function selectNode(nodeId) {
+    if (nodeId === 'root') {
+      selectedNodeId = 'root';
+      expandedNodes.clear();
+      renderTreeView();
+      renderDetails(null);
+      updateBreadcrumb('root');
+      return;
+    }
+    
+    const node = findNode(assetTree, nodeId);
+    if (!node) return;
+    
+    // Expand parents
+    expandParents(nodeId);
+    selectedNodeId = nodeId;
+    renderTreeView();
+    renderDetails(nodeId);
+    updateBreadcrumb(nodeId);
+  }
+
+  // ─── EXPAND PARENTS ───
+  function expandParents(nodeId) {
+    const node = findNode(assetTree, nodeId);
+    if (!node) return;
+    
+    function findAndExpand(current, targetId) {
+      if (current.id === targetId) return true;
+      if (current.children) {
+        for (let child of current.children) {
+          if (findAndExpand(child, targetId)) {
+            expandedNodes.add(current.id);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
+    findAndExpand(assetTree, nodeId);
+  }
+
+  // ─── RENDER TREE VIEW ───
+  function renderTreeView() {
+    const container = document.getElementById('treeContainer');
+    if (!container) return;
+    container.innerHTML = renderTree(assetTree);
+  }
+
+  // ─── RENDER DETAILS ───
+  function renderDetails(nodeId) {
+    const content = document.getElementById('detailsContent');
+    if (!content) return;
+    
+    if (!nodeId) {
+      content.innerHTML = `
+        <div class="details-empty">
+          <div class="empty-icon">📂</div>
+          <div class="empty-text">Select an asset from the tree</div>
+          <div class="empty-sub">Click on any asset to view its details</div>
+        </div>
+      `;
+      document.getElementById('selectedName').textContent = 'No selection';
+      return;
+    }
+    
+    const node = findNode(assetTree, nodeId);
+    if (!node) {
+      content.innerHTML = `
+        <div class="details-empty">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">Asset not found</div>
+        </div>
+      `;
+      return;
+    }
+    
+    document.getElementById('selectedName').textContent = node.label;
+    
+    // Get detail data
+    const details = assetDetailsData[nodeId] || null;
+    
+    let html = '';
+    
+    // Basic Info
+    const statusClass = getStatusClass(node.status);
+    const statusLabel = node.status ? node.status.toUpperCase() : 'UNKNOWN';
+    const icon = getIcon(node.type);
+    
+    html += `<div class="asset-detail-card">`;
+    html += `<div class="ad-header">`;
+    html += `<div class="ad-icon">${icon}</div>`;
+    html += `<div class="ad-title">${node.label}</div>`;
+    html += `<span class="ad-status ${statusClass}">${statusLabel}</span>`;
+    html += `</div>`;
+    
+    html += `<div class="ad-meta">`;
+    html += `<div><span class="am-label">Type:</span> <span class="am-value">${node.type.toUpperCase()}</span></div>`;
+    html += `<div><span class="am-label">ID:</span> <span class="am-value">${node.id}</span></div>`;
+    if (details) {
+      html += `<div><span class="am-label">Location:</span> <span class="am-value">${details.location || '-'}</span></div>`;
+      html += `<div><span class="am-label">Status:</span> <span class="am-value">${node.status.toUpperCase()}</span></div>`;
+    }
+    html += `</div>`;
+    html += `</div>`;
+    
+    if (details) {
+      // Health
+      html += `<div class="asset-detail-card">`;
+      html += `<div class="health-bar-section">`;
+      html += `<div class="hb-row"><span class="hb-label">Health</span><div class="hb-track"><div class="hb-fill green" style="width:${details.health}%"></div></div><span class="hb-pct">${details.health}%</span></div>`;
+      html += `<div class="hb-row"><span class="hb-label">Availability</span><div class="hb-track"><div class="hb-fill green" style="width:${details.availability}%"></div></div><span class="hb-pct">${details.availability}%</span></div>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      // Metadata
+      if (details.manufacturer) {
+        html += `<div class="asset-detail-card">`;
+        html += `<div class="detail-section-title">Metadata</div>`;
+        html += `<div class="detail-props">`;
+        html += `<span class="dp-label">Manufacturer</span><span class="dp-value">${details.manufacturer}</span>`;
+        html += `<span class="dp-label">Model</span><span class="dp-value">${details.model}</span>`;
+        html += `<span class="dp-label">Installed</span><span class="dp-value">${details.installed}</span>`;
+        html += `<span class="dp-label">Warranty</span><span class="dp-value">${details.warranty}</span>`;
+        html += `</div>`;
+        html += `</div>`;
+      }
+      
+      // Properties
+      if (details.properties && details.properties.length > 0) {
+        html += `<div class="asset-detail-card">`;
+        html += `<div class="detail-section-title">Properties</div>`;
+        html += `<div class="detail-props">`;
+        for (let prop of details.properties) {
+          html += `<span class="dp-label">${prop.name}</span><span class="dp-value">${prop.value}</span>`;
+        }
+        html += `</div>`;
+        html += `</div>`;
+      }
+      
+      // Sensors
+      if (details.sensors && details.sensors.length > 0) {
+        html += `<div class="asset-detail-card">`;
+        html += `<div class="detail-section-title">Sensors</div>`;
+        html += `<div class="detail-sensors">`;
+        for (let sensor of details.sensors) {
+          html += `<div class="sensor-item"><span class="s-icon">🌡</span><span class="s-name">${sensor}</span><span class="s-status" style="color:var(--green)">● Online</span></div>`;
+        }
+        html += `</div>`;
+        html += `</div>`;
+      }
+      
+      // Quick Actions
+      html += `<div class="asset-detail-card">`;
+      html += `<div class="detail-section-title">Quick Actions</div>`;
+      html += `<div class="detail-actions">`;
+      html += `<button class="action-btn primary" onclick="location.href='asset_details.html'">📋 View Details</button>`;
+      html += `<button class="action-btn" onclick="location.href='telemetry_center.html'">📈 Telemetry</button>`;
+      html += `<button class="action-btn" onclick="location.href='metadata.html'">📝 Metadata</button>`;
+      html += `<button class="action-btn" onclick="location.href='3d_twin.html'">🧊 Digital Twin</button>`;
+      html += `<button class="action-btn" onclick="location.href='gis_monitoring.html'">🗺 GIS</button>`;
+      html += `</div>`;
+      html += `</div>`;
+    }
+    
+    content.innerHTML = html;
+  }
+
+  // ─── UPDATE BREADCRUMB ───
+  function updateBreadcrumb(nodeId) {
+    const breadcrumb = document.getElementById('breadcrumb');
+    if (!breadcrumb) return;
+    
+    if (nodeId === 'root') {
+      breadcrumb.innerHTML = `<span class="crumb active">🏠 Home</span>`;
+      return;
+    }
+    
+    const node = findNode(assetTree, nodeId);
+    if (!node) return;
+    
+    // Build path
+    let path = [];
+    function buildPath(current, targetId) {
+      if (current.id === targetId) {
+        path.push(current);
+        return true;
+      }
+      if (current.children) {
+        for (let child of current.children) {
+          if (buildPath(child, targetId)) {
+            path.push(current);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
+    buildPath(assetTree, nodeId);
+    path.reverse();
+    
+    let html = '';
+    for (let i = 0; i < path.length; i++) {
+      const item = path[i];
+      const isActive = i === path.length - 1;
+      const icon = getIcon(item.type);
+      html += `<span class="crumb ${isActive ? 'active' : ''}" onclick="selectNode('${item.id}')">${icon} ${item.label}</span>`;
+      if (!isActive) {
+        html += `<span class="separator">›</span>`;
+      }
+    }
+    
+    breadcrumb.innerHTML = html;
+  }
+
+  // ─── SEARCH ───
+  function handleSearch(query) {
+    const results = document.getElementById('searchResults');
+    if (!results) return;
+    
+    if (query.length < 2) {
+      results.classList.remove('show');
+      return;
+    }
+    
+    const matches = [];
+    function searchNode(node) {
+      if (node.label.toLowerCase().includes(query.toLowerCase())) {
+        matches.push(node);
+      }
+      if (node.children) {
+        for (let child of node.children) {
+          searchNode(child);
+        }
+      }
+    }
+    
+    searchNode(assetTree);
+    
+    if (matches.length === 0) {
+      results.innerHTML = `<div class="result-item" style="color:var(--dim);cursor:default;">No results found</div>`;
+    } else {
+      results.innerHTML = matches.slice(0, 10).map(m => {
+        const icon = getIcon(m.type);
+        return `<div class="result-item" onclick="selectNode('${m.id}'); document.getElementById('searchInput').value=''; results.classList.remove('show');">
+          <span class="result-icon">${icon}</span>
+          ${m.label}
+          <span class="result-path">${m.type}</span>
+        </div>`;
+      }).join('');
+    }
+    
+    results.classList.add('show');
+  }
+
+  // ─── TOGGLE ALL ───
+  function toggleAll() {
+    const container = document.getElementById('treeContainer');
+    if (!container) return;
+    
+    const allNodes = [];
+    function collectNodes(node) {
+      allNodes.push(node);
+      if (node.children) {
+        for (let child of node.children) {
+          collectNodes(child);
+        }
+      }
+    }
+    collectNodes(assetTree);
+    
+    const allExpanded = allNodes.every(n => expandedNodes.has(n.id));
+    
+    if (allExpanded) {
+      expandedNodes.clear();
+    } else {
+      for (let node of allNodes) {
+        if (node.children && node.children.length > 0) {
+          expandedNodes.add(node.id);
+        }
+      }
+    }
+    
+    renderTreeView();
+  }
+
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tree with root expanded
+    expandedNodes.add('root');
+    expandedNodes.add('kerala');
+    expandedNodes.add('kochi');
+    expandedNodes.add('hvac1');
+    expandedNodes.add('comp1');
+    
+    renderTreeView();
+    updateBreadcrumb('kochi');
+    
+    // Select first asset
+    const firstNode = findNode(assetTree, 'comp1');
+    if (firstNode) {
+      selectedNodeId = 'comp1';
+      renderDetails('comp1');
+      document.getElementById('selectedName').textContent = 'COMP-001';
+    }
+  });
+
+  // ─── CLOSE SEARCH ON CLICK OUTSIDE ───
+  document.addEventListener('click', function(e) {
+    const results = document.getElementById('searchResults');
+    const input = document.getElementById('searchInput');
+    if (results && !results.contains(e.target) && e.target !== input) {
+      results.classList.remove('show');
+    }
+  });
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>

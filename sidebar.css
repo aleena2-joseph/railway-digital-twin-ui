@@ -1,6 +1,7 @@
 /* ══════════════════════════════════════════════════
    SIDEBAR STYLES - SINGLE SOURCE OF TRUTH
 ══════════════════════════════════════════════════ */
+
 :root {
   --sidebar-w: 228px;
   --sidebar-bg: #ffffff;
@@ -13,6 +14,7 @@
   --red-bg: #fee2e2;
   --muted: #64748b;
   --dim: #94a3b8;
+  --text: #0f172a;
 }
 
 [data-theme="dark"] {
@@ -24,11 +26,13 @@
   --nav-act-txt: #60a5fa;
   --red: #ef4444;
   --red-bg: rgba(239,68,68,.15);
+  --text: #f1f5f9;
 }
 
 /* ══════════════════════════════════════════════════
    SIDEBAR LAYOUT
 ══════════════════════════════════════════════════ */
+
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -43,7 +47,8 @@
   position: relative;
 }
 
-/* Logo */
+/* ─── LOGO ─── */
+
 .sb-logo {
   padding: 14px 12px 12px;
   border-bottom: 1px solid var(--sidebar-bd);
@@ -81,11 +86,6 @@
 [data-theme="dark"] .sb-brand .b1 {
   color: #60a5fa;
 }
-.sb-brand .b2 {
-  font-size: 8.5px;
-  color: var(--muted);
-  font-weight: 400;
-}
 .sb-brand .b3 {
   font-size: 8px;
   font-weight: 700;
@@ -97,10 +97,12 @@
   color: #60a5fa;
 }
 
-/* Overview Button */
+/* ─── DASHBOARD BUTTON ─── */
+
 .sb-overview {
   padding: 10px 10px 4px;
 }
+
 .sb-overview-btn {
   display: flex;
   align-items: center;
@@ -119,12 +121,17 @@
 .sb-overview-btn:hover {
   opacity: .9;
 }
+.sb-overview-btn.active {
+  background: var(--nav-act-bg);
+  color: var(--nav-act-txt);
+}
 .sb-overview-btn svg {
   width: 15px;
   height: 15px;
 }
 
-/* Section Label */
+/* ─── SECTION LABEL ─── */
+
 .sb-sec {
   padding: 10px 12px 2px;
   font-size: 9px;
@@ -134,7 +141,8 @@
   color: var(--dim);
 }
 
-/* Navigation Items */
+/* ─── NAVIGATION ITEMS ─── */
+
 .sb-item {
   display: flex;
   align-items: center;
@@ -184,7 +192,8 @@
   padding: 0 4px;
 }
 
-/* Train Image */
+/* ─── TRAIN IMAGE ─── */
+
 .sb-train-img {
   flex-shrink: 0;
   overflow: hidden;
@@ -207,7 +216,8 @@
   opacity: .9;
 }
 
-/* Logout Button */
+/* ─── LOGOUT BUTTON ─── */
+
 .sb-logout {
   display: flex;
   align-items: center;
@@ -232,7 +242,8 @@
   height: 14px;
 }
 
-/* Footer */
+/* ─── FOOTER ─── */
+
 .sb-footer {
   padding: 7px 12px;
   font-size: 9.5px;
@@ -243,6 +254,7 @@
 /* ══════════════════════════════════════════════════
    RESPONSIVE SIDEBAR
 ══════════════════════════════════════════════════ */
+
 @media (max-width: 900px) {
   :root {
     --sidebar-w: 56px;
