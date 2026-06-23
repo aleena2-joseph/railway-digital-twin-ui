@@ -3,74 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asset Details - Railway Digital Twin</title>
+<title>Asset Details - Digital Twin Platform</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
 <link rel="stylesheet" href="sidebar.css">
 <style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
 :root {
-  --bg: #f0f4f8;
-  --sidebar-bg: #ffffff;
-  --sidebar-bd: #e2e8f0;
-  --topbar-bg: #ffffff;
-  --card: #ffffff;
-  --card2: #f8fafc;
-  --border: #e2e8f0;
-  --text: #0f172a;
-  --muted: #64748b;
-  --dim: #94a3b8;
-  --accent: #3b82f6;
-  --green: #16a34a;
-  --green-bg: #dcfce7;
-  --red: #dc2626;
-  --red-bg: #fee2e2;
-  --orange: #ea580c;
-  --orange-bg: #ffedd5;
-  --teal: #0d9488;
-  --shadow: 0 1px 4px rgba(0,0,0,.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
-  --nav-txt: #374151;
-  --nav-hover: #f1f5f9;
-  --nav-act-bg: #3b82f6;
-  --nav-act-txt: #ffffff;
-  --sidebar-w: 228px;
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
 }
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --sidebar-bg: #111827;
-  --sidebar-bd: #1f2937;
-  --topbar-bg: #1e293b;
-  --card: #1e293b;
-  --card2: #0f172a;
-  --border: rgba(71,85,105,.4);
-  --text: #f1f5f9;
-  --muted: #94a3b8;
-  --dim: #64748b;
-  --green: #22c55e;
-  --green-bg: rgba(34,197,94,.15);
-  --red: #ef4444;
-  --red-bg: rgba(239,68,68,.15);
-  --orange: #f97316;
-  --orange-bg: rgba(249,115,22,.15);
-  --shadow: none;
-  --shadow-md: none;
-  --nav-txt: #9ca3af;
-  --nav-hover: rgba(255,255,255,.05);
-  --nav-act-bg: #1e293b;
-  --nav-act-txt: #60a5fa;
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
 }
 
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:Inter,Segoe UI,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
 button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
 .app{display:flex;height:100vh;overflow:hidden}
 
-/* ═══ SIDEBAR ═══ */
+/* ══════════════════════════════════════════════════
+   SIDEBAR - from sidebar.css
+══════════════════════════════════════════════════ */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
   background:var(--sidebar-bg);
@@ -81,571 +92,788 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   z-index:100;
   position:relative;
 }
-.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
-.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
-.sb-logo-icon svg{width:20px;height:20px;color:#fff}
-.sb-brand{line-height:1.25}
-.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
-[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
-.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
-.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
-[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
 
-.sb-overview{padding:10px 10px 4px}
-.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
-.sb-overview-btn:hover{opacity:.9}
-.sb-overview-btn svg{width:15px;height:15px}
-
-.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
-.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
-.sb-item:hover{background:var(--nav-hover);color:var(--text)}
-.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
-.sb-item svg{width:14px;height:14px;flex-shrink:0}
-.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
-.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
-
-.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
-.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
-.sb-train-img:hover img{opacity:.9}
-
-.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
-.sb-logout:hover{background:rgba(220,38,38,.22)}
-.sb-logout svg{width:14px;height:14px}
-.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
-
-/* ═══ MAIN ═══ */
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
-.tb-left{display:flex;align-items:center;gap:9px}
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
 .tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
-.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
+}
 .dt-pill .dt-date{font-weight:600;color:var(--text)}
 .dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
-.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
 .ib:hover{background:var(--border);color:var(--text)}
 .ib svg{width:15px;height:15px}
 .notif-wrap{position:relative}
-.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
-.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
-.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
 .admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
 .admin-role{font-size:9px;color:var(--muted)}
 
-.content{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px}
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
 
-/* ═══ PAGE HEADER ═══ */
-.page-header{margin-bottom:4px}
-.page-header h1{font-size:22px;font-weight:700;color:var(--text)}
+/* ══════════════════════════════════════════════════
+   BREADCRUMB
+══════════════════════════════════════════════════ */
+.breadcrumb{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 0;
+  font-size:12px;
+  color:var(--muted);
+  flex-shrink:0;
+  flex-wrap:wrap;
+}
+.breadcrumb .crumb{
+  color:var(--muted);
+  cursor:pointer;
+  transition:color .2s;
+}
+.breadcrumb .crumb:hover{color:var(--accent)}
+.breadcrumb .crumb.active{
+  color:var(--text);
+  font-weight:600;
+}
+.breadcrumb .separator{
+  color:var(--dim);
+  font-size:10px;
+}
 
-/* ═══ TRAIN CARD ═══ */
-.train-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;box-shadow:var(--shadow)}
-.train-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
-.train-header-left{display:flex;align-items:flex-start;gap:16px}
-.train-icon{width:48px;height:48px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.train-icon svg{width:24px;height:24px;color:#fff}
-.train-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:2px}
-.train-id{font-size:12px;color:var(--muted)}
-.train-status-badge{display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--green-bg);color:var(--green);font-size:12px;font-weight:600;white-space:nowrap}
-.train-status-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
-.train-meta{display:flex;gap:24px;flex-wrap:wrap;margin-top:8px}
-.train-meta-item{font-size:12px;color:var(--muted)}
-.train-meta-item strong{color:var(--text);font-weight:600}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ══════════════════════════════════════════════════
+   ASSET OVERVIEW CARD
+══════════════════════════════════════════════════ */
+.overview-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px 24px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:16px;
+}
+.overview-left{display:flex;align-items:flex-start;gap:16px}
+.overview-icon{
+  width:52px;height:52px;border-radius:10px;
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+.overview-info .oi-title{
+  font-size:18px;font-weight:700;color:var(--text);
+}
+.overview-info .oi-sub{
+  font-size:12px;color:var(--muted);margin-top:2px;
+}
+.overview-info .oi-meta{
+  display:flex;gap:16px;margin-top:6px;flex-wrap:wrap;
+}
+.overview-info .oi-meta span{
+  font-size:12px;color:var(--muted);
+}
+.overview-info .oi-meta strong{color:var(--text)}
+.overview-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.overview-right .status-badge{
+  padding:4px 14px;border-radius:12px;font-size:12px;font-weight:600;
+}
+.overview-right .status-badge.green{background:var(--green-bg);color:var(--green)}
+.overview-right .status-badge.yellow{background:var(--orange-bg);color:var(--orange)}
+.overview-right .status-badge.red{background:var(--red-bg);color:var(--red)}
+.overview-right .status-badge.gray{background:var(--card2);color:var(--muted)}
+.overview-right .last-update{font-size:11px;color:var(--muted)}
 
-/* ═══ STATS GRID ═══ */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
-.stat-card .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.stat-card .stat-value{font-size:20px;font-weight:700;margin-top:4px;color:var(--text)}
-.stat-card .stat-value .unit{font-size:11px;font-weight:400;color:var(--muted);margin-left:2px}
+/* ══════════════════════════════════════════════════
+   PANEL BASE
+══════════════════════════════════════════════════ */
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+}
+.pt{font-size:12px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column}
+.bl{
+  font-size:10px;color:var(--accent);cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+}
+.bl:hover{text-decoration:underline}
+.bl svg{width:9px;height:9px}
 
-/* ═══ TWO COLUMN GRID ═══ */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* ══════════════════════════════════════════════════
+   ROW 2 - Health + Status
+══════════════════════════════════════════════════ */
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  flex-shrink:0;
+}
 
-/* ═══ SECTION CARDS ═══ */
-.section-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
-.section-card .section-title{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)}
+/* Health Card */
+.health-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.health-item{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  text-align:center;
+}
+.health-item .hi-value{
+  font-size:28px;font-weight:800;color:var(--text);
+}
+.health-item .hi-value.green{color:var(--green)}
+.health-item .hi-value.yellow{color:var(--orange)}
+.health-item .hi-value.red{color:var(--red)}
+.health-item .hi-label{
+  font-size:11px;color:var(--muted);margin-top:2px;
+}
+.health-item .hi-bar{
+  height:4px;background:var(--border);border-radius:2px;
+  margin-top:8px;overflow:hidden;
+}
+.health-item .hi-bar .fill{
+  height:100%;border-radius:2px;transition:width .8s ease;
+}
+.health-item .hi-bar .fill.green{background:var(--green)}
+.health-item .hi-bar .fill.yellow{background:var(--orange)}
+.health-item .hi-bar .fill.red{background:var(--red)}
 
-/* ═══ JOURNEY STATS ═══ */
-.journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.journey-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
-.journey-item:last-child{border-bottom:none}
-.journey-item .label{font-size:12px;color:var(--muted)}
-.journey-item .value{font-size:12px;font-weight:600;color:var(--text)}
+/* Status Details */
+.status-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.status-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:6px 8px;
+  background:var(--card2);
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+.status-item .si-label{
+  font-size:11px;color:var(--muted);
+}
+.status-item .si-value{
+  font-size:12px;font-weight:600;color:var(--text);
+}
 
-/* ═══ SUB-COMPONENTS ═══ */
-.component-list{display:grid;gap:6px}
-.component-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card2);border-radius:8px;border:1px solid var(--border)}
-.component-item .comp-info{display:flex;align-items:center;gap:10px}
-.component-item .comp-name{font-size:12px;font-weight:500;color:var(--text)}
-.component-item .comp-id{font-size:10px;color:var(--muted)}
-.component-item .comp-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600}
-.component-item .comp-status .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-.component-item .comp-status .dot.green{background:var(--green)}
-.component-item .comp-status .dot.orange{background:var(--orange)}
-.component-item .comp-status .online{color:var(--green)}
-.component-item .comp-status .warning{color:var(--orange)}
+/* ══════════════════════════════════════════════════
+   ROW 3 - Properties + Sensors
+══════════════════════════════════════════════════ */
+.row3{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  flex-shrink:0;
+}
 
-/* ═══ CHART WRAPPER ═══ */
-.chart-wrapper{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
-.chart-wrapper .chart-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
-.chart-container{width:100%;height:200px;position:relative}
+/* Properties Grid */
+.props-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.prop-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  transition:all .2s;
+}
+.prop-item:hover{border-color:var(--accent)}
+.prop-item .prop-icon{font-size:18px}
+.prop-item .prop-info{flex:1}
+.prop-item .prop-name{
+  font-size:11px;color:var(--muted);
+}
+.prop-item .prop-value{
+  font-size:13px;font-weight:600;color:var(--text);
+}
 
-/* ═══ SYSTEM STATUS ═══ */
-.system-status{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--green-bg);border-radius:8px;border:1px solid rgba(34,197,94,.2)}
-.system-status .dot{width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
-.system-status .status-text{font-size:13px;font-weight:600;color:var(--green)}
-.system-status .status-sub{font-size:11px;color:var(--muted);margin-left:8px}
+/* Sensors Grid */
+.sensors-grid{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.sensor-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:6px;
+}
+.sensor-item .s-icon{font-size:14px}
+.sensor-item .s-name{flex:1;font-size:12px;color:var(--text)}
+.sensor-item .s-value{font-size:12px;color:var(--dim)}
+.sensor-item .s-status{
+  font-size:10px;padding:1px 8px;border-radius:10px;font-weight:600;
+}
+.sensor-item .s-status.green{background:var(--green-bg);color:var(--green)}
+.sensor-item .s-status.yellow{background:var(--orange-bg);color:var(--orange)}
+.sensor-item .s-status.red{background:var(--red-bg);color:var(--red)}
 
-/* ═══ RESPONSIVE ═══ */
-@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:1024px){.two-col{grid-template-columns:1fr}}
-@media(max-width:900px){:root{--sidebar-w:56px}.sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}.sb-item{justify-content:center;padding:10px}.sb-overview-btn{justify-content:center;padding:10px}.sb-overview-btn span{display:none}.sb-train-img{height:100px}.sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}}
-@media(max-width:768px){.stats-grid{grid-template-columns:1fr 1fr}.journey-grid{grid-template-columns:1fr}.train-header{flex-direction:column;align-items:flex-start}.content{padding:14px 16px}}
-@media(max-width:600px){.stats-grid{grid-template-columns:1fr}.topbar{padding:0 10px}.dt-pill .dt-date{display:none}.admin-role,.admin-name~*{display:none}}
+/* ══════════════════════════════════════════════════
+   ROW 4 - Metadata + Alerts
+══════════════════════════════════════════════════ */
+.row4{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  flex-shrink:0;
+}
+
+/* Metadata */
+.metadata-grid{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.metadata-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:4px 8px;
+  border-bottom:1px solid var(--border);
+}
+.metadata-item:last-child{border-bottom:none}
+.metadata-item .md-key{
+  font-size:11px;color:var(--muted);
+}
+.metadata-item .md-value{
+  font-size:12px;font-weight:500;color:var(--text);
+}
+.metadata-actions{
+  display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);
+}
+.metadata-actions .md-btn{
+  padding:4px 12px;border-radius:4px;font-size:10px;font-weight:500;
+  border:1px solid var(--border);color:var(--muted);transition:all .2s;
+  background:var(--card2);
+}
+.metadata-actions .md-btn:hover{border-color:var(--accent);color:var(--accent)}
+.metadata-actions .md-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.metadata-actions .md-btn.primary:hover{opacity:.85}
+.metadata-actions .md-btn.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* Alerts */
+.alerts-list{display:flex;flex-direction:column;gap:4px}
+.alert-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 10px;
+  background:var(--card2);
+  border-left:3px solid;
+  border-radius:0 6px 6px 0;
+}
+.alert-item .a-icon{font-size:14px}
+.alert-item .a-content{flex:1}
+.alert-item .a-msg{font-size:11px;color:var(--text)}
+.alert-item .a-time{font-size:10px;color:var(--muted)}
+.alert-item.critical{border-left-color:var(--red)}
+.alert-item.warning{border-left-color:var(--orange)}
+.alert-item.info{border-left-color:var(--accent)}
+
+/* ══════════════════════════════════════════════════
+   QUICK ACTIONS
+══════════════════════════════════════════════════ */
+.quick-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.quick-actions .qa-btn{
+  padding:8px 16px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:500;
+  border:1px solid var(--border);
+  color:var(--muted);
+  transition:all .2s;
+  background:var(--card2);
+  display:flex;align-items:center;gap:6px;
+}
+.quick-actions .qa-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:rgba(59,130,246,.08);
+}
+.quick-actions .qa-btn.primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+.quick-actions .qa-btn.primary:hover{opacity:.85}
+.quick-actions .qa-btn svg{width:16px;height:16px}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .row2,.row3,.row4{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:12px 14px}
+  .overview-card{flex-direction:column;align-items:flex-start}
+  .overview-right{align-items:flex-start;width:100%}
+}
+@media(max-width:768px){
+  .health-grid{grid-template-columns:1fr}
+  .status-grid{grid-template-columns:1fr}
+  .props-grid{grid-template-columns:1fr}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .overview-icon{width:40px;height:40px;font-size:18px}
+  .overview-info .oi-title{font-size:16px}
+}
+@media(max-width:600px){
+  .content{padding:10px}
+  .quick-actions .qa-btn{padding:6px 12px;font-size:11px}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══ APP ═══ -->
+<!-- ═══════════════ APP ═══════════════ -->
 <div class="app">
-  <!-- ═══ SIDEBAR ═══ -->
-  <aside class="sidebar">
-    
-  </aside>
 
-  <!-- ═══ MAIN ═══ -->
-  <div class="main">
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="tb-left">
-        <i data-lucide="layers" style="width:17px;height:17px;color:var(--muted)"></i>
-        <h2>Asset Details</h2>
-      </div>
-      <div class="tb-right">
-        <div class="dt-pill">
-          <span class="dt-date" id="clock-date">June 18, 2026</span>
-          <span style="color:var(--border)">|</span>
-          <span class="dt-time" id="clock-time">9:41 AM</span>
-        </div>
-        <button class="ib" id="theme-btn" onclick="toggleTheme()">
-          <i data-lucide="sun" id="theme-icon"></i>
-        </button>
-        <div class="notif-wrap">
-          <button class="ib"><i data-lucide="bell"></i></button>
-          <span class="notif-dot">8</span>
-        </div>
-        <div class="admin-chip">
-          <div class="admin-av">A</div>
-          <div>
-            <div class="admin-name">Admin</div>
-            <div class="admin-role">Administrator</div>
-          </div>
-          <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
-        </div>
-      </div>
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="package" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Asset Details</h2>
     </div>
-
-    <!-- ═══ CONTENT ═══ -->
-    <div class="content">
-      <!-- Train Information -->
-      <div class="train-card">
-        <div class="train-header">
-          <div class="train-header-left">
-            <div class="train-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="7" width="20" height="13" rx="2"/>
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-                <circle cx="7.5" cy="18.5" r="0.5" fill="currentColor"/>
-                <circle cx="16.5" cy="18.5" r="0.5" fill="currentColor"/>
-                <line x1="8" y1="7" x2="8" y2="14"/>
-                <line x1="16" y1="7" x2="16" y2="14"/>
-                <line x1="8" y1="14" x2="16" y2="14"/>
-              </svg>
-            </div>
-            <div>
-              <div class="train-name">Express Train WR-101</div>
-              <div class="train-id">ID: WR-101 · Electric Express</div>
-            </div>
-          </div>
-          <div class="train-status-badge">
-            <span class="dot"></span>
-            Running
-          </div>
-        </div>
-        <div class="train-meta">
-          <span class="train-meta-item">Last update: <strong>10:45:30 AM</strong></span>
-        </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Speed</div>
-          <div class="stat-value">140 <span class="unit">km/h</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Temperature</div>
-          <div class="stat-value">105 <span class="unit">°F</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Distance</div>
-          <div class="stat-value">70 <span class="unit">km</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Operating Hours</div>
-          <div class="stat-value">35 <span class="unit">hrs</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Last Maintenance</div>
-          <div class="stat-value" style="font-size:16px;">12 <span class="unit">days ago</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Next Maintenance</div>
-          <div class="stat-value" style="font-size:16px;">18 <span class="unit">days</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Driver</div>
-          <div class="stat-value" style="font-size:16px;">Rajesh <span class="unit">Kumar</span></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Passenger Load</div>
-          <div class="stat-value">842 <span class="unit">/ 1000</span></div>
-        </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
       </div>
-
-      <!-- Two Column Layout -->
-      <div class="two-col">
-        <!-- Journey Statistics -->
-        <div class="section-card">
-          <div class="section-title">Journey Statistics</div>
-          <div class="journey-grid">
-            <div class="journey-item">
-              <span class="label">Distance Today</span>
-              <span class="value">356 km</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Total Distance</span>
-              <span class="value">12,450 km</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Operating Hours</span>
-              <span class="value">342 hrs</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Last Maintenance</span>
-              <span class="value">12 days ago</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Next Maintenance</span>
-              <span class="value">18 days</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Driver</span>
-              <span class="value">Rajesh Kumar</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Location</span>
-              <span class="value">Vadodara</span>
-            </div>
-            <div class="journey-item">
-              <span class="label">Passenger Load</span>
-              <span class="value">842 / 1000</span>
-            </div>
-          </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
         </div>
-
-        <!-- Sub-Components Status -->
-        <div class="section-card">
-          <div class="section-title">Sub-Components Status</div>
-          <div class="component-list">
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">Engine Unit</span>
-                <span class="comp-id">ENG-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot green"></span>
-                <span class="online">92%</span>
-              </div>
-            </div>
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">Pantograph</span>
-                <span class="comp-id">PAN-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot green"></span>
-                <span class="online">88%</span>
-              </div>
-            </div>
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">HVAC System</span>
-                <span class="comp-id">HVAC-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot orange"></span>
-                <span class="warning">76%</span>
-              </div>
-            </div>
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">Brake System</span>
-                <span class="comp-id">BRAK-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot green"></span>
-                <span class="online">95%</span>
-              </div>
-            </div>
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">GPS Unit</span>
-                <span class="comp-id">GPS-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot green"></span>
-                <span class="online">100%</span>
-              </div>
-            </div>
-            <div class="component-item">
-              <div class="comp-info">
-                <span class="comp-name">Radio Comm</span>
-                <span class="comp-id">RAD-01</span>
-              </div>
-              <div class="comp-status">
-                <span class="dot green"></span>
-                <span class="online">95%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Speed & Temperature History Chart -->
-      <div class="chart-wrapper">
-        <div class="chart-title">Speed & Temperature History</div>
-        <div class="chart-container">
-          <canvas id="historyChart"></canvas>
-        </div>
-      </div>
-
-      <!-- System Status -->
-      <div class="system-status">
-        <span class="dot"></span>
-        <span class="status-text">System Online</span>
-        <span class="status-sub">All systems operational</span>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ═══ SCRIPTS ═══ -->
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span class="crumb" onclick="location.href='index.html'">🏠 Home</span>
+      <span class="separator">›</span>
+      <span class="crumb" onclick="location.href='asset_explorer.html'">Asset Explorer</span>
+      <span class="separator">›</span>
+      <span class="crumb" onclick="location.href='asset_explorer.html'">HVAC</span>
+      <span class="separator">›</span>
+      <span class="crumb active">COMP-001</span>
+    </div>
+
+    <!-- ═══ ASSET OVERVIEW CARD ═══ -->
+    <div class="overview-card">
+      <div class="overview-left">
+        <div class="overview-icon">⚙</div>
+        <div class="overview-info">
+          <div class="oi-title">COMP-001</div>
+          <div class="oi-sub">Asset ID: AS-1001 · Type: Compressor</div>
+          <div class="oi-meta">
+            <span>📍 Location: <strong>Kochi Station</strong></span>
+            <span>🏷️ Model: <strong>XR-200</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="overview-right">
+        <span class="status-badge green">🟢 Running</span>
+        <span class="last-update">Last Updated: 2 sec ago</span>
+      </div>
+    </div>
+
+    <!-- ═══ ROW 2 — Health + Status ═══ -->
+    <div class="row2">
+
+      <!-- Health Card -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Health Status</span></div>
+        <div class="pb">
+          <div class="health-grid">
+            <div class="health-item">
+              <div class="hi-value green">92%</div>
+              <div class="hi-label">Health Score</div>
+              <div class="hi-bar"><div class="fill green" style="width:92%"></div></div>
+            </div>
+            <div class="health-item">
+              <div class="hi-value green">96%</div>
+              <div class="hi-label">Availability</div>
+              <div class="hi-bar"><div class="fill green" style="width:96%"></div></div>
+            </div>
+            <div class="health-item">
+              <div class="hi-value green">98%</div>
+              <div class="hi-label">Performance</div>
+              <div class="hi-bar"><div class="fill green" style="width:98%"></div></div>
+            </div>
+            <div class="health-item">
+              <div class="hi-value green">94%</div>
+              <div class="hi-label">Reliability</div>
+              <div class="hi-bar"><div class="fill green" style="width:94%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Details -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Status Details</span></div>
+        <div class="pb">
+          <div class="status-grid">
+            <div class="status-item"><span class="si-label">Status</span><span class="si-value" style="color:var(--green)">Running</span></div>
+            <div class="status-item"><span class="si-label">Type</span><span class="si-value">Compressor</span></div>
+            <div class="status-item"><span class="si-label">Location</span><span class="si-value">Kochi Station</span></div>
+            <div class="status-item"><span class="si-label">Zone</span><span class="si-value">Platform-1</span></div>
+            <div class="status-item"><span class="si-label">Asset ID</span><span class="si-value">AS-1001</span></div>
+            <div class="status-item"><span class="si-label">Model</span><span class="si-value">XR-200</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ ROW 3 — Properties + Sensors ═══ -->
+    <div class="row3">
+
+      <!-- Properties -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Properties</span>
+          <button class="bl">View All <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="props-grid">
+            <div class="prop-item">
+              <span class="prop-icon">🌡</span>
+              <div class="prop-info">
+                <div class="prop-name">Temperature</div>
+                <div class="prop-value">24°C</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">📈</span>
+              <div class="prop-info">
+                <div class="prop-name">Pressure</div>
+                <div class="prop-value">1.8 Bar</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">〰</span>
+              <div class="prop-info">
+                <div class="prop-name">Vibration</div>
+                <div class="prop-value">0.2 mm/s</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">⚡</span>
+              <div class="prop-info">
+                <div class="prop-name">Voltage</div>
+                <div class="prop-value">230V</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">💧</span>
+              <div class="prop-info">
+                <div class="prop-name">Current</div>
+                <div class="prop-value">12.4 A</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">🌀</span>
+              <div class="prop-info">
+                <div class="prop-name">Speed</div>
+                <div class="prop-value">1,450 RPM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sensors -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Sensors</span>
+          <button class="bl">View All <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="sensors-grid">
+            <div class="sensor-item">
+              <span class="s-icon">🌡</span>
+              <span class="s-name">Temperature Sensor</span>
+              <span class="s-value">24°C</span>
+              <span class="s-status green">Online</span>
+            </div>
+            <div class="sensor-item">
+              <span class="s-icon">📈</span>
+              <span class="s-name">Pressure Sensor</span>
+              <span class="s-value">1.8 Bar</span>
+              <span class="s-status green">Online</span>
+            </div>
+            <div class="sensor-item">
+              <span class="s-icon">〰</span>
+              <span class="s-name">Vibration Sensor</span>
+              <span class="s-value">0.2 mm/s</span>
+              <span class="s-status yellow">Warning</span>
+            </div>
+            <div class="sensor-item">
+              <span class="s-icon">⚡</span>
+              <span class="s-name">Voltage Sensor</span>
+              <span class="s-value">230V</span>
+              <span class="s-status green">Online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ ROW 4 — Metadata + Alerts ═══ -->
+    <div class="row4">
+
+      <!-- Metadata -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Metadata</span>
+          <div style="display:flex;gap:6px;">
+            <button class="bl">✏️ Edit</button>
+            <button class="bl">➕ Add</button>
+          </div>
+        </div>
+        <div class="pb">
+          <div class="metadata-grid">
+            <div class="metadata-item"><span class="md-key">Manufacturer</span><span class="md-value">Carrier</span></div>
+            <div class="metadata-item"><span class="md-key">Model</span><span class="md-value">XR-200</span></div>
+            <div class="metadata-item"><span class="md-key">Installation Date</span><span class="md-value">2024-03-15</span></div>
+            <div class="metadata-item"><span class="md-key">Warranty</span><span class="md-value">2029-03-14</span></div>
+            <div class="metadata-item"><span class="md-key">Serial Number</span><span class="md-value">SN-1234-5678</span></div>
+            <div class="metadata-item"><span class="md-key">Last Service</span><span class="md-value">2025-01-20</span></div>
+          </div>
+          <div class="metadata-actions">
+            <button class="md-btn primary">✏️ Edit</button>
+            <button class="md-btn">➕ Add Metadata</button>
+            <button class="md-btn danger">🗑 Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Alerts -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Recent Alerts</span>
+          <button class="bl" onclick="location.href='alerts.html'">View All <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="alerts-list">
+            <div class="alert-item critical">
+              <span class="a-icon">🔴</span>
+              <div class="a-content">
+                <div class="a-msg">High Temperature Detected</div>
+                <div class="a-time">10:45 AM · 2 min ago</div>
+              </div>
+            </div>
+            <div class="alert-item warning">
+              <span class="a-icon">🟡</span>
+              <div class="a-content">
+                <div class="a-msg">Maintenance Due in 5 Days</div>
+                <div class="a-time">10:15 AM · 32 min ago</div>
+              </div>
+            </div>
+            <div class="alert-item info">
+              <span class="a-icon">ℹ️</span>
+              <div class="a-content">
+                <div class="a-msg">Firmware Update Available</div>
+                <div class="a-time">09:50 AM · 1 hour ago</div>
+              </div>
+            </div>
+            <div class="alert-item info" style="border-left-color:var(--green)">
+              <span class="a-icon">✅</span>
+              <div class="a-content">
+                <div class="a-msg">System Check Passed</div>
+                <div class="a-time">09:30 AM · 1.5 hours ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ QUICK ACTIONS ═══ -->
+    <div class="panel">
+      <div class="ph"><span class="pt">Quick Actions</span></div>
+      <div class="pb">
+        <div class="quick-actions">
+          <button class="qa-btn primary" onclick="location.href='telemetry_center.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Telemetry
+          </button>
+          <button class="qa-btn" onclick="location.href='3d_twin.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><box x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/></svg>
+            Digital Twin
+          </button>
+          <button class="qa-btn" onclick="location.href='gis_monitoring.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            GIS
+          </button>
+          <button class="qa-btn" onclick="location.href='metadata.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/></svg>
+            Asset Explorer
+          </button>
+          <button class="qa-btn" onclick="location.href='alerts.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Alerts
+          </button>
+          <button class="qa-btn" onclick="location.href='reports.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+            Reports
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
 <script>
-lucide.createIcons();
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
 
-/* ─── CLOCK ─── */
-function updateClock(){
-  const n=new Date();
-  const dateEl=document.getElementById('clock-date');
-  const timeEl=document.getElementById('clock-time');
-  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-}
-updateClock(); setInterval(updateClock,1000);
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
 
-/* ─── THEME ─── */
-let isDark = localStorage.getItem('rdt-theme') === 'dark';
-let historyChart = null;
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
 
-function applyTheme(){
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-  const icon = document.getElementById('theme-icon');
-  if(icon){
-    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
-  if(historyChart){
-    updateChartTheme();
-  }
-}
-
-function toggleTheme(){
-  isDark = !isDark;
-  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
-  applyTheme();
-}
-
-applyTheme();
-
-/* ─── NAVIGATION ─── */
-function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
-function openAssetDetails(){ window.location.href = 'asset_details.html'; }
-function openOverview(){ window.location.href = 'index.html'; }
-function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
-function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
-function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
-function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
-function openDevices(){ window.location.href = 'devices.html'; }
-function openSettings(){ window.location.href = 'settings.html'; }
-function openAlerts(){ window.location.href = 'alerts.html'; }
-function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
-
-/* ─── CHART ─── */
-function initChart(){
-  const ctx = document.getElementById('historyChart');
-  if(!ctx) return;
-
-  const isDarkMode = isDark;
-  const textColor = isDarkMode ? '#94a3b8' : '#64748b';
-  const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
-
-  const labels = ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-  const speedData = [95, 88, 92, 110, 130, 140, 145, 138, 125, 115, 100, 90];
-  const tempData = [85, 82, 84, 90, 98, 105, 108, 102, 95, 88, 83, 80];
-
-  historyChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Speed (km/h)',
-          data: speedData,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 3,
-          pointBackgroundColor: '#3b82f6',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 1,
-          yAxisID: 'y',
-        },
-        {
-          label: 'Temperature (°F)',
-          data: tempData,
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239,68,68,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 3,
-          pointBackgroundColor: '#ef4444',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 1,
-          yAxisID: 'y1',
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
-      plugins: {
-        legend: {
-          labels: {
-            color: textColor,
-            font: { size: 11, family: 'Inter' },
-            boxWidth: 12,
-            padding: 12,
-          }
-        },
-        tooltip: {
-          backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-          borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-          borderWidth: 1,
-          titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
-          bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
-          titleFont: { size: 12, weight: '600' },
-          bodyFont: { size: 11 },
-          padding: 10,
-          cornerRadius: 8,
-        }
-      },
-      scales: {
-        x: {
-          grid: {
-            color: gridColor,
-            drawBorder: false,
-          },
-          ticks: {
-            color: textColor,
-            font: { size: 10, family: 'Inter' },
-            maxTicksLimit: 12,
-          },
-        },
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          grid: {
-            color: gridColor,
-            drawBorder: false,
-          },
-          ticks: {
-            color: textColor,
-            font: { size: 10, family: 'Inter' },
-            stepSize: 50,
-          },
-          min: 0,
-          max: 200,
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          grid: {
-            drawOnChartArea: false,
-          },
-          ticks: {
-            color: textColor,
-            font: { size: 10, family: 'Inter' },
-            stepSize: 20,
-          },
-          min: 60,
-          max: 140,
-        }
-      }
-    }
-  });
-}
-
-function updateChartTheme(){
-  if(!historyChart) return;
-  const isDarkMode = isDark;
-  const textColor = isDarkMode ? '#94a3b8' : '#64748b';
-  const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
-  
-  historyChart.options.plugins.legend.labels.color = textColor;
-  historyChart.options.plugins.tooltip.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
-  historyChart.options.plugins.tooltip.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
-  historyChart.options.plugins.tooltip.titleColor = isDarkMode ? '#f1f5f9' : '#0f172a';
-  historyChart.options.plugins.tooltip.bodyColor = isDarkMode ? '#94a3b8' : '#64748b';
-  historyChart.options.scales.x.ticks.color = textColor;
-  historyChart.options.scales.x.grid.color = gridColor;
-  historyChart.options.scales.y.ticks.color = textColor;
-  historyChart.options.scales.y.grid.color = gridColor;
-  historyChart.options.scales.y1.ticks.color = textColor;
-  historyChart.update('none');
-}
-
-/* ─── INIT CHART ─── */
-window.addEventListener('load', function(){
-  setTimeout(initChart, 200);
-});
-
-window.addEventListener('resize', function(){
-  if(historyChart) historyChart.resize();
-});
 </script>
+
 <script src="sidebar.js"></script>
 </body>
 </html>

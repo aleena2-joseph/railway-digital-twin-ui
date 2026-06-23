@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management - Digital Twin Platform</title>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR - from sidebar.css
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* ══════════════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════════════ */
+.page-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.page-header .ph-left h1{
+  font-size:20px;font-weight:700;color:var(--text);
+}
+.page-header .ph-left p{
+  font-size:13px;color:var(--muted);margin-top:2px;
+}
+.page-header .ph-stats{
+  display:flex;gap:16px;
+}
+.page-header .ph-stats .stat{
+  text-align:center;
+  padding:4px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+.page-header .ph-stats .stat .num{
+  font-size:18px;font-weight:700;color:var(--text);
+}
+.page-header .ph-stats .stat .lbl{
+  font-size:10px;color:var(--muted);
+}
+
+/* ══════════════════════════════════════════════════
+   CONTROLS
+══════════════════════════════════════════════════ */
+.controls{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.search-wrapper{
+  flex:1;
+  position:relative;
+  min-width:200px;
+  max-width:350px;
+}
+.search-wrapper .search-icon{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  width:15px;height:15px;
+}
+.search-wrapper input{
+  width:100%;
+  height:36px;
+  padding:0 12px 0 34px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-wrapper input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.search-wrapper input::placeholder{color:var(--dim)}
+
+.filter-select{
+  height:36px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  cursor:pointer;
+  min-width:120px;
+}
+.filter-select:focus{border-color:var(--accent)}
+
+.btn-primary{
+  height:36px;
+  padding:0 16px;
+  border-radius:8px;
+  background:var(--accent);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.btn-primary:hover{opacity:.85;transform:scale(1.02)}
+.btn-primary svg{width:16px;height:16px}
+
+/* ══════════════════════════════════════════════════
+   USER TABLE
+══════════════════════════════════════════════════ */
+.table-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-scroll{overflow-x:auto}
+.user-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.user-table th{
+  text-align:left;
+  padding:10px 14px;
+  background:var(--card2);
+  color:var(--muted);
+  font-weight:600;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  border-bottom:1px solid var(--border);
+}
+.user-table td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+.user-table tr:hover td{background:var(--nav-hover)}
+.user-table tr:last-child td{border-bottom:none}
+.user-table .user-info{display:flex;align-items:center;gap:10px}
+.user-table .user-avatar{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;
+  flex-shrink:0;
+}
+.user-table .user-avatar.blue{background:linear-gradient(135deg,#3b82f6,#8b5cf6)}
+.user-table .user-avatar.green{background:linear-gradient(135deg,#16a34a,#0d9488)}
+.user-table .user-avatar.orange{background:linear-gradient(135deg,#ea580c,#f97316)}
+.user-table .user-avatar.purple{background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
+.user-table .user-avatar.teal{background:linear-gradient(135deg,#0d9488,#06b6d4)}
+.user-table .user-name{font-weight:600;color:var(--text)}
+.user-table .user-email{font-size:11px;color:var(--muted)}
+.user-table .role-badge{
+  padding:2px 10px;border-radius:12px;font-size:10px;font-weight:600;
+}
+.user-table .role-badge.admin{background:#eff6ff;color:#2563eb}
+[data-theme="dark"] .user-table .role-badge.admin{background:rgba(59,130,246,.2);color:#60a5fa}
+.user-table .role-badge.operator{background:#f0fdf4;color:#16a34a}
+[data-theme="dark"] .user-table .role-badge.operator{background:rgba(34,197,94,.2);color:#22c55e}
+.user-table .role-badge.viewer{background:#f5f3ff;color:#7c3aed}
+[data-theme="dark"] .user-table .role-badge.viewer{background:rgba(139,92,246,.2);color:#a78bfa}
+.user-table .status-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 10px;border-radius:12px;font-size:10px;font-weight:600;
+}
+.user-table .status-badge .dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;
+}
+.user-table .status-badge.active{background:var(--green-bg);color:var(--green)}
+.user-table .status-badge.active .dot{background:var(--green)}
+.user-table .status-badge.pending{background:var(--orange-bg);color:var(--orange)}
+.user-table .status-badge.pending .dot{background:var(--orange)}
+.user-table .status-badge.disabled{background:var(--red-bg);color:var(--red)}
+.user-table .status-badge.disabled .dot{background:var(--red)}
+
+.user-table .login-status{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:500;
+}
+.user-table .login-status .ls-dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;
+}
+.user-table .login-status .ls-dot.online{background:var(--green)}
+.user-table .login-status .ls-dot.idle{background:var(--orange)}
+.user-table .login-status .ls-dot.offline{background:var(--dim)}
+
+.user-table .actions{display:flex;gap:4px}
+.user-table .actions button{
+  padding:4px 8px;border-radius:4px;font-size:11px;
+  color:var(--muted);transition:all .2s;border:1px solid transparent;
+}
+.user-table .actions button:hover{background:var(--nav-hover)}
+.user-table .actions button.edit:hover{color:var(--accent);border-color:var(--accent)}
+.user-table .actions button.disable:hover{color:var(--orange);border-color:var(--orange)}
+.user-table .actions button.delete:hover{color:var(--red);border-color:var(--red)}
+
+/* ══════════════════════════════════════════════════
+   ROW 2 - User Details + Roles
+══════════════════════════════════════════════════ */
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+/* ─── USER DETAILS ─── */
+.detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px 16px;
+}
+.detail-item{
+  display:flex;
+  flex-direction:column;
+  padding:4px 0;
+}
+.detail-item .di-label{
+  font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;
+}
+.detail-item .di-value{
+  font-size:13px;font-weight:500;color:var(--text);margin-top:1px;
+}
+
+/* Assigned Assets */
+.assigned-assets{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-top:4px;
+}
+.assigned-assets .aa-tag{
+  padding:2px 10px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:10px;
+  color:var(--text);
+  font-weight:500;
+}
+.assigned-assets .aa-tag:hover{border-color:var(--accent)}
+
+/* User Activity */
+.activity-list{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  margin-top:4px;
+}
+.activity-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  color:var(--muted);
+  padding:2px 4px;
+}
+.activity-item .act-time{
+  color:var(--dim);
+  font-weight:500;
+  flex:0 0 50px;
+}
+.activity-item .act-dot{
+  width:5px;height:5px;border-radius:50%;flex-shrink:0;
+}
+.activity-item .act-dot.green{background:var(--green)}
+.activity-item .act-dot.blue{background:var(--accent)}
+.activity-item .act-dot.orange{background:var(--orange)}
+.activity-item .act-msg{color:var(--text);flex:1}
+
+/* ─── ROLE CARDS ─── */
+.role-cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.role-card{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  text-align:center;
+  transition:all .2s;
+}
+.role-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.role-card .rc-icon{font-size:24px;margin-bottom:4px}
+.role-card .rc-name{font-size:13px;font-weight:700;color:var(--text)}
+.role-card .rc-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.role-card .rc-perms{
+  font-size:10px;color:var(--dim);margin-top:6px;
+  display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+}
+.role-card .rc-perms .perm{display:flex;align-items:center;gap:2px}
+.role-card .rc-perms .perm.yes{color:var(--green)}
+.role-card .rc-perms .perm.no{color:var(--red)}
+
+/* ══════════════════════════════════════════════════
+   PERMISSIONS TABLE
+══════════════════════════════════════════════════ */
+.perms-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.perms-table th{
+  text-align:left;
+  padding:6px 10px;
+  color:var(--muted);
+  font-weight:600;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+  border-bottom:1px solid var(--border);
+}
+.perms-table td{
+  padding:6px 10px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+.perms-table tr:last-child td{border-bottom:none}
+.perms-table .perm-check{
+  font-size:16px;text-align:center;
+}
+.perms-table .perm-check.yes{color:var(--green)}
+.perms-table .perm-check.no{color:var(--dim)}
+
+/* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+.modal-overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.5);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:28px 32px;
+  width:min(480px,95%);
+  max-height:90vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.modal .modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+.modal .modal-header h3{
+  font-size:18px;font-weight:700;color:var(--text);
+}
+.modal .modal-header .close-btn{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:all .2s;
+  font-size:20px;
+}
+.modal .modal-header .close-btn:hover{background:var(--nav-hover);color:var(--text)}
+.modal .form-group{margin-bottom:16px}
+.modal .form-group label{
+  display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;
+}
+.modal .form-group input,
+.modal .form-group select{
+  width:100%;height:38px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.modal .form-group input:focus,
+.modal .form-group select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.modal .form-group .helper{
+  font-size:10px;color:var(--muted);margin-top:3px;
+}
+.modal .modal-actions{
+  display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);
+}
+.modal .modal-actions .btn-cancel{
+  padding:8px 20px;border-radius:8px;border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:500;transition:all .2s;
+}
+.modal .modal-actions .btn-cancel:hover{background:var(--nav-hover)}
+.modal .modal-actions .btn-save{
+  padding:8px 20px;border-radius:8px;background:var(--accent);
+  color:#fff;font-size:12px;font-weight:600;border:none;transition:all .2s;
+}
+.modal .modal-actions .btn-save:hover{opacity:.85}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .row2{grid-template-columns:1fr}
+  .role-cards{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:12px 14px}
+  .controls{flex-wrap:wrap}
+  .search-wrapper{max-width:100%;min-width:auto}
+}
+@media(max-width:768px){
+  .page-header{flex-direction:column}
+  .page-header .ph-stats{width:100%;justify-content:space-around}
+  .role-cards{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .user-table{font-size:11px}
+  .user-table th,.user-table td{padding:6px 10px}
+  .modal{padding:20px}
+}
+@media(max-width:600px){
+  .content{padding:10px}
+  .page-header .ph-stats .stat{padding:4px 8px}
+  .page-header .ph-stats .stat .num{font-size:14px}
+  .user-table .actions{flex-direction:column;gap:2px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="users" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>User Management</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="ph-left">
+        <h1>User Management</h1>
+        <p>Manage platform users and access roles.</p>
+      </div>
+      <div class="ph-stats">
+        <div class="stat">
+          <div class="num">24</div>
+          <div class="lbl">Total Users</div>
+        </div>
+        <div class="stat">
+          <div class="num" style="color:var(--green)">21</div>
+          <div class="lbl">Active</div>
+        </div>
+        <div class="stat">
+          <div class="num" style="color:var(--red)">3</div>
+          <div class="lbl">Inactive</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" placeholder="Search users..." id="searchInput" oninput="filterUsers()">
+      </div>
+      <select class="filter-select" id="roleFilter" onchange="filterUsers()">
+        <option value="all">All Roles</option>
+        <option value="Admin">Admin</option>
+        <option value="Operator">Operator</option>
+        <option value="Viewer">Viewer</option>
+      </select>
+      <select class="filter-select" id="statusFilter" onchange="filterUsers()">
+        <option value="all">All Status</option>
+        <option value="Active">Active</option>
+        <option value="Pending">Pending</option>
+        <option value="Disabled">Disabled</option>
+      </select>
+      <button class="btn-primary" onclick="openAddUser()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add User
+      </button>
+    </div>
+
+    <!-- User Table -->
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="user-table" id="userTable">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Login Status</th>
+              <th>Last Login</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <!-- Users rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Row 2: User Details + Roles -->
+    <div class="row2">
+
+      <!-- User Details -->
+      <div class="panel">
+        <div class="ph"><span class="pt">User Details</span></div>
+        <div class="pb" id="userDetails">
+          <div style="color:var(--muted);text-align:center;padding:20px 0;">
+            Select a user to view details
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Cards -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Roles & Permissions</span></div>
+        <div class="pb">
+          <div class="role-cards">
+            <div class="role-card">
+              <div class="rc-icon">🔑</div>
+              <div class="rc-name">Admin</div>
+              <div class="rc-desc">Full system access</div>
+              <div class="rc-perms">
+                <span class="perm yes">✓ All modules</span>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="rc-icon">🛠</div>
+              <div class="rc-name">Operator</div>
+              <div class="rc-desc">Operational access</div>
+              <div class="rc-perms">
+                <span class="perm yes">✓ Assets</span>
+                <span class="perm yes">✓ Telemetry</span>
+                <span class="perm no">✗ Users</span>
+              </div>
+            </div>
+            <div class="role-card">
+              <div class="rc-icon">👁</div>
+              <div class="rc-name">Viewer</div>
+              <div class="rc-desc">Read-only access</div>
+              <div class="rc-perms">
+                <span class="perm yes">✓ Dashboard</span>
+                <span class="perm yes">✓ GIS</span>
+                <span class="perm no">✗ Settings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Permissions Table -->
+    <div class="panel">
+      <div class="ph"><span class="pt">Module Permissions</span></div>
+      <div class="pb">
+        <div class="table-scroll">
+          <table class="perms-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th style="text-align:center">Admin</th>
+                <th style="text-align:center">Operator</th>
+                <th style="text-align:center">Viewer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Dashboard</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>Asset Explorer</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>Asset Details</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>Telemetry Center</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>GIS Monitoring</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>Digital Twin</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>Metadata</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check no">✗</td></tr>
+              <tr><td>Alerts</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td><td class="perm-check yes">✓</td></tr>
+              <tr><td>User Management</td><td class="perm-check yes">✓</td><td class="perm-check no">✗</td><td class="perm-check no">✗</td></tr>
+              <tr><td>Settings</td><td class="perm-check yes">✓</td><td class="perm-check no">✗</td><td class="perm-check no">✗</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add New User</h3>
+      <button class="close-btn" onclick="closeAddUser()">✕</button>
+    </div>
+    <form id="addUserForm" onsubmit="submitAddUser(event)">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="newName" placeholder="Enter full name" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="newEmail" placeholder="Enter email address" required>
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="newRole">
+          <option value="Admin">Admin</option>
+          <option value="Operator" selected>Operator</option>
+          <option value="Viewer">Viewer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select id="newDepartment">
+          <option value="Operations">Operations</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Administration">Administration</option>
+          <option value="Monitoring">Monitoring</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="newPassword" placeholder="Enter password" required>
+        <div class="helper">Minimum 8 characters</div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="newStatus">
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Disabled">Disabled</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeAddUser()">Cancel</button>
+        <button type="submit" class="btn-save">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
+<script>
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
+
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
+
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── USERS DATA ───
+  const users = [
+    { id: 1, name: 'John Doe', email: 'john@test.com', role: 'Admin', status: 'Active', loginStatus: 'online', lastLogin: '10:45 AM', department: 'Administration', avatar: 'blue', assets: ['All Assets'], activities: [{ time: '10:30 AM', msg: 'Viewed GIS', dot: 'blue' }, { time: '10:20 AM', msg: 'Acknowledged Alert', dot: 'orange' }, { time: '09:55 AM', msg: 'Edited Metadata', dot: 'green' }] },
+    { id: 2, name: 'Alex Smith', email: 'alex@test.com', role: 'Operator', status: 'Active', loginStatus: 'online', lastLogin: 'Yesterday', department: 'Operations', avatar: 'green', assets: ['COMP-001', 'AHU-002', 'Station HVAC'], activities: [{ time: '10:45 AM', msg: 'Viewed Telemetry', dot: 'blue' }, { time: '09:30 AM', msg: 'Acknowledged Alert', dot: 'orange' }] },
+    { id: 3, name: 'Sarah Johnson', email: 'sarah@test.com', role: 'Viewer', status: 'Disabled', loginStatus: 'offline', lastLogin: '2 days ago', department: 'Monitoring', avatar: 'orange', assets: ['Dashboard Only'], activities: [{ time: 'Yesterday', msg: 'Viewed Dashboard', dot: 'blue' }] },
+    { id: 4, name: 'Mike Chen', email: 'mike@test.com', role: 'Operator', status: 'Active', loginStatus: 'idle', lastLogin: '10:20 AM', department: 'Maintenance', avatar: 'purple', assets: ['COMP-002', 'AHU-001'], activities: [{ time: '10:15 AM', msg: 'Edited Metadata', dot: 'green' }, { time: '09:45 AM', msg: 'Viewed GIS', dot: 'blue' }] },
+    { id: 5, name: 'Emily Davis', email: 'emily@test.com', role: 'Viewer', status: 'Pending', loginStatus: 'offline', lastLogin: 'Never', department: 'Monitoring', avatar: 'teal', assets: ['Dashboard Only'], activities: [] },
+    { id: 6, name: 'Robert Wilson', email: 'robert@test.com', role: 'Admin', status: 'Active', loginStatus: 'online', lastLogin: '09:30 AM', department: 'Administration', avatar: 'blue', assets: ['All Assets'], activities: [{ time: '09:30 AM', msg: 'Logged In', dot: 'green' }, { time: '09:15 AM', msg: 'Updated Settings', dot: 'blue' }] },
+    { id: 7, name: 'Lisa Park', email: 'lisa@test.com', role: 'Operator', status: 'Active', loginStatus: 'online', lastLogin: 'Yesterday', department: 'Operations', avatar: 'green', assets: ['COMP-003', 'SENSOR-001'], activities: [{ time: 'Yesterday', msg: 'Acknowledged Alert', dot: 'orange' }] },
+    { id: 8, name: 'David Kim', email: 'david@test.com', role: 'Viewer', status: 'Disabled', loginStatus: 'offline', lastLogin: '5 days ago', department: 'Monitoring', avatar: 'orange', assets: ['Dashboard Only'], activities: [{ time: '5 days ago', msg: 'Viewed Dashboard', dot: 'blue' }] },
+  ];
+
+  let selectedUserId = 1;
+  let nextId = 9;
+
+  // ─── RENDER USERS ───
+  function renderUsers(filteredUsers) {
+    const tbody = document.getElementById('userTableBody');
+    const data = filteredUsers || users;
+
+    tbody.innerHTML = data.map(u => {
+      const statusClass = u.status.toLowerCase();
+      const initial = u.name.charAt(0);
+      const avatarClass = u.avatar || 'blue';
+      const loginClass = u.loginStatus || 'offline';
+      
+      return `
+        <tr onclick="selectUser(${u.id})" style="cursor:pointer;">
+          <td>
+            <div class="user-info">
+              <div class="user-avatar ${avatarClass}">${initial}</div>
+              <div>
+                <div class="user-name">${u.name}</div>
+                <div class="user-email">${u.department || 'Operations'}</div>
+              </div>
+            </div>
+          </td>
+          <td class="user-email">${u.email}</td>
+          <td><span class="role-badge ${u.role.toLowerCase()}">${u.role}</span></td>
+          <td><span class="status-badge ${statusClass}"><span class="dot"></span> ${u.status}</span></td>
+          <td>
+            <span class="login-status">
+              <span class="ls-dot ${loginClass}"></span>
+              ${loginClass.charAt(0).toUpperCase() + loginClass.slice(1)}
+            </span>
+          </td>
+          <td>${u.lastLogin}</td>
+          <td>
+            <div class="actions">
+              <button class="edit" onclick="event.stopPropagation();editUser(${u.id})" title="Edit">✏️</button>
+              <button class="disable" onclick="event.stopPropagation();disableUser(${u.id})" title="Disable">🔒</button>
+              <button class="delete" onclick="event.stopPropagation();deleteUser(${u.id})" title="Delete">🗑</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    if (users.find(u => u.id === selectedUserId)) {
+      showUserDetails(selectedUserId);
+    } else if (data.length > 0) {
+      selectUser(data[0].id);
+    }
+  }
+
+  // ─── FILTER USERS ───
+  function filterUsers() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const role = document.getElementById('roleFilter').value;
+    const status = document.getElementById('statusFilter').value;
+
+    const filtered = users.filter(u => {
+      const matchSearch = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search);
+      const matchRole = role === 'all' || u.role === role;
+      const matchStatus = status === 'all' || u.status === status;
+      return matchSearch && matchRole && matchStatus;
+    });
+
+    renderUsers(filtered);
+  }
+
+  // ─── SELECT USER ───
+  function selectUser(id) {
+    selectedUserId = id;
+    showUserDetails(id);
+    document.querySelectorAll('#userTableBody tr').forEach((tr, index) => {
+      const user = users[index];
+      if (user && user.id === id) {
+        tr.style.background = 'var(--nav-hover)';
+      } else {
+        tr.style.background = '';
+      }
+    });
+  }
+
+  // ─── SHOW USER DETAILS ───
+  function showUserDetails(id) {
+    const user = users.find(u => u.id === id);
+    const container = document.getElementById('userDetails');
+    
+    if (!user) {
+      container.innerHTML = `<div style="color:var(--muted);text-align:center;padding:20px 0;">User not found</div>`;
+      return;
+    }
+
+    const loginClass = user.loginStatus || 'offline';
+    const loginLabel = loginClass.charAt(0).toUpperCase() + loginClass.slice(1);
+
+    container.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+        <div class="user-avatar ${user.avatar}" style="width:48px;height:48px;font-size:18px;">${user.name.charAt(0)}</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--text)">${user.name}</div>
+          <div style="font-size:12px;color:var(--muted)">${user.role} · ${user.department || 'Operations'}</div>
+          <div style="font-size:11px;margin-top:2px;">
+            <span class="login-status"><span class="ls-dot ${loginClass}"></span> ${loginLabel}</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="di-label">Email</span><span class="di-value">${user.email}</span></div>
+        <div class="detail-item"><span class="di-label">Role</span><span class="di-value">${user.role}</span></div>
+        <div class="detail-item"><span class="di-label">Status</span><span class="di-value">${user.status}</span></div>
+        <div class="detail-item"><span class="di-label">Last Login</span><span class="di-value">${user.lastLogin}</span></div>
+        <div class="detail-item"><span class="di-label">Department</span><span class="di-value">${user.department || 'Operations'}</span></div>
+        <div class="detail-item"><span class="di-label">Joined</span><span class="di-value">Jan 2025</span></div>
+      </div>
+      
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Assigned Assets</div>
+        <div class="assigned-assets">
+          ${user.assets.map(a => `<span class="aa-tag">${a}</span>`).join('')}
+        </div>
+      </div>
+
+      ${user.activities && user.activities.length > 0 ? `
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Recent Activity</div>
+        <div class="activity-list">
+          ${user.activities.map(a => `
+            <div class="activity-item">
+              <span class="act-time">${a.time}</span>
+              <span class="act-dot ${a.dot}"></span>
+              <span class="act-msg">${a.msg}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+    `;
+  }
+
+  // ─── ACTIONS ───
+  function editUser(id) {
+    const user = users.find(u => u.id === id);
+    alert(`✏️ Edit User: ${user.name}\n\nThis would open edit modal in production.\nFields: Name, Email, Role, Department, Status, Password`);
+  }
+
+  function disableUser(id) {
+    const user = users.find(u => u.id === id);
+    const newStatus = user.status === 'Active' ? 'Disabled' : 'Active';
+    user.status = newStatus;
+    user.loginStatus = newStatus === 'Active' ? 'online' : 'offline';
+    filterUsers();
+    showUserDetails(id);
+  }
+
+  function deleteUser(id) {
+    if (confirm('Are you sure you want to delete this user?')) {
+      const index = users.findIndex(u => u.id === id);
+      if (index > -1) {
+        users.splice(index, 1);
+        if (selectedUserId === id) {
+          selectedUserId = users.length > 0 ? users[0].id : null;
+        }
+        filterUsers();
+        if (selectedUserId) showUserDetails(selectedUserId);
+        else document.getElementById('userDetails').innerHTML = `<div style="color:var(--muted);text-align:center;padding:20px 0;">No users available</div>`;
+      }
+    }
+  }
+
+  // ─── MODAL FUNCTIONS ───
+  function openAddUser() {
+    document.getElementById('addUserModal').classList.add('show');
+    document.getElementById('newName').value = '';
+    document.getElementById('newEmail').value = '';
+    document.getElementById('newPassword').value = '';
+  }
+
+  function closeAddUser() {
+    document.getElementById('addUserModal').classList.remove('show');
+  }
+
+  function submitAddUser(e) {
+    e.preventDefault();
+    const name = document.getElementById('newName').value.trim();
+    const email = document.getElementById('newEmail').value.trim();
+    const role = document.getElementById('newRole').value;
+    const department = document.getElementById('newDepartment').value;
+    const status = document.getElementById('newStatus').value;
+    
+    if (!name || !email) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    const avatarColors = ['blue', 'green', 'purple', 'teal', 'orange'];
+    const newUser = {
+      id: nextId++,
+      name,
+      email,
+      role,
+      status,
+      loginStatus: status === 'Active' ? 'online' : 'offline',
+      lastLogin: 'Just now',
+      department,
+      avatar: avatarColors[Math.floor(Math.random() * avatarColors.length)],
+      assets: role === 'Admin' ? ['All Assets'] : ['Pending Assignment'],
+      activities: [{ time: 'Just now', msg: 'User created', dot: 'green' }]
+    };
+
+    users.push(newUser);
+    closeAddUser();
+    filterUsers();
+    selectUser(newUser.id);
+    
+    // Show success
+    alert(`✅ User "${name}" created successfully!`);
+  }
+
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    renderUsers();
+    if (users.length > 0) showUserDetails(users[0].id);
+  });
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>
