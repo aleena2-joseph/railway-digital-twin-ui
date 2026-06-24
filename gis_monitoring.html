@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Digital Twin Platform</title>
+<title>GIS Monitoring - Railway Digital Twin</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
-<link rel="stylesheet" href="sidebar.css">
 <style>
   /* ══════════════════════════════════════════════════
-   CSS VARIABLES
+   CSS VARIABLES  — LIGHT (default) + DARK overrides
 ══════════════════════════════════════════════════ */
 :root {
   --bg:           #f0f4f8;
@@ -40,12 +40,6 @@
   --nav-act-bg:   #3b82f6;
   --nav-act-txt:  #ffffff;
   --sidebar-w:    228px;
-
-  /* KPI icon tints — theme-aware so dark mode doesn't get blown-out light squares */
-  --kpi-blue-ic:   #2563eb; --kpi-blue-bg:   #eff6ff;
-  --kpi-green-ic:  #16a34a; --kpi-green-bg:  #f0fdf4;
-  --kpi-purple-ic: #7c3aed; --kpi-purple-bg: #f5f3ff;
-  --kpi-orange-ic: #ea580c; --kpi-orange-bg: #fff7ed;
 }
 [data-theme="dark"] {
   --bg:           #0f172a;
@@ -70,11 +64,6 @@
   --nav-hover:    rgba(255,255,255,.05);
   --nav-act-bg:   #1e293b;
   --nav-act-txt:  #60a5fa;
-
-  --kpi-blue-ic:   #60a5fa; --kpi-blue-bg:   rgba(59,130,246,.15);
-  --kpi-green-ic:  #4ade80; --kpi-green-bg:  rgba(34,197,94,.15);
-  --kpi-purple-ic: #a78bfa; --kpi-purple-bg: rgba(124,58,237,.15);
-  --kpi-orange-ic: #fb923c; --kpi-orange-bg: rgba(234,88,12,.15);
 }
 
 /* ══════════════════════════════════════════════════
@@ -93,7 +82,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* ══════════════════════════════════════════════════
-   SIDEBAR - from sidebar.css
+   SIDEBAR
 ══════════════════════════════════════════════════ */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
@@ -106,532 +95,261 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   position:relative;
 }
 
+.sb-logo{padding:14px 12px 12px;border-bottom:1px solid var(--sidebar-bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-brand{line-height:1.25}
+.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
+[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
+.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
+.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
+[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
+
+.sb-overview{padding:10px 10px 4px}
+.sb-overview-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border-radius:8px;background:#3b82f6;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer}
+.sb-overview-btn svg{width:15px;height:15px}
+
+.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;color:var(--nav-txt);font-size:11.5px;transition:background .12s,color .12s;border-right:2.5px solid transparent}
+.sb-item:hover{background:var(--nav-hover);color:var(--text)}
+.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
+.sb-item svg{width:14px;height:14px;flex-shrink:0}
+.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
+.sb-badge{margin-left:auto;min-width:17px;height:17px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+.sb-train-img{flex-shrink:0;overflow:hidden;height:160px;position:relative;margin-top:auto}
+.sb-train-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75;transition:opacity .25s;position:absolute;top:0;left:0}
+.sb-train-img:hover img{opacity:.9}
+
+.sb-logout{display:flex;align-items:center;gap:8px;width:calc(100% - 20px);margin:6px 10px 4px;padding:8px 14px;border-radius:8px;background:var(--red-bg);color:var(--red);font-size:11.5px;font-weight:600;border:1px solid rgba(220,38,38,.2);cursor:pointer;transition:background .15s}
+.sb-logout:hover{background:rgba(220,38,38,.22)}
+.sb-logout svg{width:14px;height:14px}
+.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
+
 /* ══════════════════════════════════════════════════
    MAIN
 ══════════════════════════════════════════════════ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-/* Topbar */
-.topbar{
-  height:56px;flex-shrink:0;
-  background:var(--topbar-bg);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;
-  box-shadow:var(--shadow);
-}
-.tb-left{display:flex;align-items:center;gap:10px}
-.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap;line-height:1}
-.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.dt-pill{
-  display:flex;align-items:center;gap:6px;
-  background:var(--card2);border:1px solid var(--border);
-  border-radius:7px;padding:6px 12px;font-size:11px;color:var(--muted);
-  line-height:1;
-}
+.topbar{height:52px;flex-shrink:0;background:var(--topbar-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:var(--shadow);transition:background .25s}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dt-pill{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted)}
 .dt-pill .dt-date{font-weight:600;color:var(--text)}
 .dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
-.ib{
-  width:32px;height:32px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--card2);border:1px solid var(--border);
-  color:var(--muted);cursor:pointer;transition:all .12s;
-  flex-shrink:0;
-}
+.ib{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--card2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .12s}
 .ib:hover{background:var(--border);color:var(--text)}
 .ib svg{width:15px;height:15px}
-.notif-wrap{position:relative;display:flex}
-.notif-dot{
-  position:absolute;top:-4px;right:-4px;
-  width:15px;height:15px;border-radius:50%;
-  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  line-height:1;
-}
-.admin-chip{
-  display:flex;align-items:center;gap:8px;
-  background:var(--card2);border:1px solid var(--border);
-  border-radius:8px;padding:4px 10px 4px 4px;cursor:pointer;
-}
-.admin-av{
-  width:28px;height:28px;border-radius:6px;flex-shrink:0;
-  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;
-}
-.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
-.admin-role{font-size:9px;color:var(--muted);line-height:1.3}
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:#ef4444;font-size:8px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.admin-chip{display:flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer}
+.admin-av{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
 
-/* Content */
-.content{
-  flex:1;overflow-y:auto;
-  padding:18px 20px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
+.content{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 
 /* ══════════════════════════════════════════════════
-   ROW 1 — KPI ROW
+   GIS MONITORING STYLES
 ══════════════════════════════════════════════════ */
-.kpi-row{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  flex-shrink:0;
-}
-.kpi{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:16px 20px;
-  box-shadow:var(--shadow);
-  display:flex;
-  align-items:center;
-  gap:14px;
-  transition:all .2s;
-}
-.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.kpi-ico{
-  width:44px;height:44px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.kpi-ico.blue{background:var(--kpi-blue-bg)}
-.kpi-ico.green{background:var(--kpi-green-bg)}
-.kpi-ico.purple{background:var(--kpi-purple-bg)}
-.kpi-ico.orange{background:var(--kpi-orange-bg)}
-.kpi-ico svg{width:20px;height:20px}
-.kpi-ico.blue svg{stroke:var(--kpi-blue-ic)}
-.kpi-ico.green svg{stroke:var(--kpi-green-ic)}
-.kpi-ico.purple svg{stroke:var(--kpi-purple-ic)}
-.kpi-ico.orange svg{stroke:var(--kpi-orange-ic)}
-.kpi-info{min-width:0}
-.kpi-lbl{
-  font-size:10px;
-  color:var(--muted);
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:.4px;
-  line-height:1.2;
-}
-.kpi-val{
-  font-size:26px;
-  font-weight:800;
-  color:var(--text);
-  line-height:1.25;
-  margin-top:3px;
-}
-.kpi-val.green{color:var(--green)}
-.kpi-val.orange{color:var(--orange)}
-.kpi-sub{
-  font-size:10px;
-  color:var(--dim);
-  margin-top:2px;
-  line-height:1.2;
-}
-.kpi-sub.green{color:var(--green)}
+.gis-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;flex:1;min-height:0}
+.gis-map-panel{height:100%;display:flex;flex-direction:column}
+.gis-side-panel{display:flex;flex-direction:column;gap:10px;overflow:hidden}
 
-/* ══════════════════════════════════════════════════
-   PANEL BASE
-══════════════════════════════════════════════════ */
 .panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  min-height:0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;overflow:hidden;
   transition:background .25s,border-color .25s;
 }
-.ph{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:11px 16px;
-  flex-shrink:0;
-  border-bottom:1px solid var(--border);
-  background:var(--card2);
-  gap:8px;
-}
-.pt{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
-.pb{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;min-height:0}
-.bl{
-  font-size:10px;color:var(--accent);cursor:pointer;
-  display:flex;align-items:center;gap:4px;
-  flex-shrink:0;line-height:1;
-}
-.bl:hover{text-decoration:underline}
-.bl svg{width:9px;height:9px}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 7px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.pt{font-size:11.5px;font-weight:700;color:var(--text)}
+.pb{flex:1;overflow:hidden;padding:10px 12px;display:flex;flex-direction:column}
+.dim{font-size:10px;color:var(--dim)}
 
-/* ══════════════════════════════════════════════════
-   ROW 2 — SYSTEM HEALTH + RECENT ALERTS
-══════════════════════════════════════════════════ */
-.row2{
-  display:grid;
-  grid-template-columns:1fr 1.15fr;
-  gap:14px;
-  height:212px;
-  flex-shrink:0;
-}
+#gis-map{flex:1;min-height:0;border-radius:0 0 10px 10px}
 
-/* ─── SYSTEM HEALTH ─── */
-.health-container{
-  display:flex;
-  gap:18px;
-  flex:1;
-  align-items:center;
-}
-.health-circle{
-  position:relative;
-  width:96px;
-  height:96px;
-  flex-shrink:0;
-}
-.health-circle svg{transform:rotate(-90deg)}
-.health-circle .bg{
-  fill:none;
-  stroke:var(--border);
-  stroke-width:7;
-}
-.health-circle .progress{
-  fill:none;
-  stroke:var(--green);
-  stroke-width:7;
-  stroke-linecap:round;
-  transition:stroke-dashoffset 1s ease;
-}
-.health-circle .center{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center;
-}
-.health-circle .center .big{
-  font-size:21px;
-  font-weight:800;
-  color:var(--text);
-  line-height:1.2;
-}
-.health-circle .center .sm{
-  font-size:9px;
-  color:var(--muted);
-  margin-top:1px;
-}
-.health-bars{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  justify-content:center;
-  min-width:0;
-}
-.health-row{
-  display:flex;
-  align-items:center;
-  gap:9px;
-}
-.health-dot{
-  width:9px;
-  height:9px;
-  border-radius:50%;
-  flex-shrink:0;
-}
-.health-dot.green{background:var(--green)}
-.health-dot.yellow{background:var(--orange)}
-.health-dot.red{background:var(--red)}
-.health-label{
-  font-size:11px;
-  color:var(--text);
-  flex:0 0 60px;
-}
-.health-count{
-  font-size:13px;
-  font-weight:700;
-  color:var(--text);
-  flex:0 0 30px;
-  text-align:right;
-}
-.health-bar-wrap{
-  flex:1;
-  height:6px;
-  background:var(--border);
-  border-radius:3px;
-  overflow:hidden;
-  min-width:40px;
-}
-.health-bar{
-  height:100%;
-  border-radius:3px;
-  transition:width .8s ease;
-}
-.health-bar.green{background:var(--green)}
-.health-bar.yellow{background:var(--orange)}
-.health-bar.red{background:var(--red)}
-.health-percent{
-  font-size:10px;
-  color:var(--muted);
-  flex:0 0 36px;
-  text-align:right;
-}
-
-/* ─── ALERTS ─── */
-.al-list{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  flex:1;
-  overflow-y:auto;
-}
-.al-item{
-  background:var(--card2);
-  border-left:3px solid;
-  border-radius:0 6px 6px 0;
-  padding:7px 10px;
-  display:flex;
-  align-items:center;
-  gap:9px;
-  transition:all .2s;
-}
-.al-item:hover{background:var(--border)}
-.al-item .al-icon{font-size:14px;flex-shrink:0;line-height:1}
-.al-item .al-content{flex:1;min-width:0}
-.al-item .al-msg{
-  font-size:11px;
-  color:var(--text);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  font-weight:500;
-}
-.al-item .al-meta{
-  font-size:9px;
-  color:var(--muted);
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:3px;
-}
-.al-item .al-badge{
-  font-size:8px;
-  padding:2px 6px;
-  border-radius:3px;
-  font-weight:700;
-  letter-spacing:.2px;
-  line-height:1.4;
-}
-.al-item.critical{border-left-color:var(--red)}
-.al-item.warning{border-left-color:var(--orange)}
-.al-item.info{border-left-color:var(--accent)}
-.al-footer{
-  display:flex;
-  gap:16px;
-  padding-top:8px;
-  border-top:1px solid var(--border);
-  margin-top:8px;
-  font-size:10px;
-  color:var(--muted);
-  flex-shrink:0;
-}
-.al-footer span{display:flex;align-items:center;gap:4px}
-
-/* ══════════════════════════════════════════════════
-   ROW 3 — GIS MAP + DIGITAL TWIN STATUS
-══════════════════════════════════════════════════ */
-.row3{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:14px;
-  height:340px;
-  flex-shrink:0;
-}
-
-/* ─── GIS MAP PANEL ─── */
-.gis-map-panel{display:flex;flex-direction:column;position:relative}
-#gis-map{flex:1;min-height:0;height:100%}
-.map-live-pill{
-  font-size:9px;padding:3px 9px;
-  background:var(--green-bg);color:var(--green);
-  border-radius:10px;display:flex;align-items:center;gap:4px;
-  font-weight:600;flex-shrink:0;
-}
-.map-live-pill .dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block}
-.map-hint{font-size:9px;color:var(--muted);flex-shrink:0}
-
-/* Floating layers control, overlaid on the map so it doesn't cost a row */
-.layers-float{
-  position:absolute;top:10px;right:10px;z-index:20;
+/* KPI Cards */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;flex-shrink:0}
+.kpi{
   background:var(--card);border:1px solid var(--border);
-  border-radius:8px;padding:8px 10px;
-  box-shadow:var(--shadow-md);
-  display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;
-}
-.layer-item{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:10px;
-  color:var(--text);
-  cursor:pointer;
-  padding:2px 2px;
-  border-radius:4px;
-  transition:background .2s;
-  white-space:nowrap;
-}
-.layer-item:hover{background:var(--nav-hover)}
-.layer-item input[type="checkbox"]{
-  width:13px;height:13px;
-  accent-color:var(--accent);
-  cursor:pointer;
-  flex-shrink:0;
-}
-.layer-item .layer-color{
-  width:9px;height:9px;border-radius:50%;display:inline-block;
-  flex-shrink:0;
-}
-
-/* ─── DIGITAL TWIN STATUS CARD ─── */
-.twin-card-panel{display:flex;flex-direction:column}
-.twin-card-body{flex:1;display:flex;flex-direction:column;gap:14px}
-.twin-head{display:flex;align-items:center;gap:12px}
-.twin-icon{
-  width:42px;
-  height:42px;
-  border-radius:10px;
-  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-}
-.twin-icon svg{width:21px;height:21px;color:#fff}
-.twin-head-text .twin-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
-.twin-head-text .twin-sub{font-size:10px;color:var(--muted);margin-top:1px}
-.twin-stat-list{display:flex;flex-direction:column;gap:0;flex:1}
-.twin-stat-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 0;
-  border-bottom:1px solid var(--border);
-}
-.twin-stat-row:last-child{border-bottom:none}
-.twin-stat-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
-.twin-stat-label svg{width:13px;height:13px;color:var(--dim)}
-.twin-stat-value{font-size:14px;font-weight:700;color:var(--text)}
-.twin-btn{
-  padding:9px 16px;
-  border-radius:7px;
-  background:var(--accent);
-  color:#fff;
-  font-size:11.5px;
-  font-weight:600;
-  cursor:pointer;
-  transition:all .2s;
-  border:none;
-  flex-shrink:0;
-  width:100%;
-  text-align:center;
-}
-.twin-btn:hover{opacity:.88;transform:scale(1.01)}
-
-/* ══════════════════════════════════════════════════
-   TRAIN FILTER BAR (sits between Recent Alerts and the GIS map)
-══════════════════════════════════════════════════ */
-.filter-bar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  flex-shrink:0;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:10px 14px;
+  border-radius:8px;padding:10px 12px;
   box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:10px;
+  transition:background .25s;
 }
-.filter-bar .filter-label{
-  font-size:10px;color:var(--muted);font-weight:700;
-  text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;
-}
+.kpi-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-ico svg{width:18px;height:18px}
+.kpi-lbl{font-size:9px;color:var(--muted)}
+.kpi-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;margin:2px 0}
+.kpi-sub{font-size:9px;color:var(--dim)}
+
+/* Filters */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;padding:6px 0}
 .filter-bar select{
   background:var(--card2);color:var(--text);border:1px solid var(--border);
-  border-radius:7px;padding:6px 10px;font-size:11.5px;font-family:inherit;
-  outline:none;cursor:pointer;min-width:130px;flex:1 1 130px;max-width:200px;
+  border-radius:6px;padding:5px 10px;font-size:11px;font-family:inherit;outline:none;cursor:pointer;
 }
 .filter-bar select:focus{border-color:var(--accent)}
-.filter-bar .filter-reset{
-  display:flex;align-items:center;gap:5px;
-  margin-left:auto;flex-shrink:0;
-}
+.filter-bar .filter-label{font-size:10px;color:var(--muted);font-weight:600}
+
+/* Train Details Panel */
+.train-detail-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.train-detail-item:last-child{border-bottom:none}
+.train-detail-item .label{color:var(--muted)}
+.train-detail-item .value{font-weight:600;color:var(--text)}
+
+.health-bar{height:4px;border-radius:2px;background:var(--border);margin-top:3px;overflow:hidden}
+.health-bar .fill{height:100%;border-radius:2px;transition:width .3s}
+
+.health-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.health-item .h-label{font-size:10px;color:var(--muted)}
+.health-item .h-value{font-size:11px;font-weight:600}
+
+/* Layer Controls */
+.layer-item{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:11px;color:var(--text)}
+.layer-item input[type="checkbox"]{accent-color:var(--accent);cursor:pointer;width:14px;height:14px}
+.layer-item .layer-color{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Selected Train Info */
+.selected-train-header{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.selected-train-header .train-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.selected-train-header .train-name{font-size:14px;font-weight:700}
+.selected-train-header .train-status{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+
+/* Alert items */
+.alert-item{padding:6px 8px;border-radius:6px;margin-bottom:4px;font-size:10px;display:flex;align-items:center;gap:8px}
+.alert-item .alert-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.alert-item.critical{background:var(--red-bg);border-left:3px solid var(--red)}
+.alert-item.warning{background:var(--orange-bg);border-left:3px solid var(--orange)}
+.alert-item.info{background:var(--green-bg);border-left:3px solid var(--green)}
+
+/* Chart container */
+.chart-container{height:80px;position:relative;margin-top:4px}
 
 /* ══════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════ */
 @media(max-width:1200px){
-  .kpi-row{grid-template-columns:repeat(2,1fr)}
-  .row2{grid-template-columns:1fr;height:auto}
-  .row2 .panel{height:212px}
-  .row3{grid-template-columns:1fr;height:auto}
-  .row3 .gis-map-panel{height:320px}
-  .row3 .twin-card-panel{height:auto}
+  :root{--sidebar-w:190px}
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+  .gis-grid{grid-template-columns:1fr;height:auto}
+  .gis-side-panel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 }
 @media(max-width:900px){
   :root{--sidebar-w:56px}
-  .content{padding:14px 16px}
-  .kpi-row{gap:10px}
-  .row2,.row3{gap:10px}
-  .filter-bar select{min-width:110px;flex:1 1 100px}
+  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
+  .sb-item{justify-content:center;padding:10px}
+  .sb-overview-btn{justify-content:center;padding:10px}
+  .sb-overview-btn span{display:none}
+  .sb-train-img{height:100px}
+  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
+  body{overflow:auto}
+  html,body{height:auto}
+  .app{height:auto;flex-direction:column}
+  .main{overflow:auto}
+  .content{overflow:visible}
+  .gis-side-panel{grid-template-columns:1fr}
 }
 @media(max-width:768px){
-  .kpi-row{grid-template-columns:1fr 1fr}
   .topbar{padding:0 12px}
+  .tb-left h2{font-size:14px}
   .dt-pill .dt-date{display:none}
   .admin-role{display:none}
-  .filter-bar{padding:8px 10px}
-  .filter-bar .filter-reset{margin-left:0;width:100%;justify-content:flex-end}
-  .filter-bar select{flex:1 1 calc(50% - 5px);max-width:none}
-  .layers-float{position:static;margin:0 0 8px;box-shadow:none}
+  .kpi-row{grid-template-columns:1fr 1fr}
 }
 @media(max-width:600px){
-  .kpi-row{grid-template-columns:1fr}
+  .topbar{padding:0 10px}
   .content{padding:10px}
-  .kpi{padding:12px 16px}
-  .kpi-val{font-size:22px}
-  .filter-bar select{flex:1 1 100%}
+  .dt-pill .dt-date{display:none}
+  .admin-role,.admin-name~*{display:none}
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .gis-side-panel{grid-template-columns:1fr}
 }
 
-/* Leaflet dark tile filter */
-[data-theme="dark"] .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
-[data-theme="dark"] .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
-[data-theme="dark"] .leaflet-popup-content-wrapper{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
-[data-theme="dark"] .leaflet-popup-tip{background:#1e293b}
-.leaflet-popup-content{font-family:inherit;font-size:12px}
-.leaflet-popup-content .popup-row{display:flex;justify-content:space-between;gap:10px;padding:2px 0;font-size:11px;border-bottom:1px solid rgba(148,163,184,.15)}
-.leaflet-popup-content .popup-row:last-child{border-bottom:none}
+/* Leaflet dark mode filter */
+[data-theme="dark"] #gis-map .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
+[data-theme="dark"] #gis-map .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
+[data-theme="dark"] #gis-map .leaflet-popup-content-wrapper{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
+[data-theme="dark"] #gis-map .leaflet-popup-tip{background:#1e293b}
+
+.leaflet-popup-content{font-size:12px;min-width:180px}
+.leaflet-popup-content strong{display:block;font-size:14px;margin-bottom:4px}
+.leaflet-popup-content .popup-row{display:flex;justify-content:space-between;padding:2px 0;font-size:11px}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════ APP ═══════════════════ -->
+<!-- ═══════════════ APP ═══════════════ -->
 <div class="app">
 
 <!-- ════════ SIDEBAR ════════ -->
-<div class="sidebar"></div>
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="13" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        <circle cx="7.5" cy="18.5" r=".5" fill="currentColor"/>
+        <circle cx="16.5" cy="18.5" r=".5" fill="currentColor"/>
+        <line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/>
+        <line x1="8" y1="14" x2="16" y2="14"/>
+      </svg>
+    </div>
+    <div class="sb-brand">
+      <div class="b1">RAILWAY</div>
+      <div class="b2">Digital Twin</div>
+      <div class="b3">Monitoring Platform</div>
+    </div>
+  </div>
+
+  <div class="sb-overview">
+    <button class="sb-overview-btn" onclick="openOverview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>Overview</span>
+    </button>
+  </div>
+
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item" onclick="openAssetHierarchy()"><i data-lucide="layers"></i><span>Asset Hierarchy</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openAssetDetails()"><i data-lucide="layers"></i><span>Asset Details</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openLiveTelemetry()"><i data-lucide="radio"></i><span>Live Telemetry</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item active" onclick="openGisMonitoring()"><i data-lucide="map"></i><span>GIS Monitoring</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openGoogleEarthView()"><i data-lucide="globe"></i><span>Google Earth View</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openRoutevisualization()"><i data-lucide="route"></i><span>Route Visualization</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+  <div class="sb-item" onclick="openDevices()"><i data-lucide="cpu"></i><span>Devices</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+
+  <div class="sb-sec">Management</div>
+  <div class="sb-item"><i data-lucide="settings"></i><span>Settings</span><i data-lucide="chevron-right" class="sb-chevron"></i></div>
+
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item"><i data-lucide="bell"></i><span>Alerts</span><span class="sb-badge">8</span></div>
+
+  <div style="padding:6px 0 2px">
+    <button class="sb-logout" onclick="doLogout()">
+      <i data-lucide="log-out"></i><span>Logout</span>
+    </button>
+  </div>
+
+  <div class="sb-train-img">
+    <img src="assets/images/train_img.png" alt="Train" id="sidebar-train-img"/>
+  </div>
+
+  <div class="sb-footer">© 2026 Railway Systems</div>
+</aside>
 
 <!-- ════════ MAIN ════════ -->
 <div class="main">
 
-  <!-- Topbar -->
   <div class="topbar">
     <div class="tb-left">
-      <i data-lucide="layout-dashboard" style="width:17px;height:17px;color:var(--muted)"></i>
-      <h2>Dashboard</h2>
+      <i data-lucide="map" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>GIS Monitoring</h2>
     </div>
     <div class="tb-right">
       <div class="dt-pill">
-        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span class="dt-date" id="clock-date">June 18, 2026</span>
         <span style="color:var(--border)">|</span>
         <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
@@ -653,481 +371,549 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     </div>
   </div>
 
-  <!-- Content -->
+  <!-- ═══ CONTENT ═══ -->
   <div class="content">
 
-    <!-- ═══ ROW 1 — KPI CARDS ═══ -->
-    <div class="kpi-row">
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpi-row">
       <div class="kpi">
-        <div class="kpi-ico blue">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-lbl">Total Assets</div>
-          <div class="kpi-val">456</div>
-          <div class="kpi-sub">+12 this month</div>
-        </div>
+        <div class="kpi-ico" style="background:#eff6ff"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5" fill="#2563eb"/><circle cx="16.5" cy="18.5" r=".5" fill="#2563eb"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/></svg></div>
+        <div><div class="kpi-lbl">Total Trains</div><div class="kpi-val" id="total-trains">25</div><div class="kpi-sub">All trains</div></div>
       </div>
       <div class="kpi">
-        <div class="kpi-ico green">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-lbl">Active Assets</div>
-          <div class="kpi-val green">421</div>
-          <div class="kpi-sub green">92% online</div>
-        </div>
+        <div class="kpi-ico" style="background:#f0fdf4"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#16a34a"/></svg></div>
+        <div><div class="kpi-lbl">Online</div><div class="kpi-val" style="color:#16a34a" id="online-trains">22</div><div class="kpi-sub">Running</div></div>
       </div>
       <div class="kpi">
-        <div class="kpi-ico purple">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-lbl">Sensors</div>
-          <div class="kpi-val">2,450</div>
-          <div class="kpi-sub">Connected sensors</div>
-        </div>
+        <div class="kpi-ico" style="background:#fef2f2"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div>
+        <div><div class="kpi-lbl">Offline</div><div class="kpi-val" style="color:#dc2626" id="offline-trains">3</div><div class="kpi-sub">Not connected</div></div>
       </div>
       <div class="kpi">
-        <div class="kpi-ico orange">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div class="kpi-info">
-          <div class="kpi-lbl">Active Alerts</div>
-          <div class="kpi-val orange">8</div>
-          <div class="kpi-sub">3 critical, 5 warning</div>
-        </div>
+        <div class="kpi-ico" style="background:#f0fdf4"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="5 12 10 17 20 7"/></svg></div>
+        <div><div class="kpi-lbl">Moving</div><div class="kpi-val" style="color:#16a34a" id="moving-trains">18</div><div class="kpi-sub">In transit</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fff7ed"><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg></div>
+        <div><div class="kpi-lbl">Stopped</div><div class="kpi-val" style="color:#ea580c" id="stopped-trains">4</div><div class="kpi-sub">At stations</div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico" style="background:#fef2f2"><svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div><div class="kpi-lbl">Alerts</div><div class="kpi-val" style="color:#dc2626" id="alert-count">6</div><div class="kpi-sub">Requires attention</div></div>
       </div>
     </div>
 
-    <!-- ═══ ROW 2 — SYSTEM HEALTH + RECENT ALERTS ═══ -->
-    <div class="row2">
-
-      <!-- System Health -->
-      <div class="panel">
-        <div class="ph"><span class="pt">System Health</span></div>
-        <div class="pb">
-          <div class="health-container">
-            <div class="health-circle">
-              <svg width="96" height="96" viewBox="0 0 90 90">
-                <circle class="bg" cx="45" cy="45" r="36"/>
-                <circle class="progress" id="health-progress" cx="45" cy="45" r="36" stroke-dasharray="226.2" stroke-dashoffset="18.1"/>
-              </svg>
-              <div class="center">
-                <div class="big">92%</div>
-                <div class="sm">Overall</div>
-              </div>
-            </div>
-            <div class="health-bars">
-              <div class="health-row">
-                <span class="health-dot green"></span>
-                <span class="health-label">Healthy</span>
-                <span class="health-count">412</span>
-                <div class="health-bar-wrap">
-                  <div class="health-bar green" style="width:90.4%"></div>
-                </div>
-                <span class="health-percent">90.4%</span>
-              </div>
-              <div class="health-row">
-                <span class="health-dot yellow"></span>
-                <span class="health-label">Warning</span>
-                <span class="health-count">28</span>
-                <div class="health-bar-wrap">
-                  <div class="health-bar yellow" style="width:6.1%"></div>
-                </div>
-                <span class="health-percent">6.1%</span>
-              </div>
-              <div class="health-row">
-                <span class="health-dot red"></span>
-                <span class="health-label">Critical</span>
-                <span class="health-count">16</span>
-                <div class="health-bar-wrap">
-                  <div class="health-bar red" style="width:3.5%"></div>
-                </div>
-                <span class="health-percent">3.5%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Alerts -->
-      <div class="panel">
-        <div class="ph">
-          <span class="pt">Recent Alerts</span>
-          <button class="bl" onclick="location.href='alerts.html'">View All <i data-lucide="external-link"></i></button>
-        </div>
-        <div class="pb">
-          <div class="al-list">
-            <div class="al-item critical">
-              <span class="al-icon">🔴</span>
-              <div class="al-content">
-                <div class="al-msg">Train 03 — Brake Pressure Low</div>
-                <div class="al-meta"><span>10:42 AM</span><span class="al-badge" style="background:var(--red-bg);color:var(--red)">Critical</span></div>
-              </div>
-            </div>
-            <div class="al-item warning">
-              <span class="al-icon">🟡</span>
-              <div class="al-content">
-                <div class="al-msg">Train 04 — GPS Signal Lost</div>
-                <div class="al-meta"><span>10:31 AM</span><span class="al-badge" style="background:var(--orange-bg);color:var(--orange)">Warning</span></div>
-              </div>
-            </div>
-            <div class="al-item critical">
-              <span class="al-icon">🔴</span>
-              <div class="al-content">
-                <div class="al-msg">Train 06 — Communication Lost</div>
-                <div class="al-meta"><span>09:58 AM</span><span class="al-badge" style="background:var(--red-bg);color:var(--red)">Critical</span></div>
-              </div>
-            </div>
-            <div class="al-item warning">
-              <span class="al-icon">🟡</span>
-              <div class="al-content">
-                <div class="al-msg">Train 02 — High Engine Temp</div>
-                <div class="al-meta"><span>10:15 AM</span><span class="al-badge" style="background:var(--orange-bg);color:var(--orange)">Warning</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="al-footer">
-            <span>🔴 Critical: <strong>2</strong></span>
-            <span>🟡 Warning: <strong>2</strong></span>
-            <span>ℹ️ Info: <strong>0</strong></span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ═══ TRAIN FILTERS ═══ -->
+    <!-- Filter Bar -->
     <div class="filter-bar">
       <span class="filter-label">Filters:</span>
-      <select id="train-filter" onchange="filterByTrain(this.value)">
+      <select id="train-filter" onchange="filterTrains(this.value)">
         <option value="all">All Trains</option>
         <option value="Train 01">Train 01</option>
         <option value="Train 02">Train 02</option>
         <option value="Train 03">Train 03</option>
         <option value="Train 04">Train 04</option>
         <option value="Train 05">Train 05</option>
-        <option value="Train 06">Train 06</option>
       </select>
-      <select id="status-filter" onchange="filterByStatus(this.value)">
+      <select id="status-filter" onchange="filterStatus(this.value)">
         <option value="all">All Status</option>
         <option value="Running">Running</option>
         <option value="Stopped">Stopped</option>
         <option value="Warning">Warning</option>
         <option value="Offline">Offline</option>
       </select>
-      <select id="route-filter" onchange="filterByRoute(this.value)">
+      <select id="route-filter" onchange="filterRoute(this.value)">
         <option value="all">All Routes</option>
         <option value="Mumbai-Ahmedabad">Mumbai → Ahmedabad</option>
         <option value="Surat-Ahmedabad">Surat → Ahmedabad</option>
         <option value="Rajkot-Ahmedabad">Rajkot → Ahmedabad</option>
       </select>
-      <div class="filter-reset">
-        <button class="ib" onclick="resetTrainFilters()" title="Reset Filters"><i data-lucide="rotate-ccw" style="width:13px;height:13px"></i></button>
-      </div>
+      <button class="ib" onclick="resetFilters()" title="Reset Filters"><i data-lucide="rotate-ccw" style="width:13px;height:13px"></i></button>
     </div>
 
-    <!-- ═══ ROW 3 — GIS MAP + DIGITAL TWIN STATUS ═══ -->
-    <div class="row3">
+    <!-- GIS Grid -->
+    <div class="gis-grid">
 
       <!-- Map Panel -->
       <div class="panel gis-map-panel">
         <div class="ph">
           <span class="pt">Live GIS Map</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="map-hint">📍 Real-time tracking</span>
-            <span class="map-live-pill"><span class="dot"></span>Live</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="dim" style="font-size:9px">📍 Real-time tracking</span>
+            <span class="pill green" style="font-size:9px;padding:2px 8px"><span class="status-dot" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px"></span>Live</span>
           </div>
         </div>
-        <div id="gis-map"></div>
-
-        <!-- Layers control floats on the map instead of taking its own panel -->
-        <div class="layers-float">
-          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('trains',this.checked)"><span class="layer-color" style="background:#3b82f6"></span>Trains</label>
-          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('routes',this.checked)"><span class="layer-color" style="background:#f59e0b"></span>Routes</label>
-          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('stations',this.checked)"><span class="layer-color" style="background:#64748b"></span>Stations</label>
-        </div>
+        <div id="gis-map" style="flex:1;min-height:0"></div>
       </div>
 
-      <!-- Digital Twin Status -->
-      <div class="panel twin-card-panel">
-        <div class="ph"><span class="pt">Digital Twin Status</span></div>
-        <div class="pb">
-          <div class="twin-card-body">
-            <div class="twin-head">
-              <div class="twin-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
-              </div>
-              <div class="twin-head-text">
-                <div class="twin-title">Twin Sync Engine</div>
-                <div class="twin-sub">All models synced</div>
-              </div>
+      <!-- Side Panel -->
+      <div class="gis-side-panel">
+
+        <!-- Selected Train Details -->
+        <div class="panel" style="flex:1;min-height:0">
+          <div class="ph">
+            <span class="pt">Selected Train</span>
+            <button class="bl" style="font-size:9px;color:var(--accent)" onclick="clearSelection()">Clear</button>
+          </div>
+          <div class="pb" id="selected-train-details">
+            <div style="text-align:center;color:var(--muted);padding:20px 0;font-size:11px">
+              Click on a train marker on the map to view details
             </div>
-            <div class="twin-stat-list">
-              <div class="twin-stat-row">
-                <span class="twin-stat-label"><i data-lucide="link-2"></i>Connected Assets</span>
-                <span class="twin-stat-value">421</span>
-              </div>
-              <div class="twin-stat-row">
-                <span class="twin-stat-label"><i data-lucide="radio"></i>Sensors Online</span>
-                <span class="twin-stat-value">2,450</span>
-              </div>
-              <div class="twin-stat-row">
-                <span class="twin-stat-label"><i data-lucide="activity"></i>Telemetry Messages</span>
-                <span class="twin-stat-value">18.2k/min</span>
-              </div>
-              <div class="twin-stat-row">
-                <span class="twin-stat-label"><i data-lucide="refresh-cw"></i>Last Sync</span>
-                <span class="twin-stat-value">12s ago</span>
-              </div>
-            </div>
-            <button class="twin-btn" onclick="location.href='3d_twin.html'">Open 3D Viewer</button>
           </div>
         </div>
-      </div>
 
+        <!-- Alerts -->
+        <div class="panel" style="flex-shrink:0;max-height:180px">
+          <div class="ph">
+            <span class="pt">Active Alerts</span>
+            <span class="dim" style="font-size:9px" id="alert-count-label">6 alerts</span>
+          </div>
+          <div class="pb" style="overflow-y:auto;padding:6px 10px" id="alerts-list">
+            <!-- Alerts rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Layers Control -->
+        <div class="panel" style="flex-shrink:0;max-height:150px">
+          <div class="ph">
+            <span class="pt">Layers</span>
+          </div>
+          <div class="pb" style="padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;gap:2px" id="layers-control">
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('trains',this.checked)"><span class="layer-color" style="background:#3b82f6"></span>Trains</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('routes',this.checked)"><span class="layer-color" style="background:#f59e0b"></span>Routes</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('stations',this.checked)"><span class="layer-color" style="background:#8b5cf6"></span>Stations</label>
+            <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('alerts',this.checked)"><span class="layer-color" style="background:#ef4444"></span>Alerts</label>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</div>
+</div>
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
-
 <script>
-  // ─── SIDEBAR AUTO-INIT ───
-  // sidebar.js will auto-render on DOMContentLoaded
+lucide.createIcons();
 
-  // ─── THEME ───
-  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+/* ─── CLOCK ─── */
+function updateClock(){
+  const n=new Date();
+  const dateEl=document.getElementById('clock-date');
+  const timeEl=document.getElementById('clock-time');
+  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
 
-  function applyTheme(){
-    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-    const icon = document.getElementById('theme-icon');
-    if(icon){
-      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+/* ─── THEME ─── */
+let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+function applyTheme(){
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  const icon = document.getElementById('theme-icon');
+  if(icon){
+    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+    lucide.createIcons();
   }
+}
 
-  function toggleTheme(){
-    isDark = !isDark;
-    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
-    applyTheme();
-  }
-
+function toggleTheme(){
+  isDark = !isDark;
+  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
   applyTheme();
+}
+applyTheme();
 
-  // ─── CLOCK ───
-  function updateClock(){
-    const n=new Date();
-    const dateEl=document.getElementById('clock-date');
-    const timeEl=document.getElementById('clock-time');
-    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-  }
-  updateClock(); setInterval(updateClock,1000);
+/* ─── NAVIGATION ─── */
+function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
+function openAssetDetails(){ window.location.href = 'asset_details.html'; }
+function openOverview(){ window.location.href = 'index.html'; }
+function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
+function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
+function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
+function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
+function openDevices(){ window.location.href = 'devices.html'; }
+function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
 
-  // ─── TRAIN DATA ───
-  const TRAINS = [
-    { id: 't1', name: 'Train 01', lat: 21.95, lng: 73.09, speed: 128, status: 'Running',  route: 'Mumbai-Ahmedabad', nextStation: 'Vadodara', driver: 'Rajesh Kumar' },
-    { id: 't2', name: 'Train 02', lat: 22.44, lng: 71.80, speed: 96,  status: 'Running',  route: 'Rajkot-Ahmedabad', nextStation: 'Ahmedabad', driver: 'Priya Patel' },
-    { id: 't3', name: 'Train 03', lat: 21.50, lng: 73.05, speed: 0,   status: 'Stopped',  route: 'Mumbai-Ahmedabad', nextStation: 'Surat', driver: 'Vikram Singh' },
-    { id: 't4', name: 'Train 04', lat: 22.75, lng: 72.85, speed: 78,  status: 'Warning',  route: 'Surat-Ahmedabad', nextStation: 'Ahmedabad', driver: 'Amit Sharma' },
-    { id: 't5', name: 'Train 05', lat: 22.19, lng: 72.63, speed: 110, status: 'Running',  route: 'Surat-Ahmedabad', nextStation: 'Vadodara', driver: 'John Smith' },
-    { id: 't6', name: 'Train 06', lat: 23.02, lng: 72.57, speed: 0,   status: 'Offline',  route: 'Mumbai-Ahmedabad', nextStation: 'Ahmedabad', driver: 'N/A' },
-  ];
+/* ─── TRAIN DATA ─── */
+const TRAINS = [
+  { id: 't1', name: 'Train 01', lat: 21.95, lng: 73.09, speed: 128, status: 'Running', color: '#22c55e', route: 'Mumbai-Ahmedabad', nextStation: 'Vadodara', driver: 'Rajesh Kumar', health: { engine: 95, brake: 88, power: 92, comm: 90 } },
+  { id: 't2', name: 'Train 02', lat: 22.44, lng: 71.80, speed: 96, status: 'Running', color: '#22c55e', route: 'Rajkot-Ahmedabad', nextStation: 'Ahmedabad', driver: 'Priya Patel', health: { engine: 88, brake: 92, power: 85, comm: 78 } },
+  { id: 't3', name: 'Train 03', lat: 21.50, lng: 73.05, speed: 0, status: 'Stopped', color: '#f97316', route: 'Mumbai-Ahmedabad', nextStation: 'Surat', driver: 'Vikram Singh', health: { engine: 45, brake: 30, power: 20, comm: 65 } },
+  { id: 't4', name: 'Train 04', lat: 22.75, lng: 72.85, speed: 78, status: 'Warning', color: '#f59e0b', route: 'Surat-Ahmedabad', nextStation: 'Ahmedabad', driver: 'Amit Sharma', health: { engine: 72, brake: 65, power: 80, comm: 55 } },
+  { id: 't5', name: 'Train 05', lat: 22.19, lng: 72.63, speed: 110, status: 'Running', color: '#22c55e', route: 'Surat-Ahmedabad', nextStation: 'Vadodara', driver: 'John Smith', health: { engine: 92, brake: 95, power: 88, comm: 95 } },
+  { id: 't6', name: 'Train 06', lat: 23.02, lng: 72.57, speed: 0, status: 'Offline', color: '#94a3b8', route: 'Mumbai-Ahmedabad', nextStation: 'Ahmedabad', driver: 'N/A', health: { engine: 0, brake: 0, power: 0, comm: 0 } },
+];
 
-  const STATUS_COLORS = { Running: '#22c55e', Stopped: '#f97316', Warning: '#f59e0b', Offline: '#94a3b8' };
+const STATIONS = [
+  { name: 'Mumbai', lat: 19.076, lng: 72.877 },
+  { name: 'Valsad', lat: 20.599, lng: 72.934 },
+  { name: 'Navsari', lat: 20.946, lng: 72.952 },
+  { name: 'Surat', lat: 21.170, lng: 72.831 },
+  { name: 'Bharuch', lat: 21.705, lng: 72.996 },
+  { name: 'Vadodara', lat: 22.307, lng: 73.181 },
+  { name: 'Anand', lat: 22.557, lng: 72.954 },
+  { name: 'Ahmedabad', lat: 23.022, lng: 72.571 },
+  { name: 'Rajkot', lat: 22.303, lng: 70.802 },
+];
 
-  let mapInstance = null;
-  let trainMarkers = {};
-  let layerStates = { trains: true, routes: true, stations: true };
-  let routeLayers = [];
-  let stationLayers = [];
-  let currentTrainFilter = 'all';
-  let currentStatusFilter = 'all';
-  let currentRouteFilter = 'all';
+const ALERTS = [
+  { train: 'Train 03', message: 'Brake Pressure Low', type: 'critical', time: '10:42 AM' },
+  { train: 'Train 04', message: 'GPS Signal Lost', type: 'warning', time: '10:31 AM' },
+  { train: 'Train 02', message: 'High Engine Temp', type: 'warning', time: '10:15 AM' },
+  { train: 'Train 06', message: 'Communication Lost', type: 'critical', time: '09:58 AM' },
+  { train: 'Train 01', message: 'Door Sensor Fault', type: 'info', time: '09:40 AM' },
+  { train: 'Train 04', message: 'Low Fuel Level', type: 'warning', time: '09:22 AM' },
+];
 
-  // ─── INIT MAP ───
-  function initMap() {
-    const container = document.getElementById('gis-map');
-    if (!container) return;
+const ROUTES = [
+  { color: '#f59e0b', weight: 3, points: [ [19.076,72.877], [20.599,72.934], [20.946,72.952], [21.170,72.831], [21.705,72.996], [22.307,73.181], [22.557,72.954], [23.022,72.571] ] },
+  { color: '#60a5fa', weight: 3, points: [ [22.303,70.802], [22.680,71.350], [22.900,71.880], [23.022,72.571] ] },
+  { color: '#a78bfa', weight: 2.5, points: [ [21.170,72.831], [22.307,73.181], [23.022,72.571] ] },
+];
 
-    mapInstance = L.map('gis-map', {
-      center: [22.0, 72.5],
-      zoom: 7,
-      zoomControl: false,
-      attributionControl: true,
-    });
+let mapInstance = null;
+let trainMarkers = {};
+let routeLayers = [];
+let stationMarkers = [];
+let alertMarkers = [];
+let selectedTrainId = null;
+let currentFilter = 'all';
+let currentStatusFilter = 'all';
+let currentRouteFilter = 'all';
+let layerStates = { trains: true, routes: true, stations: true, alerts: true };
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap',
-      subdomains: 'abcd',
-      maxZoom: 19,
-    }).addTo(mapInstance);
+/* ─── INIT MAP ─── */
+function initMap(){
+  const container = document.getElementById('gis-map');
+  if(!container) return;
 
-    L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+  mapInstance = L.map('gis-map', { center: [22.0, 72.5], zoom: 7, zoomControl: false, attributionControl: true });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    subdomains: 'abcd', maxZoom: 19,
+  }).addTo(mapInstance);
+  L.control.zoom({ position: 'topright' }).addTo(mapInstance);
 
-    // Routes
-    const routes = [
-      { color: '#f59e0b', points: [[19.076,72.877],[20.599,72.934],[20.946,72.952],[21.170,72.831],[21.627,73.001],[21.705,72.996],[22.307,73.181],[22.557,72.954],[23.022,72.571]] },
-      { color: '#60a5fa', points: [[22.303,70.802],[22.680,71.350],[22.900,71.880],[23.022,72.571]] },
-    ];
-    routes.forEach(r => {
-      routeLayers.push(L.polyline(r.points, { color: r.color, weight: 2.5, opacity: .7 }).addTo(mapInstance));
-    });
+  // Draw routes
+  ROUTES.forEach(r => {
+    const opts = { color: r.color, weight: r.weight || 2.5, opacity: .85, lineJoin: 'round' };
+    const layer = L.polyline(r.points, opts).addTo(mapInstance);
+    routeLayers.push(layer);
+  });
 
-    // Stations
-    const stations = {
-      'Mumbai': [19.076,72.877],
-      'Surat': [21.170,72.831],
-      'Vadodara': [22.307,73.181],
-      'Ahmedabad': [23.022,72.571],
-      'Rajkot': [22.303,70.802]
-    };
-    Object.entries(stations).forEach(([name, coords]) => {
-      const icon = L.divIcon({
-        className: '',
-        html: `<div style="width:8px;height:8px;border-radius:50%;background:#64748b;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>`,
-        iconAnchor: [4,4],
-      });
-      stationLayers.push(
-        L.marker(coords, { icon, interactive: false }).addTo(mapInstance)
-          .bindTooltip(name, { permanent: true, direction: 'right', offset: [6,0], opacity: .7 })
-      );
-    });
-
-    // Train markers — clicking opens a popup with the train's live details
-    TRAINS.forEach(train => {
-      const marker = createTrainMarker(train);
-      marker.addTo(mapInstance);
-      trainMarkers[train.id] = marker;
-    });
-
-    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 400);
-  }
-
-  function createTrainMarker(train){
-    const color = STATUS_COLORS[train.status] || '#3b82f6';
-    const isStopped = train.status === 'Stopped' || train.status === 'Offline';
+  // Draw stations
+  STATIONS.forEach(s => {
     const icon = L.divIcon({
-      className: '',
-      html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;">
-        <div style="width:18px;height:18px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 0 10px ${color}77,0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;">${isStopped ? '⏸' : '▶'}</div>
-        <div style="background:rgba(15,23,42,.85);backdrop-filter:blur(4px);color:#fff;font-size:7.5px;font-weight:600;padding:1px 5px;border-radius:3px;white-space:nowrap;border:1px solid ${color}55;line-height:1.3;">
-          ${train.name}<br><span style="color:#94a3b8;font-weight:400">${isStopped ? train.status : train.speed + ' km/h'}</span>
+      className: '', html: `<div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>`,
+      iconAnchor: [4,4],
+    });
+    const marker = L.marker([s.lat, s.lng], { icon, interactive: false }).addTo(mapInstance);
+    marker.bindTooltip(s.name, { permanent: true, direction: 'right', offset: [6,0], className: 'station-label', opacity: .85 });
+    stationMarkers.push(marker);
+  });
+
+  // Draw trains
+  TRAINS.forEach(train => {
+    const marker = createTrainMarker(train);
+    marker.addTo(mapInstance);
+    trainMarkers[train.id] = marker;
+  });
+
+  // Draw alert markers
+  ALERTS.forEach(alert => {
+    const train = TRAINS.find(t => t.name === alert.train);
+    if(train){
+      const icon = L.divIcon({
+        className: '', html: `<div style="width:16px;height:16px;border-radius:50%;background:#ef4444;border:2px solid #fff;box-shadow:0 0 12px rgba(239,68,68,.5);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;">!</div>`,
+        iconAnchor: [8,8],
+      });
+      const marker = L.marker([train.lat, train.lng], { icon }).addTo(mapInstance);
+      marker.bindPopup(`<strong>⚠️ ${alert.train}</strong><div class="popup-row"><span>${alert.message}</span></div><div class="popup-row"><span style="color:#94a3b8">${alert.time}</span></div>`);
+      alertMarkers.push(marker);
+    }
+  });
+
+  // Style for station labels
+  const style = document.createElement('style');
+  style.textContent = `
+    .station-label{background:none!important;border:none!important;box-shadow:none!important;padding:0!important;font-size:9px!important;font-weight:600!important;color:#475569!important;font-family:Inter,sans-serif!important;white-space:nowrap!important;}
+    [data-theme="dark"] .station-label{color:#94a3b8!important}
+    .leaflet-control-attribution{font-size:8px}
+  `;
+  document.head.appendChild(style);
+}
+
+function createTrainMarker(train){
+  const statusColors = { 'Running': '#22c55e', 'Stopped': '#f97316', 'Warning': '#f59e0b', 'Offline': '#94a3b8' };
+  const color = statusColors[train.status] || train.color;
+  const isStopped = train.status === 'Stopped' || train.status === 'Offline';
+
+  const icon = L.divIcon({
+    className: '',
+    html: `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer">
+        <div style="width:18px;height:18px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 0 12px ${color}66,0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;transition:transform .2s">
+          ${isStopped ? '⏸' : '▶'}
+        </div>
+        <div style="background:rgba(15,23,42,.85);backdrop-filter:blur(4px);color:${color};font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap;border:1px solid ${color}55;line-height:1.3;font-family:Inter,sans-serif;">
+          ${train.name}<br>
+          <span style="color:${isStopped ? '#94a3b8' : '#94a3b8'};font-weight:400">${isStopped ? 'Stopped' : train.speed+' km/h'}</span>
         </div>
       </div>`,
-      iconSize: [80, 40],
-      iconAnchor: [9, 9],
-      popupAnchor: [0, -12],
-    });
-    return L.marker([train.lat, train.lng], { icon, zIndexOffset: 100 })
-      .bindPopup(buildPopupHtml(train))
-      .on('click', () => {
-        Object.values(trainMarkers).forEach(m => m.setZIndexOffset(100));
-        trainMarkers[train.id] && trainMarkers[train.id].setZIndexOffset(1000);
-      });
-  }
+    iconSize: [80, 44],
+    iconAnchor: [8, 8],
+    popupAnchor: [0, -12],
+  });
 
-  function buildPopupHtml(train){
-    const color = STATUS_COLORS[train.status] || 'var(--accent)';
-    return `<div style="font-family:inherit;min-width:160px">
-      <strong style="display:block;font-size:13px;margin-bottom:4px">🚆 ${train.name}</strong>
-      <div class="popup-row"><span>Status</span><span style="color:${color};font-weight:600">${train.status}</span></div>
+  const marker = L.marker([train.lat, train.lng], { icon, zIndexOffset: 100 });
+  
+  marker.on('click', (e) => {
+    selectTrain(train.id);
+    // Show popup with train details
+    const popupContent = `
+      <strong>🚆 ${train.name}</strong>
+      <div class="popup-row"><span>Status</span><span style="color:${statusColors[train.status]}">${train.status}</span></div>
       <div class="popup-row"><span>Speed</span><span>${train.speed} km/h</span></div>
       <div class="popup-row"><span>Route</span><span>${train.route}</span></div>
       <div class="popup-row"><span>Next Station</span><span>${train.nextStation}</span></div>
       <div class="popup-row"><span>Driver</span><span>${train.driver}</span></div>
-    </div>`;
-  }
-
-  // ─── SELECT / FOCUS A SPECIFIC TRAIN ───
-  // Used by both the "Select Train" dropdown and direct marker clicks.
-  function focusTrain(id){
-    const train = TRAINS.find(t => t.id === id);
-    const marker = trainMarkers[id];
-    if (!train || !marker || !mapInstance) return;
-    Object.values(trainMarkers).forEach(m => m.setZIndexOffset(100));
-    marker.setZIndexOffset(1000);
-    mapInstance.flyTo([train.lat, train.lng], 9, { duration: 0.6 });
-    marker.openPopup();
-  }
-
-  // ─── FILTERS ───
-  function filterByTrain(value){
-    currentTrainFilter = value;
-    applyTrainFilters();
-    if (value !== 'all') {
-      const train = TRAINS.find(t => t.name === value);
-      if (train) focusTrain(train.id);
-    }
-  }
-  function filterByStatus(value){ currentStatusFilter = value; applyTrainFilters(); }
-  function filterByRoute(value){ currentRouteFilter = value; applyTrainFilters(); }
-
-  function resetTrainFilters(){
-    document.getElementById('train-filter').value = 'all';
-    document.getElementById('status-filter').value = 'all';
-    document.getElementById('route-filter').value = 'all';
-    currentTrainFilter = 'all';
-    currentStatusFilter = 'all';
-    currentRouteFilter = 'all';
-    applyTrainFilters();
-    if (mapInstance) mapInstance.flyTo([22.0, 72.5], 7, { duration: 0.5 });
-  }
-
-  function applyTrainFilters(){
-    if (!mapInstance) return;
-    TRAINS.forEach(train => {
-      const marker = trainMarkers[train.id];
-      if (!marker) return;
-      const matches =
-        (currentTrainFilter === 'all' || train.name === currentTrainFilter) &&
-        (currentStatusFilter === 'all' || train.status === currentStatusFilter) &&
-        (currentRouteFilter === 'all' || train.route === currentRouteFilter);
-      if (matches && layerStates.trains) mapInstance.addLayer(marker);
-      else mapInstance.removeLayer(marker);
-    });
-  }
-
-  // ─── TOGGLE LAYER ───
-  function toggleLayer(layer, visible) {
-    if (layer === 'trains') {
-      layerStates.trains = visible;
-      applyTrainFilters();
-    }
-    if (layer === 'routes') {
-      layerStates.routes = visible;
-      routeLayers.forEach(l => visible ? mapInstance.addLayer(l) : mapInstance.removeLayer(l));
-    }
-    if (layer === 'stations') {
-      layerStates.stations = visible;
-      stationLayers.forEach(m => visible ? mapInstance.addLayer(m) : mapInstance.removeLayer(m));
-    }
-  }
-
-  // ─── INIT ───
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initMap, 300);
+    `;
+    marker.bindPopup(popupContent).openPopup();
   });
 
-  // ─── LUCIDE ICONS ───
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
+  return marker;
+}
+
+/* ─── SELECT TRAIN ─── */
+function selectTrain(trainId){
+  selectedTrainId = trainId;
+  const train = TRAINS.find(t => t.id === trainId);
+  if(!train) return;
+
+  const detailsPanel = document.getElementById('selected-train-details');
+  const statusColors = { 'Running': '#22c55e', 'Stopped': '#f97316', 'Warning': '#f59e0b', 'Offline': '#94a3b8' };
+  const color = statusColors[train.status] || '#22c55e';
+
+  // Highlight marker
+  Object.values(trainMarkers).forEach(m => {
+    m.setZIndexOffset(100);
+  });
+  if(trainMarkers[trainId]){
+    trainMarkers[trainId].setZIndexOffset(1000);
   }
 
-  // ─── MAKE FUNCTIONS GLOBAL ───
-  window.toggleLayer = toggleLayer;
-  window.filterByTrain = filterByTrain;
-  window.filterByStatus = filterByStatus;
-  window.filterByRoute = filterByRoute;
-  window.resetTrainFilters = resetTrainFilters;
+  const healthHtml = Object.entries(train.health).map(([key, val]) => `
+    <div class="health-item">
+      <span class="h-label">${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+      <span class="h-value" style="color:${val > 80 ? 'var(--green)' : val > 50 ? 'var(--orange)' : 'var(--red)'}">${val}%</span>
+    </div>
+    <div class="health-bar"><div class="fill" style="width:${val}%;background:${val > 80 ? 'var(--green)' : val > 50 ? 'var(--orange)' : 'var(--red)'}"></div></div>
+  `).join('');
 
+  detailsPanel.innerHTML = `
+    <div class="selected-train-header">
+      <div class="train-dot" style="background:${color}"></div>
+      <div>
+        <div class="train-name">${train.name}</div>
+        <div style="font-size:10px;color:var(--muted)">${train.route}</div>
+      </div>
+      <span class="train-status" style="background:${color}20;color:${color}">${train.status}</span>
+    </div>
+    <div style="margin-top:8px">
+      <div class="train-detail-item"><span class="label">Speed</span><span class="value">${train.speed} km/h</span></div>
+      <div class="train-detail-item"><span class="label">Next Station</span><span class="value">${train.nextStation}</span></div>
+      <div class="train-detail-item"><span class="label">Driver</span><span class="value">${train.driver}</span></div>
+      <div class="train-detail-item"><span class="label">Status</span><span class="value" style="color:${color}">${train.status}</span></div>
+    </div>
+    <div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px">
+      <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:4px">Asset Health</div>
+      ${healthHtml}
+    </div>
+  `;
+}
+
+function clearSelection(){
+  selectedTrainId = null;
+  Object.values(trainMarkers).forEach(m => m.setZIndexOffset(100));
+  document.getElementById('selected-train-details').innerHTML = `
+    <div style="text-align:center;color:var(--muted);padding:20px 0;font-size:11px">
+      Click on a train marker on the map to view details
+    </div>
+  `;
+}
+
+/* ─── FILTERS ─── */
+function filterTrains(value){
+  currentFilter = value;
+  applyFilters();
+}
+
+function filterStatus(value){
+  currentStatusFilter = value;
+  applyFilters();
+}
+
+function filterRoute(value){
+  currentRouteFilter = value;
+  applyFilters();
+}
+
+function resetFilters(){
+  document.getElementById('train-filter').value = 'all';
+  document.getElementById('status-filter').value = 'all';
+  document.getElementById('route-filter').value = 'all';
+  currentFilter = 'all';
+  currentStatusFilter = 'all';
+  currentRouteFilter = 'all';
+  applyFilters();
+}
+
+function applyFilters(){
+  const filteredTrains = TRAINS.filter(t => {
+    if(currentFilter !== 'all' && t.name !== currentFilter) return false;
+    if(currentStatusFilter !== 'all' && t.status !== currentStatusFilter) return false;
+    if(currentRouteFilter !== 'all' && t.route !== currentRouteFilter) return false;
+    return true;
+  });
+
+  // Update map
+  TRAINS.forEach(train => {
+    const marker = trainMarkers[train.id];
+    if(marker){
+      const visible = filteredTrains.some(t => t.id === train.id);
+      if(visible && layerStates.trains){
+        mapInstance.addLayer(marker);
+      } else {
+        mapInstance.removeLayer(marker);
+      }
+    }
+  });
+
+  // Update KPIs based on filtered data
+  updateKPIs(filteredTrains);
+}
+
+function updateKPIs(filteredTrains){
+  const total = filteredTrains.length;
+  const online = filteredTrains.filter(t => t.status === 'Running').length;
+  const offline = filteredTrains.filter(t => t.status === 'Offline').length;
+  const moving = filteredTrains.filter(t => t.speed > 0).length;
+  const stopped = filteredTrains.filter(t => t.speed === 0 && t.status !== 'Offline').length;
+  const alerts = ALERTS.filter(a => filteredTrains.some(t => t.name === a.train)).length;
+
+  document.getElementById('total-trains').textContent = total;
+  document.getElementById('online-trains').textContent = online;
+  document.getElementById('offline-trains').textContent = offline;
+  document.getElementById('moving-trains').textContent = moving;
+  document.getElementById('stopped-trains').textContent = stopped;
+  document.getElementById('alert-count').textContent = alerts;
+  document.getElementById('alert-count-label').textContent = alerts + ' alerts';
+}
+
+/* ─── LAYERS ─── */
+function toggleLayer(layer, enabled){
+  layerStates[layer] = enabled;
+  
+  if(layer === 'trains'){
+    TRAINS.forEach(train => {
+      const marker = trainMarkers[train.id];
+      if(marker){
+        if(enabled) mapInstance.addLayer(marker);
+        else mapInstance.removeLayer(marker);
+      }
+    });
+  }
+  if(layer === 'routes'){
+    routeLayers.forEach(l => {
+      if(enabled) mapInstance.addLayer(l);
+      else mapInstance.removeLayer(l);
+    });
+  }
+  if(layer === 'stations'){
+    stationMarkers.forEach(m => {
+      if(enabled) mapInstance.addLayer(m);
+      else mapInstance.removeLayer(m);
+    });
+  }
+  if(layer === 'alerts'){
+    alertMarkers.forEach(m => {
+      if(enabled) mapInstance.addLayer(m);
+      else mapInstance.removeLayer(m);
+    });
+  }
+}
+
+/* ─── RENDER ALERTS ─── */
+function renderAlerts(){
+  const container = document.getElementById('alerts-list');
+  if(!container) return;
+  
+  container.innerHTML = ALERTS.map(alert => `
+    <div class="alert-item ${alert.type}">
+      <span class="alert-dot" style="background:${alert.type === 'critical' ? 'var(--red)' : alert.type === 'warning' ? 'var(--orange)' : 'var(--green)'}"></span>
+      <span style="font-weight:600">${alert.train}</span>
+      <span style="flex:1;color:var(--muted)">${alert.message}</span>
+      <span style="font-size:8px;color:var(--dim)">${alert.time}</span>
+    </div>
+  `).join('');
+}
+
+/* ─── SIMULATE TRAIN MOVEMENT ─── */
+setInterval(() => {
+  TRAINS.forEach(train => {
+    if(train.status === 'Running' && train.speed > 0){
+      train.lat += (Math.random() - 0.48) * 0.002;
+      train.lng += (Math.random() - 0.48) * 0.002;
+      // Update marker position
+      const marker = trainMarkers[train.id];
+      if(marker && mapInstance.hasLayer(marker)){
+        marker.setLatLng([train.lat, train.lng]);
+      }
+    }
+  });
+}, 2000);
+
+/* ─── INIT ─── */
+function init(){
+  renderAlerts();
+  setTimeout(() => {
+    initMap();
+    // Initial KPI update
+    updateKPIs(TRAINS);
+  }, 100);
+}
+
+// Re-initialize on theme change
+const origToggleTheme = toggleTheme;
+toggleTheme = function(){
+  origToggleTheme();
+  // Re-render map with new theme
+  if(mapInstance){
+    // Leaflet handles theme via CSS filter
+  }
+};
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => {
+  if(mapInstance) setTimeout(() => mapInstance.invalidateSize(), 200);
+});
+
+// Add station label styles
+const styleEl = document.createElement('style');
+styleEl.textContent = `
+  .leaflet-popup-content-wrapper{ border-radius:8px; }
+  .leaflet-popup-content{ margin:8px 10px; }
+  .leaflet-popup-content .popup-row{ display:flex;justify-content:space-between;padding:2px 0;font-size:11px;border-bottom:1px solid rgba(148,163,184,.15); }
+  .leaflet-popup-content .popup-row:last-child{ border-bottom:none; }
+  .leaflet-popup-content strong{ display:block;font-size:14px;margin-bottom:4px; }
+  .leaflet-control-zoom a{ background:var(--card);color:var(--text);border-color:var(--border); }
+  .leaflet-control-zoom a:hover{ background:var(--nav-hover); }
+`;
+document.head.appendChild(styleEl);
+
+lucide.createIcons();
 </script>
 
-<script src="sidebar.js"></script>
 </body>
 </html>
