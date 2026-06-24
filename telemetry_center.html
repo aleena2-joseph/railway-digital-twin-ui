@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telemetry Center - Digital Twin Platform</title>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* ══════════════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════════════ */
+.page-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.page-header .ph-left h1{
+  font-size:20px;font-weight:700;color:var(--text);
+}
+.page-header .ph-left p{
+  font-size:13px;color:var(--muted);margin-top:2px;
+}
+
+/* ══════════════════════════════════════════════════
+   SELECTION CONTROLS
+══════════════════════════════════════════════════ */
+.controls{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.controls .filter-select{
+  height:36px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  cursor:pointer;
+  min-width:150px;
+}
+.controls .filter-select:focus{border-color:var(--accent)}
+.controls .live-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;
+  border-radius:20px;
+  background:var(--green-bg);
+  color:var(--green);
+  font-size:11px;
+  font-weight:600;
+  margin-left:auto;
+}
+.controls .live-badge .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  animation:pulse 1.6s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ══════════════════════════════════════════════════
+   CONNECTION STATUS
+══════════════════════════════════════════════════ */
+.conn-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  flex-shrink:0;
+}
+.conn-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 14px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.conn-card .conn-info{display:flex;align-items:center;gap:8px}
+.conn-card .conn-info .conn-icon{font-size:18px}
+.conn-card .conn-info .conn-name{font-size:12px;color:var(--muted)}
+.conn-card .conn-status{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;
+}
+.conn-card .conn-status .dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;
+}
+.conn-card .conn-status .dot.green{background:var(--green)}
+.conn-card .conn-status .dot.red{background:var(--red)}
+.conn-card .conn-status.connected{color:var(--green)}
+.conn-card .conn-status.disconnected{color:var(--red)}
+
+/* ══════════════════════════════════════════════════
+   SENSOR CARDS
+══════════════════════════════════════════════════ */
+.sensor-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  flex-shrink:0;
+}
+.sensor-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px 18px;
+  box-shadow:var(--shadow);
+  transition:all .2s;
+}
+.sensor-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.sensor-card .sensor-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:6px;
+}
+.sensor-card .sensor-top .sensor-name{
+  font-size:11px;color:var(--muted);
+}
+.sensor-card .sensor-top .sensor-icon{font-size:18px}
+.sensor-card .sensor-value{
+  font-size:28px;font-weight:800;color:var(--text);
+}
+.sensor-card .sensor-value .unit{
+  font-size:14px;font-weight:400;color:var(--muted);margin-left:2px;
+}
+.sensor-card .sensor-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:4px;
+}
+.sensor-card .sensor-bottom .sensor-status{
+  font-size:10px;font-weight:600;padding:2px 10px;border-radius:12px;
+}
+.sensor-card .sensor-bottom .sensor-status.healthy{background:var(--green-bg);color:var(--green)}
+.sensor-card .sensor-bottom .sensor-status.warning{background:var(--orange-bg);color:var(--orange)}
+.sensor-card .sensor-bottom .sensor-status.critical{background:var(--red-bg);color:var(--red)}
+.sensor-card .sensor-bottom .sensor-time{
+  font-size:9px;color:var(--dim);
+}
+
+/* ══════════════════════════════════════════════════
+   TELEMETRY TABLE
+══════════════════════════════════════════════════ */
+.table-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-wrap .ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px 8px;
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+}
+.table-wrap .ph .pt{
+  font-size:12px;font-weight:700;color:var(--text);
+}
+.table-scroll{overflow-x:auto}
+.telemetry-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.telemetry-table th{
+  text-align:left;
+  padding:8px 14px;
+  background:var(--card2);
+  color:var(--muted);
+  font-weight:600;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  border-bottom:1px solid var(--border);
+}
+.telemetry-table td{
+  padding:8px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+.telemetry-table tr:last-child td{border-bottom:none}
+.telemetry-table tr:hover td{background:var(--nav-hover)}
+.telemetry-table .status-dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;
+}
+.telemetry-table .status-dot.healthy{background:var(--green)}
+.telemetry-table .status-dot.warning{background:var(--orange)}
+.telemetry-table .status-dot.critical{background:var(--red)}
+.telemetry-table .status-badge-sm{
+  font-size:10px;font-weight:600;padding:2px 10px;border-radius:12px;
+}
+.telemetry-table .status-badge-sm.healthy{background:var(--green-bg);color:var(--green)}
+.telemetry-table .status-badge-sm.warning{background:var(--orange-bg);color:var(--orange)}
+.telemetry-table .status-badge-sm.critical{background:var(--red-bg);color:var(--red)}
+
+/* ══════════════════════════════════════════════════
+   RECENT UPDATES
+══════════════════════════════════════════════════ */
+.updates-list{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.update-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:4px 6px;
+  font-size:11px;
+  color:var(--muted);
+  border-radius:4px;
+}
+.update-item:hover{background:var(--nav-hover)}
+.update-item .up-time{
+  color:var(--dim);
+  font-weight:500;
+  flex:0 0 55px;
+}
+.update-item .up-dot{
+  width:5px;height:5px;border-radius:50%;flex-shrink:0;
+}
+.update-item .up-dot.green{background:var(--green)}
+.update-item .up-dot.orange{background:var(--orange)}
+.update-item .up-dot.blue{background:var(--accent)}
+.update-item .up-msg{color:var(--text);flex:1}
+
+/* ══════════════════════════════════════════════════
+   ROW LAYOUT
+══════════════════════════════════════════════════ */
+.row2{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:14px;
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1200px){
+  .sensor-row{grid-template-columns:repeat(2,1fr)}
+  .conn-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:1024px){
+  .row2{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:12px 14px}
+  .controls{flex-wrap:wrap}
+  .controls .live-badge{margin-left:0}
+}
+@media(max-width:768px){
+  .page-header{flex-direction:column}
+  .sensor-row{grid-template-columns:1fr}
+  .conn-row{grid-template-columns:1fr}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+}
+@media(max-width:600px){
+  .content{padding:10px}
+  .sensor-card .sensor-value{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="activity" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Telemetry Center</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="ph-left">
+        <h1>Telemetry Center</h1>
+        <p>Monitor live sensor data and asset status.</p>
+      </div>
+    </div>
+
+    <!-- ═══ ASSET SELECTION ═══ -->
+    <div class="controls">
+      <select class="filter-select" id="assetSelect" onchange="updateTelemetry()">
+        <option value="hvac">HVAC-SYS-001</option>
+        <option value="comp">COMP-001</option>
+        <option value="ahu">AHU-003</option>
+      </select>
+      <select class="filter-select" id="propertySelect" onchange="updateTelemetry()">
+        <option value="all">All Properties</option>
+        <option value="temp">Temperature</option>
+        <option value="pressure">Pressure</option>
+        <option value="electrical">Electrical</option>
+      </select>
+      <select class="filter-select" id="sensorSelect" onchange="updateTelemetry()">
+        <option value="all">All Sensors</option>
+        <option value="temp1">TEMP-001</option>
+        <option value="press1">PRESS-001</option>
+        <option value="rpm1">RPM-001</option>
+      </select>
+      <div class="live-badge">
+        <span class="dot"></span>
+        Live
+      </div>
+    </div>
+
+    <!-- ═══ CONNECTION STATUS ═══ -->
+    <div class="conn-row" id="connectionStatus">
+      <div class="conn-card">
+        <div class="conn-info">
+          <span class="conn-icon">🔌</span>
+          <span class="conn-name">OPC UA</span>
+        </div>
+        <span class="conn-status connected"><span class="dot green"></span> Connected</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-info">
+          <span class="conn-icon">⚡</span>
+          <span class="conn-name">GraphQL</span>
+        </div>
+        <span class="conn-status connected"><span class="dot green"></span> Active</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-info">
+          <span class="conn-icon">📡</span>
+          <span class="conn-name">WebSocket</span>
+        </div>
+        <span class="conn-status connected"><span class="dot green"></span> Live</span>
+      </div>
+      <div class="conn-card">
+        <div class="conn-info">
+          <span class="conn-icon">📊</span>
+          <span class="conn-name">Telemetry</span>
+        </div>
+        <span class="conn-status connected"><span class="dot green"></span> Receiving</span>
+      </div>
+    </div>
+
+    <!-- ═══ SENSOR CARDS ═══ -->
+    <div class="sensor-row" id="sensorCards">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- ═══ ROW 2: Table + Updates ═══ -->
+    <div class="row2">
+
+      <!-- Telemetry Table -->
+      <div class="table-wrap">
+        <div class="ph">
+          <span class="pt">Live Telemetry</span>
+          <span style="font-size:10px;color:var(--muted);">Updating in real-time</span>
+        </div>
+        <div class="table-scroll">
+          <table class="telemetry-table">
+            <thead>
+              <tr>
+                <th>Sensor</th>
+                <th>Value</th>
+                <th>Unit</th>
+                <th>Status</th>
+                <th>Last Update</th>
+              </tr>
+            </thead>
+            <tbody id="telemetryTableBody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Updates -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Recent Updates</span></div>
+        <div class="pb" id="recentUpdates">
+          <div class="updates-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
+<script>
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
+
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
+
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── TELEMETRY DATA ───
+  const sensorData = [
+    { id: 'temp1', name: 'Temperature', value: 36, unit: '°C', status: 'healthy', icon: '🌡️', lastUpdate: '2 sec ago' },
+    { id: 'press1', name: 'Pressure', value: 8.2, unit: 'bar', status: 'healthy', icon: '📈', lastUpdate: '1 sec ago' },
+    { id: 'rpm1', name: 'RPM', value: 1450, unit: 'RPM', status: 'warning', icon: '🔄', lastUpdate: '4 sec ago' },
+    { id: 'volt1', name: 'Voltage', value: 230, unit: 'V', status: 'healthy', icon: '⚡', lastUpdate: '3 sec ago' },
+    { id: 'humid1', name: 'Humidity', value: 60, unit: '%', status: 'healthy', icon: '💧', lastUpdate: '5 sec ago' },
+    { id: 'vib1', name: 'Vibration', value: 0.2, unit: 'mm/s', status: 'critical', icon: '〰️', lastUpdate: '2 sec ago' },
+  ];
+
+  const telemetryTableData = [
+    { id: 'temp1', sensor: 'TEMP-01', value: 36, unit: '°C', status: 'healthy', lastUpdate: '2 sec ago' },
+    { id: 'press1', sensor: 'PRESS-01', value: 8.2, unit: 'bar', status: 'healthy', lastUpdate: '1 sec ago' },
+    { id: 'rpm1', sensor: 'RPM-01', value: 1450, unit: 'RPM', status: 'warning', lastUpdate: '4 sec ago' },
+    { id: 'volt1', sensor: 'VOLT-01', value: 230, unit: 'V', status: 'healthy', lastUpdate: '3 sec ago' },
+    { id: 'humid1', sensor: 'HUMID-01', value: 60, unit: '%', status: 'healthy', lastUpdate: '5 sec ago' },
+    { id: 'vib1', sensor: 'VIB-01', value: 0.2, unit: 'mm/s', status: 'critical', lastUpdate: '2 sec ago' },
+  ];
+
+  const recentUpdates = [
+    { time: '10:45 AM', msg: 'Temperature updated to 36°C', dot: 'blue' },
+    { time: '10:44 AM', msg: 'Pressure updated to 8.2 bar', dot: 'green' },
+    { time: '10:43 AM', msg: 'RPM warning generated - 1450 RPM', dot: 'orange' },
+    { time: '10:42 AM', msg: 'Voltage stable at 230V', dot: 'green' },
+    { time: '10:41 AM', msg: 'Vibration alert - 0.2 mm/s', dot: 'orange' },
+  ];
+
+  // ─── RENDER SENSOR CARDS ───
+  function renderSensorCards() {
+    const container = document.getElementById('sensorCards');
+    container.innerHTML = sensorData.map(s => `
+      <div class="sensor-card">
+        <div class="sensor-top">
+          <span class="sensor-name">${s.name}</span>
+          <span class="sensor-icon">${s.icon}</span>
+        </div>
+        <div class="sensor-value">${s.value} <span class="unit">${s.unit}</span></div>
+        <div class="sensor-bottom">
+          <span class="sensor-status ${s.status}">${s.status.toUpperCase()}</span>
+          <span class="sensor-time">${s.lastUpdate}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ─── RENDER TELEMETRY TABLE ───
+  function renderTelemetryTable() {
+    const tbody = document.getElementById('telemetryTableBody');
+    tbody.innerHTML = telemetryTableData.map(t => `
+      <tr>
+        <td><strong>${t.sensor}</strong></td>
+        <td>${t.value}</td>
+        <td>${t.unit}</td>
+        <td>
+          <span class="status-badge-sm ${t.status}">
+            <span class="status-dot ${t.status}"></span>${t.status.toUpperCase()}
+          </span>
+        </td>
+        <td style="font-size:11px;color:var(--muted)">${t.lastUpdate}</td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── RENDER RECENT UPDATES ───
+  function renderRecentUpdates() {
+    const container = document.getElementById('recentUpdates');
+    container.innerHTML = `
+      <div class="updates-list">
+        ${recentUpdates.map(u => `
+          <div class="update-item">
+            <span class="up-time">${u.time}</span>
+            <span class="up-dot ${u.dot}"></span>
+            <span class="up-msg">${u.msg}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ─── UPDATE TELEMETRY (Simulate live updates) ───
+  function updateTelemetry() {
+    // Simulate slight value changes
+    sensorData.forEach(s => {
+      const variation = (Math.random() - 0.5) * 2;
+      if (s.id === 'temp1') s.value = Math.round((36 + variation) * 10) / 10;
+      else if (s.id === 'press1') s.value = Math.round((8.2 + variation * 0.2) * 10) / 10;
+      else if (s.id === 'rpm1') s.value = Math.round(1450 + variation * 20);
+      else if (s.id === 'volt1') s.value = Math.round(230 + variation * 2);
+      else if (s.id === 'humid1') s.value = Math.round(60 + variation * 2);
+      else if (s.id === 'vib1') s.value = Math.round((0.2 + variation * 0.05) * 100) / 100;
+      
+      // Update status based on values
+      if (s.id === 'rpm1' && s.value > 1460) s.status = 'critical';
+      else if (s.id === 'rpm1' && s.value > 1440) s.status = 'warning';
+      else if (s.id === 'vib1' && s.value > 0.25) s.status = 'critical';
+      else if (s.id === 'vib1' && s.value > 0.18) s.status = 'warning';
+      else s.status = 'healthy';
+    });
+
+    // Update telemetry table data
+    telemetryTableData.forEach(t => {
+      const sensor = sensorData.find(s => s.id === t.id);
+      if (sensor) {
+        t.value = sensor.value;
+        t.status = sensor.status;
+      }
+    });
+
+    // Re-render
+    renderSensorCards();
+    renderTelemetryTable();
+  }
+
+  // ─── SIMULATE LIVE UPDATES ───
+  let updateInterval;
+
+  function startLiveUpdates() {
+    if (updateInterval) clearInterval(updateInterval);
+    updateInterval = setInterval(() => {
+      updateTelemetry();
+    }, 3000);
+  }
+
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    renderSensorCards();
+    renderTelemetryTable();
+    renderRecentUpdates();
+    startLiveUpdates();
+  });
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+
+  // ─── MAKE FUNCTIONS GLOBAL ───
+  window.updateTelemetry = updateTelemetry;
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>
