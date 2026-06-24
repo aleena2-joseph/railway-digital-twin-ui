@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metadata Management - Digital Twin Platform</title>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<link rel="stylesheet" href="sidebar.css">
+<style>
+  /* ══════════════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
+}
+
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ══════════════════════════════════════════════════
+   SIDEBAR - from sidebar.css
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{
+  height:52px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative}
+.notif-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
+.admin-role{font-size:9px;color:var(--muted)}
+
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* ══════════════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════════════ */
+.page-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.page-header .ph-left h1{
+  font-size:20px;font-weight:700;color:var(--text);
+}
+.page-header .ph-left p{
+  font-size:13px;color:var(--muted);margin-top:2px;
+}
+.page-header .ph-stats{
+  display:flex;gap:12px;
+}
+.page-header .ph-stats .stat{
+  text-align:center;
+  padding:4px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+}
+.page-header .ph-stats .stat .num{
+  font-size:16px;font-weight:700;color:var(--text);
+}
+.page-header .ph-stats .stat .lbl{
+  font-size:9px;color:var(--muted);
+}
+
+/* ══════════════════════════════════════════════════
+   CONTROLS
+══════════════════════════════════════════════════ */
+.controls{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.search-wrapper{
+  flex:1;
+  position:relative;
+  min-width:180px;
+  max-width:320px;
+}
+.search-wrapper .search-icon{
+  position:absolute;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  width:15px;height:15px;
+}
+.search-wrapper input{
+  width:100%;
+  height:36px;
+  padding:0 12px 0 34px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.search-wrapper input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.search-wrapper input::placeholder{color:var(--dim)}
+
+.filter-select{
+  height:36px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  cursor:pointer;
+  min-width:140px;
+}
+.filter-select:focus{border-color:var(--accent)}
+
+/* ══════════════════════════════════════════════════
+   METADATA TABLE
+══════════════════════════════════════════════════ */
+.table-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-scroll{overflow-x:auto}
+.metadata-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+}
+.metadata-table th{
+  text-align:left;
+  padding:10px 14px;
+  background:var(--card2);
+  color:var(--muted);
+  font-weight:600;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  border-bottom:1px solid var(--border);
+}
+.metadata-table td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+.metadata-table tr:hover td{background:var(--nav-hover)}
+.metadata-table tr:last-child td{border-bottom:none}
+.metadata-table .key-cell{font-weight:500;color:var(--text)}
+.metadata-table .value-cell{color:var(--text)}
+.metadata-table .actions{display:flex;gap:4px}
+.metadata-table .actions button{
+  padding:4px 8px;border-radius:4px;font-size:11px;
+  color:var(--muted);transition:all .2s;border:1px solid transparent;
+}
+.metadata-table .actions button:hover{background:var(--nav-hover)}
+.metadata-table .actions button.edit:hover{color:var(--accent);border-color:var(--accent)}
+.metadata-table .actions button.delete:hover{color:var(--red);border-color:var(--red)}
+
+/* ══════════════════════════════════════════════════
+   ROW 2
+══════════════════════════════════════════════════ */
+.row2{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:14px;
+}
+
+/* ─── ADD METADATA PANEL ─── */
+.add-panel .form-group{margin-bottom:12px}
+.add-panel .form-group label{
+  display:block;font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;
+}
+.add-panel .form-group input{
+  width:100%;height:36px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.add-panel .form-group input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.add-panel .form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.add-panel .btn-add{
+  padding:8px 20px;
+  border-radius:8px;
+  background:var(--accent);
+  color:#fff;
+  font-size:12px;
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.add-panel .btn-add:hover{opacity:.85;transform:scale(1.02)}
+.add-panel .btn-add svg{width:16px;height:16px}
+
+/* ─── ENTITY INFO CARD ─── */
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px 16px;
+}
+.info-item{
+  display:flex;
+  flex-direction:column;
+  padding:4px 0;
+}
+.info-item .ii-label{
+  font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;
+}
+.info-item .ii-value{
+  font-size:13px;font-weight:500;color:var(--text);margin-top:1px;
+}
+.info-divider{
+  border-top:1px solid var(--border);
+  margin:8px 0;
+}
+.info-tag{
+  display:inline-block;
+  padding:2px 10px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:10px;
+  color:var(--muted);
+}
+.info-tag.active{background:var(--green-bg);color:var(--green);border-color:var(--green)}
+
+/* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+.modal-overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.5);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:28px 32px;
+  width:min(420px,95%);
+  max-height:90vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.modal .modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+.modal .modal-header h3{
+  font-size:18px;font-weight:700;color:var(--text);
+}
+.modal .modal-header .close-btn{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:all .2s;
+  font-size:20px;
+}
+.modal .modal-header .close-btn:hover{background:var(--nav-hover);color:var(--text)}
+.modal .form-group{margin-bottom:16px}
+.modal .form-group label{
+  display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;
+}
+.modal .form-group input{
+  width:100%;height:38px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card2);
+  color:var(--text);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.modal .form-group input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
+}
+.modal .modal-actions{
+  display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);
+}
+.modal .modal-actions .btn-cancel{
+  padding:8px 20px;border-radius:8px;border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:500;transition:all .2s;
+}
+.modal .modal-actions .btn-cancel:hover{background:var(--nav-hover)}
+.modal .modal-actions .btn-save{
+  padding:8px 20px;border-radius:8px;background:var(--accent);
+  color:#fff;font-size:12px;font-weight:600;border:none;transition:all .2s;
+}
+.modal .modal-actions .btn-save:hover{opacity:.85}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .row2{grid-template-columns:1fr}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:12px 14px}
+  .controls{flex-wrap:wrap}
+  .search-wrapper{max-width:100%;min-width:auto}
+}
+@media(max-width:768px){
+  .page-header{flex-direction:column}
+  .page-header .ph-stats{width:100%;justify-content:space-around}
+  .add-panel .form-row{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .modal{padding:20px}
+}
+@media(max-width:600px){
+  .content{padding:10px}
+  .page-header .ph-stats .stat{padding:4px 8px}
+  .page-header .ph-stats .stat .num{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="file-text" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Metadata Management</h2>
+    </div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="ph-left">
+        <h1>Metadata Management</h1>
+        <p>Manage additional information for assets, properties, and sensors.</p>
+      </div>
+      <div class="ph-stats">
+        <div class="stat">
+          <div class="num" id="totalMetadata">12</div>
+          <div class="lbl">Total</div>
+        </div>
+        <div class="stat">
+          <div class="num" style="color:var(--green)" id="activeMetadata">10</div>
+          <div class="lbl">Active</div>
+        </div>
+        <div class="stat">
+          <div class="num" style="color:var(--orange)" id="pendingMetadata">2</div>
+          <div class="lbl">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" placeholder="Search metadata..." id="searchInput" oninput="filterMetadata()">
+      </div>
+      <select class="filter-select" id="entityFilter" onchange="filterMetadata()">
+        <option value="all">All Entities</option>
+        <option value="asset">Assets</option>
+        <option value="property">Properties</option>
+        <option value="sensor">Sensors</option>
+      </select>
+    </div>
+
+    <!-- Metadata Table -->
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="metadata-table" id="metadataTable">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+              <th>Entity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="metadataTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Row 2: Add Metadata + Entity Info -->
+    <div class="row2">
+
+      <!-- Add Metadata Panel -->
+      <div class="panel add-panel">
+        <div class="ph"><span class="pt">Add Metadata</span></div>
+        <div class="pb">
+          <form id="addMetadataForm" onsubmit="addMetadata(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Key</label>
+                <input type="text" id="newKey" placeholder="e.g. Manufacturer" required>
+              </div>
+              <div class="form-group">
+                <label>Value</label>
+                <input type="text" id="newValue" placeholder="e.g. Carrier" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Entity</label>
+              <select id="newEntity" class="filter-select" style="width:100%;">
+                <option value="asset">Asset</option>
+                <option value="property">Property</option>
+                <option value="sensor">Sensor</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-add">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Metadata
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Entity Information -->
+      <div class="panel">
+        <div class="ph"><span class="pt">Entity Information</span></div>
+        <div class="pb" id="entityInfo">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="ii-label">Entity</span>
+              <span class="ii-value" id="infoEntity">HVAC-SYS-001</span>
+            </div>
+            <div class="info-item">
+              <span class="ii-label">Type</span>
+              <span class="ii-value" id="infoType">Asset</span>
+            </div>
+            <div class="info-item">
+              <span class="ii-label">Total Metadata</span>
+              <span class="ii-value" id="infoTotal">12</span>
+            </div>
+            <div class="info-item">
+              <span class="ii-label">Last Updated</span>
+              <span class="ii-value" id="infoLastUpdate">10:45 AM</span>
+            </div>
+          </div>
+          <div class="info-divider"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="info-tag active">● Active</span>
+            <span class="info-tag">📦 COMP-001</span>
+            <span class="info-tag">🏷️ HVAC</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════ EDIT MODAL ═══════════════ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Edit Metadata</h3>
+      <button class="close-btn" onclick="closeEditModal()">✕</button>
+    </div>
+    <form id="editMetadataForm" onsubmit="submitEdit(event)">
+      <div class="form-group">
+        <label>Key</label>
+        <input type="text" id="editKey" readonly style="background:var(--border);">
+      </div>
+      <div class="form-group">
+        <label>Value</label>
+        <input type="text" id="editValue" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn-save">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
+<script>
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
+
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
+
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── METADATA DATA ───
+  let metadata = [
+    { id: 1, key: 'Manufacturer', value: 'Carrier', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 2, key: 'Model', value: 'XR-200', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 3, key: 'Installation Date', value: '2024-03-15', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 4, key: 'Warranty', value: '3 Years', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 5, key: 'Location', value: 'Kochi Station', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 6, key: 'Serial Number', value: 'SN-45678', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 7, key: 'Capacity', value: '5 Ton', entity: 'property', entityName: 'Temperature' },
+    { id: 8, key: 'Unit', value: '°C', entity: 'property', entityName: 'Temperature' },
+    { id: 9, key: 'Range', value: '0-100', entity: 'property', entityName: 'Temperature' },
+    { id: 10, key: 'Sensor Type', value: 'Temperature', entity: 'sensor', entityName: 'Temp Sensor' },
+    { id: 11, key: 'Protocol', value: 'Modbus', entity: 'sensor', entityName: 'Temp Sensor' },
+    { id: 12, key: 'Accuracy', value: '±1°C', entity: 'sensor', entityName: 'Temp Sensor' },
+  ];
+
+  let nextId = 13;
+  let editingId = null;
+
+  // ─── RENDER METADATA ───
+  function renderMetadata(filteredData) {
+    const tbody = document.getElementById('metadataTableBody');
+    const data = filteredData || metadata;
+
+    tbody.innerHTML = data.map(m => {
+      const entityLabel = m.entity.charAt(0).toUpperCase() + m.entity.slice(1);
+      return `
+        <tr>
+          <td class="key-cell">${m.key}</td>
+          <td class="value-cell">${m.value}</td>
+          <td><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--card2);border:1px solid var(--border);">${entityLabel}</span></td>
+          <td>
+            <div class="actions">
+              <button class="edit" onclick="openEditModal(${m.id})" title="Edit">✏️</button>
+              <button class="delete" onclick="deleteMetadata(${m.id})" title="Delete">🗑</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Update stats
+    document.getElementById('totalMetadata').textContent = metadata.length;
+    document.getElementById('activeMetadata').textContent = metadata.length - 2;
+    document.getElementById('pendingMetadata').textContent = 2;
+    document.getElementById('infoTotal').textContent = metadata.length;
+  }
+
+  // ─── FILTER METADATA ───
+  function filterMetadata() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const entity = document.getElementById('entityFilter').value;
+
+    const filtered = metadata.filter(m => {
+      const matchSearch = m.key.toLowerCase().includes(search) || m.value.toLowerCase().includes(search);
+      const matchEntity = entity === 'all' || m.entity === entity;
+      return matchSearch && matchEntity;
+    });
+
+    renderMetadata(filtered);
+  }
+
+  // ─── ADD METADATA ───
+  function addMetadata(e) {
+    e.preventDefault();
+    const key = document.getElementById('newKey').value.trim();
+    const value = document.getElementById('newValue').value.trim();
+    const entity = document.getElementById('newEntity').value;
+
+    if (!key || !value) {
+      alert('Please fill in both Key and Value fields.');
+      return;
+    }
+
+    const newMeta = {
+      id: nextId++,
+      key: key,
+      value: value,
+      entity: entity,
+      entityName: entity === 'asset' ? 'HVAC-SYS-001' : entity === 'property' ? 'Temperature' : 'Temp Sensor'
+    };
+
+    metadata.push(newMeta);
+    document.getElementById('newKey').value = '';
+    document.getElementById('newValue').value = '';
+    filterMetadata();
+
+    // Show success feedback
+    const btn = document.querySelector('.btn-add');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✅ Added!';
+    setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+  }
+
+  // ─── EDIT METADATA ───
+  function openEditModal(id) {
+    const item = metadata.find(m => m.id === id);
+    if (!item) return;
+    editingId = id;
+    document.getElementById('editKey').value = item.key;
+    document.getElementById('editValue').value = item.value;
+    document.getElementById('editModal').classList.add('show');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('show');
+    editingId = null;
+  }
+
+  function submitEdit(e) {
+    e.preventDefault();
+    const value = document.getElementById('editValue').value.trim();
+    if (!value) return;
+
+    const item = metadata.find(m => m.id === editingId);
+    if (item) {
+      item.value = value;
+      closeEditModal();
+      filterMetadata();
+    }
+  }
+
+  // ─── DELETE METADATA ───
+  function deleteMetadata(id) {
+    if (!confirm('Are you sure you want to delete this metadata entry?')) return;
+    const index = metadata.findIndex(m => m.id === id);
+    if (index > -1) {
+      metadata.splice(index, 1);
+      filterMetadata();
+    }
+  }
+
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMetadata();
+  });
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+
+  // ─── MAKE FUNCTIONS GLOBAL ───
+  window.filterMetadata = filterMetadata;
+  window.addMetadata = addMetadata;
+  window.openEditModal = openEditModal;
+  window.closeEditModal = closeEditModal;
+  window.submitEdit = submitEdit;
+  window.deleteMetadata = deleteMetadata;
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>

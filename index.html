@@ -1,1075 +1,1075 @@
-  <!DOCTYPE html>
-  <html lang="en" data-theme="light">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Digital Twin Platform</title>
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Digital Twin Platform</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
-  <link rel="stylesheet" href="sidebar.css">
-  <style>
-    /* ══════════════════════════════════════════════════
-    CSS VARIABLES
-  ══════════════════════════════════════════════════ */
-  :root {
-    --bg:           #f0f4f8;
-    --sidebar-bg:   #ffffff;
-    --sidebar-bd:   #e2e8f0;
-    --topbar-bg:    #ffffff;
-    --card:         #ffffff;
-    --card2:        #f8fafc;
-    --border:       #e2e8f0;
-    --text:         #0f172a;
-    --muted:        #64748b;
-    --dim:          #94a3b8;
-    --accent:       #3b82f6;
-    --green:        #16a34a;
-    --green-bg:     #dcfce7;
-    --red:          #dc2626;
-    --red-bg:       #fee2e2;
-    --orange:       #ea580c;
-    --orange-bg:    #ffedd5;
-    --teal:         #0d9488;
-    --shadow:       0 1px 4px rgba(0,0,0,.08);
-    --shadow-md:    0 4px 16px rgba(0,0,0,.10);
-    --nav-txt:      #374151;
-    --nav-hover:    #f1f5f9;
-    --nav-act-bg:   #3b82f6;
-    --nav-act-txt:  #ffffff;
-    --sidebar-w:    228px;
-  }
-  [data-theme="dark"] {
-    --bg:           #0f172a;
-    --sidebar-bg:   #111827;
-    --sidebar-bd:   #1f2937;
-    --topbar-bg:    #1e293b;
-    --card:         #1e293b;
-    --card2:        #0f172a;
-    --border:       rgba(71,85,105,.4);
-    --text:         #f1f5f9;
-    --muted:        #94a3b8;
-    --dim:          #64748b;
-    --green:        #22c55e;
-    --green-bg:     rgba(34,197,94,.15);
-    --red:          #ef4444;
-    --red-bg:       rgba(239,68,68,.15);
-    --orange:       #f97316;
-    --orange-bg:    rgba(249,115,22,.15);
-    --shadow:       none;
-    --shadow-md:    none;
-    --nav-txt:      #9ca3af;
-    --nav-hover:    rgba(255,255,255,.05);
-    --nav-act-bg:   #1e293b;
-    --nav-act-txt:  #60a5fa;
-  }
-
+<link rel="stylesheet" href="sidebar.css">
+<style>
   /* ══════════════════════════════════════════════════
-    RESET
-  ══════════════════════════════════════════════════ */
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
-  button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
-  ::-webkit-scrollbar{width:4px;height:4px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+   CSS VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  --bg:           #f0f4f8;
+  --sidebar-bg:   #ffffff;
+  --sidebar-bd:   #e2e8f0;
+  --topbar-bg:    #ffffff;
+  --card:         #ffffff;
+  --card2:        #f8fafc;
+  --border:       #e2e8f0;
+  --text:         #0f172a;
+  --muted:        #64748b;
+  --dim:          #94a3b8;
+  --accent:       #3b82f6;
+  --green:        #16a34a;
+  --green-bg:     #dcfce7;
+  --red:          #dc2626;
+  --red-bg:       #fee2e2;
+  --orange:       #ea580c;
+  --orange-bg:    #ffedd5;
+  --teal:         #0d9488;
+  --shadow:       0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.10);
+  --nav-txt:      #374151;
+  --nav-hover:    #f1f5f9;
+  --nav-act-bg:   #3b82f6;
+  --nav-act-txt:  #ffffff;
+  --sidebar-w:    228px;
 
-  /* ══════════════════════════════════════════════════
-    APP SHELL
-  ══════════════════════════════════════════════════ */
-  .app{display:flex;height:100vh;overflow:hidden}
+  /* KPI icon tints — theme-aware so dark mode doesn't get blown-out light squares */
+  --kpi-blue-ic:   #2563eb; --kpi-blue-bg:   #eff6ff;
+  --kpi-green-ic:  #16a34a; --kpi-green-bg:  #f0fdf4;
+  --kpi-purple-ic: #7c3aed; --kpi-purple-bg: #f5f3ff;
+  --kpi-orange-ic: #ea580c; --kpi-orange-bg: #fff7ed;
+}
+[data-theme="dark"] {
+  --bg:           #0f172a;
+  --sidebar-bg:   #111827;
+  --sidebar-bd:   #1f2937;
+  --topbar-bg:    #1e293b;
+  --card:         #1e293b;
+  --card2:        #0f172a;
+  --border:       rgba(71,85,105,.4);
+  --text:         #f1f5f9;
+  --muted:        #94a3b8;
+  --dim:          #64748b;
+  --green:        #22c55e;
+  --green-bg:     rgba(34,197,94,.15);
+  --red:          #ef4444;
+  --red-bg:       rgba(239,68,68,.15);
+  --orange:       #f97316;
+  --orange-bg:    rgba(249,115,22,.15);
+  --shadow:       none;
+  --shadow-md:    none;
+  --nav-txt:      #9ca3af;
+  --nav-hover:    rgba(255,255,255,.05);
+  --nav-act-bg:   #1e293b;
+  --nav-act-txt:  #60a5fa;
 
-  /* ══════════════════════════════════════════════════
-    SIDEBAR - imported from sidebar.css
-  ══════════════════════════════════════════════════ */
-  .sidebar{
-    width:var(--sidebar-w);flex-shrink:0;
-    background:var(--sidebar-bg);
-    border-right:1px solid var(--sidebar-bd);
-    display:flex;flex-direction:column;
-    overflow-y:auto;overflow-x:hidden;
-    transition:background .25s,border-color .25s,width .25s;
-    z-index:100;
-    position:relative;
-  }
+  --kpi-blue-ic:   #60a5fa; --kpi-blue-bg:   rgba(59,130,246,.15);
+  --kpi-green-ic:  #4ade80; --kpi-green-bg:  rgba(34,197,94,.15);
+  --kpi-purple-ic: #a78bfa; --kpi-purple-bg: rgba(124,58,237,.15);
+  --kpi-orange-ic: #fb923c; --kpi-orange-bg: rgba(234,88,12,.15);
+}
 
-  /* ══════════════════════════════════════════════════
-    MAIN
-  ══════════════════════════════════════════════════ */
-  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+/* ══════════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--text);overflow:hidden}
+button{cursor:pointer;background:none;border:none;color:inherit;font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-  /* Topbar */
-  .topbar{
-    height:52px;flex-shrink:0;
-    background:var(--topbar-bg);
-    border-bottom:1px solid var(--border);
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 20px;
-    box-shadow:var(--shadow);
-  }
-  .tb-left{display:flex;align-items:center;gap:10px}
-  .tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
-  .tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-  .dt-pill{
-    display:flex;align-items:center;gap:6px;
-    background:var(--card2);border:1px solid var(--border);
-    border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
-  }
-  .dt-pill .dt-date{font-weight:600;color:var(--text)}
-  .dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
-  .ib{
-    width:32px;height:32px;border-radius:7px;
-    display:flex;align-items:center;justify-content:center;
-    background:var(--card2);border:1px solid var(--border);
-    color:var(--muted);cursor:pointer;transition:all .12s;
-  }
-  .ib:hover{background:var(--border);color:var(--text)}
-  .ib svg{width:15px;height:15px}
-  .notif-wrap{position:relative}
-  .notif-dot{
-    position:absolute;top:-3px;right:-3px;
-    width:15px;height:15px;border-radius:50%;
-    background:#ef4444;font-size:8px;font-weight:700;color:#fff;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .admin-chip{
-    display:flex;align-items:center;gap:8px;
-    background:var(--card2);border:1px solid var(--border);
-    border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
-  }
-  .admin-av{
-    width:28px;height:28px;border-radius:6px;
-    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
-    display:flex;align-items:center;justify-content:center;
-    font-size:11px;font-weight:700;color:#fff;
-  }
-  .admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
-  .admin-role{font-size:9px;color:var(--muted)}
+/* ══════════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
 
-  /* Content */
-  .content{
-    flex:1;overflow-y:auto;
-    padding:16px 20px;
-    display:flex;flex-direction:column;
-    gap:14px;
-  }
+/* ══════════════════════════════════════════════════
+   SIDEBAR - from sidebar.css
+══════════════════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar-bg);
+  border-right:1px solid var(--sidebar-bd);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:background .25s,border-color .25s,width .25s;
+  z-index:100;
+  position:relative;
+}
 
-  /* ══════════════════════════════════════════════════
-    KPI ROW
-  ══════════════════════════════════════════════════ */
-  .kpi-row{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:14px;
-    flex-shrink:0;
-  }
-  .kpi{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:10px;
-    padding:16px 20px;
-    box-shadow:var(--shadow);
-    display:flex;
-    align-items:center;
-    gap:14px;
-    transition:all .2s;
-  }
-  .kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-  .kpi-ico{
-    width:44px;height:44px;border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;
-  }
-  .kpi-ico svg{width:20px;height:20px}
-  .kpi-info{min-width:0}
-  .kpi-lbl{
-    font-size:10px;
-    color:var(--muted);
-    font-weight:500;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-  }
-  .kpi-val{
-    font-size:26px;
-    font-weight:800;
-    color:var(--text);
-    line-height:1.2;
-    margin-top:2px;
-  }
-  .kpi-sub{
-    font-size:10px;
-    color:var(--dim);
-    margin-top:1px;
-  }
+/* ══════════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-  /* ══════════════════════════════════════════════════
-    PANEL BASE
-  ══════════════════════════════════════════════════ */
-  .panel{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:10px;
-    box-shadow:var(--shadow);
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    transition:background .25s,border-color .25s;
-  }
-  .ph{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:10px 16px 8px;
-    flex-shrink:0;
-    border-bottom:1px solid var(--border);
-    background:var(--card2);
-  }
-  .pt{font-size:12px;font-weight:700;color:var(--text)}
-  .pb{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column}
-  .bl{
-    font-size:10px;color:var(--accent);cursor:pointer;
-    display:flex;align-items:center;gap:4px;
-  }
-  .bl:hover{text-decoration:underline}
-  .bl svg{width:9px;height:9px}
+/* Topbar */
+.topbar{
+  height:56px;flex-shrink:0;
+  background:var(--topbar-bg);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:var(--shadow);
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left h2{font-size:15px;font-weight:700;white-space:nowrap;line-height:1}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dt-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:7px;padding:6px 12px;font-size:11px;color:var(--muted);
+  line-height:1;
+}
+.dt-pill .dt-date{font-weight:600;color:var(--text)}
+.dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
+.ib{
+  width:32px;height:32px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);cursor:pointer;transition:all .12s;
+  flex-shrink:0;
+}
+.ib:hover{background:var(--border);color:var(--text)}
+.ib svg{width:15px;height:15px}
+.notif-wrap{position:relative;display:flex}
+.notif-dot{
+  position:absolute;top:-4px;right:-4px;
+  width:15px;height:15px;border-radius:50%;
+  background:#ef4444;font-size:8px;font-weight:700;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.admin-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;padding:4px 10px 4px 4px;cursor:pointer;
+}
+.admin-av{
+  width:28px;height:28px;border-radius:6px;flex-shrink:0;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+}
+.admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.admin-role{font-size:9px;color:var(--muted);line-height:1.3}
 
-  /* ══════════════════════════════════════════════════
-    ROW 2
-  ══════════════════════════════════════════════════ */
-  .row2{
-    display:grid;
-    grid-template-columns:1fr 1.2fr 1.2fr;
-    gap:14px;
-    height:230px;
-    flex-shrink:0;
-  }
+/* Content */
+.content{
+  flex:1;overflow-y:auto;
+  padding:18px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
 
-  /* ─── SYSTEM HEALTH ─── */
-  .health-container{
-    display:flex;
-    gap:16px;
-    flex:1;
-    align-items:center;
-  }
-  .health-circle{
-    position:relative;
-    width:90px;
-    height:90px;
-    flex-shrink:0;
-  }
-  .health-circle svg{transform:rotate(-90deg)}
-  .health-circle .bg{
-    fill:none;
-    stroke:var(--border);
-    stroke-width:7;
-  }
-  .health-circle .progress{
-    fill:none;
-    stroke:var(--green);
-    stroke-width:7;
-    stroke-linecap:round;
-    transition:stroke-dashoffset 1s ease;
-  }
-  .health-circle .center{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    text-align:center;
-  }
-  .health-circle .center .big{
-    font-size:20px;
-    font-weight:800;
-    color:var(--text);
-  }
-  .health-circle .center .sm{
-    font-size:9px;
-    color:var(--muted);
-  }
-  .health-bars{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    justify-content:center;
-  }
-  .health-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .health-dot{
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    flex-shrink:0;
-  }
-  .health-dot.green{background:var(--green)}
-  .health-dot.yellow{background:var(--orange)}
-  .health-dot.red{background:var(--red)}
-  .health-label{
-    font-size:11px;
-    color:var(--text);
-    flex:0 0 56px;
-  }
-  .health-count{
-    font-size:13px;
-    font-weight:700;
-    color:var(--text);
-    flex:0 0 32px;
-    text-align:right;
-  }
-  .health-bar-wrap{
-    flex:1;
-    height:5px;
-    background:var(--border);
-    border-radius:3px;
-    overflow:hidden;
-  }
-  .health-bar{
-    height:100%;
-    border-radius:3px;
-    transition:width .8s ease;
-  }
-  .health-bar.green{background:var(--green)}
-  .health-bar.yellow{background:var(--orange)}
-  .health-bar.red{background:var(--red)}
-  .health-percent{
-    font-size:10px;
-    color:var(--muted);
-    flex:0 0 34px;
-    text-align:right;
-  }
+/* ══════════════════════════════════════════════════
+   ROW 1 — KPI ROW
+══════════════════════════════════════════════════ */
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  flex-shrink:0;
+}
+.kpi{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px 20px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  transition:all .2s;
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-ico{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.kpi-ico.blue{background:var(--kpi-blue-bg)}
+.kpi-ico.green{background:var(--kpi-green-bg)}
+.kpi-ico.purple{background:var(--kpi-purple-bg)}
+.kpi-ico.orange{background:var(--kpi-orange-bg)}
+.kpi-ico svg{width:20px;height:20px}
+.kpi-ico.blue svg{stroke:var(--kpi-blue-ic)}
+.kpi-ico.green svg{stroke:var(--kpi-green-ic)}
+.kpi-ico.purple svg{stroke:var(--kpi-purple-ic)}
+.kpi-ico.orange svg{stroke:var(--kpi-orange-ic)}
+.kpi-info{min-width:0}
+.kpi-lbl{
+  font-size:10px;
+  color:var(--muted);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  line-height:1.2;
+}
+.kpi-val{
+  font-size:26px;
+  font-weight:800;
+  color:var(--text);
+  line-height:1.25;
+  margin-top:3px;
+}
+.kpi-val.green{color:var(--green)}
+.kpi-val.orange{color:var(--orange)}
+.kpi-sub{
+  font-size:10px;
+  color:var(--dim);
+  margin-top:2px;
+  line-height:1.2;
+}
+.kpi-sub.green{color:var(--green)}
 
-  /* ─── ALERTS ─── */
-  .al-list{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    flex:1;
-    overflow-y:auto;
-  }
-  .al-item{
-    background:var(--card2);
-    border-left:3px solid;
-    border-radius:0 6px 6px 0;
-    padding:5px 10px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    transition:all .2s;
-  }
-  .al-item:hover{background:var(--border)}
-  .al-item .al-icon{font-size:14px;flex-shrink:0}
-  .al-item .al-content{flex:1;min-width:0}
-  .al-item .al-msg{
-    font-size:11px;
-    color:var(--text);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .al-item .al-meta{
-    font-size:9px;
-    color:var(--muted);
-    display:flex;
-    gap:8px;
-    margin-top:1px;
-  }
-  .al-item .al-badge{
-    font-size:8px;
-    padding:1px 6px;
-    border-radius:3px;
-    font-weight:600;
-  }
-  .al-item.critical{border-left-color:var(--red)}
-  .al-item.warning{border-left-color:var(--orange)}
-  .al-item.info{border-left-color:var(--accent)}
-  .al-footer{
-    display:flex;
-    gap:14px;
-    padding-top:6px;
-    border-top:1px solid var(--border);
-    margin-top:6px;
-    font-size:10px;
-    color:var(--muted);
-  }
-  .al-footer span{display:flex;align-items:center;gap:4px}
+/* ══════════════════════════════════════════════════
+   PANEL BASE
+══════════════════════════════════════════════════ */
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  min-height:0;
+  transition:background .25s,border-color .25s;
+}
+.ph{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 16px;
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+  gap:8px;
+}
+.pt{font-size:12px;font-weight:700;color:var(--text);line-height:1.3}
+.pb{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;min-height:0}
+.bl{
+  font-size:10px;color:var(--accent);cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  flex-shrink:0;line-height:1;
+}
+.bl:hover{text-decoration:underline}
+.bl svg{width:9px;height:9px}
 
-  /* ─── ASSET SUMMARY ─── */
-  .summary-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:6px;
-    flex:1;
-    align-content:center;
-  }
-  .summary-item{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:6px 12px;
-    background:var(--card2);
-    border-radius:6px;
-    border:1px solid var(--border);
-    transition:all .2s;
-  }
-  .summary-item:hover{border-color:var(--accent);background:var(--nav-hover)}
-  .summary-item .summary-label{
-    font-size:11px;
-    color:var(--text);
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  .summary-item .summary-label .summary-icon{font-size:15px}
-  .summary-item .summary-count{
-    font-size:14px;
-    font-weight:700;
-    color:var(--text);
-  }
+/* ══════════════════════════════════════════════════
+   ROW 2 — SYSTEM HEALTH + RECENT ALERTS
+══════════════════════════════════════════════════ */
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  gap:14px;
+  height:212px;
+  flex-shrink:0;
+}
 
-  /* ══════════════════════════════════════════════════
-    ROW 3
-  ══════════════════════════════════════════════════ */
-  .row3{
-    display:grid;
-    grid-template-columns:1.8fr 1.2fr;
-    gap:14px;
-    height:200px;
-    flex-shrink:0;
-  }
+/* ─── SYSTEM HEALTH ─── */
+.health-container{
+  display:flex;
+  gap:18px;
+  flex:1;
+  align-items:center;
+}
+.health-circle{
+  position:relative;
+  width:96px;
+  height:96px;
+  flex-shrink:0;
+}
+.health-circle svg{transform:rotate(-90deg)}
+.health-circle .bg{
+  fill:none;
+  stroke:var(--border);
+  stroke-width:7;
+}
+.health-circle .progress{
+  fill:none;
+  stroke:var(--green);
+  stroke-width:7;
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s ease;
+}
+.health-circle .center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.health-circle .center .big{
+  font-size:21px;
+  font-weight:800;
+  color:var(--text);
+  line-height:1.2;
+}
+.health-circle .center .sm{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:1px;
+}
+.health-bars{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  justify-content:center;
+  min-width:0;
+}
+.health-row{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.health-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.health-dot.green{background:var(--green)}
+.health-dot.yellow{background:var(--orange)}
+.health-dot.red{background:var(--red)}
+.health-label{
+  font-size:11px;
+  color:var(--text);
+  flex:0 0 60px;
+}
+.health-count{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  flex:0 0 30px;
+  text-align:right;
+}
+.health-bar-wrap{
+  flex:1;
+  height:6px;
+  background:var(--border);
+  border-radius:3px;
+  overflow:hidden;
+  min-width:40px;
+}
+.health-bar{
+  height:100%;
+  border-radius:3px;
+  transition:width .8s ease;
+}
+.health-bar.green{background:var(--green)}
+.health-bar.yellow{background:var(--orange)}
+.health-bar.red{background:var(--red)}
+.health-percent{
+  font-size:10px;
+  color:var(--muted);
+  flex:0 0 36px;
+  text-align:right;
+}
 
-  /* ─── LIVE ASSET STATUS ─── */
-  .status-table{width:100%;border-collapse:collapse}
-  .status-table th{
-    text-align:left;
-    font-size:9px;
-    font-weight:600;
-    color:var(--muted);
-    text-transform:uppercase;
-    letter-spacing:.4px;
-    padding:4px 8px;
-    border-bottom:1px solid var(--border);
-  }
-  .status-table td{
-    padding:6px 8px;
-    font-size:11px;
-    color:var(--text);
-    border-bottom:1px solid var(--border);
-  }
-  .status-table tr:last-child td{border-bottom:none}
-  .status-table .status-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    display:inline-block;
-    margin-right:6px;
-  }
-  .status-table .status-dot.green{background:var(--green)}
-  .status-table .status-dot.yellow{background:var(--orange)}
-  .status-table .status-dot.red{background:var(--red)}
-  .status-table .health-bar-mini{
-    width:60px;
-    height:4px;
-    background:var(--border);
-    border-radius:2px;
-    overflow:hidden;
-    display:inline-block;
-    vertical-align:middle;
-  }
-  .status-table .health-bar-mini .fill{
-    height:100%;
-    border-radius:2px;
-    transition:width .8s ease;
-  }
-  .status-table .health-bar-mini .fill.green{background:var(--green)}
-  .status-table .health-bar-mini .fill.yellow{background:var(--orange)}
-  .status-table .health-bar-mini .fill.red{background:var(--red)}
-  .status-table .status-val{font-weight:600}
+/* ─── ALERTS ─── */
+.al-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1;
+  overflow-y:auto;
+}
+.al-item{
+  background:var(--card2);
+  border-left:3px solid;
+  border-radius:0 6px 6px 0;
+  padding:7px 10px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  transition:all .2s;
+}
+.al-item:hover{background:var(--border)}
+.al-item .al-icon{font-size:14px;flex-shrink:0;line-height:1}
+.al-item .al-content{flex:1;min-width:0}
+.al-item .al-msg{
+  font-size:11px;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-weight:500;
+}
+.al-item .al-meta{
+  font-size:9px;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:3px;
+}
+.al-item .al-badge{
+  font-size:8px;
+  padding:2px 6px;
+  border-radius:3px;
+  font-weight:700;
+  letter-spacing:.2px;
+  line-height:1.4;
+}
+.al-item.critical{border-left-color:var(--red)}
+.al-item.warning{border-left-color:var(--orange)}
+.al-item.info{border-left-color:var(--accent)}
+.al-footer{
+  display:flex;
+  gap:16px;
+  padding-top:8px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+  font-size:10px;
+  color:var(--muted);
+  flex-shrink:0;
+}
+.al-footer span{display:flex;align-items:center;gap:4px}
 
-  /* ─── QUICK ACTIONS ─── */
-  .quick-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:6px;
-    flex:1;
-    align-content:center;
-  }
-  .quick-btn{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:10px 6px;
-    background:var(--card2);
-    border:1px solid var(--border);
-    border-radius:8px;
-    cursor:pointer;
-    transition:all .2s;
-    gap:4px;
-  }
-  .quick-btn:hover{
-    background:var(--nav-hover);
-    border-color:var(--accent);
-    transform:translateY(-2px);
-    box-shadow:var(--shadow-md);
-  }
-  .quick-btn svg{
-    width:22px;
-    height:22px;
-    color:var(--accent);
-  }
-  .quick-btn .qb-label{
-    font-size:9px;
-    color:var(--muted);
-    font-weight:500;
-  }
+/* ══════════════════════════════════════════════════
+   ROW 3 — GIS MAP + DIGITAL TWIN STATUS
+══════════════════════════════════════════════════ */
+.row3{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:14px;
+  height:340px;
+  flex-shrink:0;
+}
 
-  /* ══════════════════════════════════════════════════
-    ROW 4
-  ══════════════════════════════════════════════════ */
-  .row4{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-    height:110px;
-    flex-shrink:0;
-  }
+/* ─── GIS MAP PANEL ─── */
+.gis-map-panel{display:flex;flex-direction:column;position:relative}
+#gis-map{flex:1;min-height:0;height:100%}
+.map-live-pill{
+  font-size:9px;padding:3px 9px;
+  background:var(--green-bg);color:var(--green);
+  border-radius:10px;display:flex;align-items:center;gap:4px;
+  font-weight:600;flex-shrink:0;
+}
+.map-live-pill .dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block}
+.map-hint{font-size:9px;color:var(--muted);flex-shrink:0}
 
-  /* ─── RECENT ACTIVITY ─── */
-  .activity-list{
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-    flex:1;
-    overflow-y:auto;
-  }
-  .activity-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:3px 4px;
-    font-size:10px;
-    color:var(--muted);
-  }
-  .activity-item .act-time{
-    color:var(--dim);
-    font-weight:500;
-    flex:0 0 50px;
-  }
-  .activity-item .act-dot{
-    width:5px;
-    height:5px;
-    border-radius:50%;
-    flex-shrink:0;
-  }
-  .activity-item .act-dot.green{background:var(--green)}
-  .activity-item .act-dot.orange{background:var(--orange)}
-  .activity-item .act-dot.blue{background:var(--accent)}
-  .activity-item .act-dot.red{background:var(--red)}
-  .activity-item .act-msg{
-    color:var(--text);
-    flex:1;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+/* Floating layers control, overlaid on the map so it doesn't cost a row */
+.layers-float{
+  position:absolute;top:10px;right:10px;z-index:20;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;
+  box-shadow:var(--shadow-md);
+  display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;
+}
+.layer-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color:var(--text);
+  cursor:pointer;
+  padding:2px 2px;
+  border-radius:4px;
+  transition:background .2s;
+  white-space:nowrap;
+}
+.layer-item:hover{background:var(--nav-hover)}
+.layer-item input[type="checkbox"]{
+  width:13px;height:13px;
+  accent-color:var(--accent);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.layer-item .layer-color{
+  width:9px;height:9px;border-radius:50%;display:inline-block;
+  flex-shrink:0;
+}
 
-  /* ─── DIGITAL TWIN STATUS ─── */
-  .twin-status{display:flex;align-items:center;gap:16px;flex:1}
-  .twin-icon{
-    width:44px;
-    height:44px;
-    border-radius:10px;
-    background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-  }
-  .twin-icon svg{width:22px;height:22px;color:#fff}
-  .twin-info{flex:1}
-  .twin-info .twin-title{
-    font-size:13px;
-    font-weight:700;
-    color:var(--text);
-  }
-  .twin-info .twin-stats{
-    display:flex;
-    gap:16px;
-    margin-top:3px;
-  }
-  .twin-info .twin-stats span{
-    font-size:10px;
-    color:var(--muted);
-  }
-  .twin-info .twin-stats strong{color:var(--text)}
-  .twin-btn{
-    padding:6px 16px;
-    border-radius:6px;
-    background:var(--accent);
-    color:#fff;
-    font-size:11px;
-    font-weight:600;
-    cursor:pointer;
-    transition:all .2s;
-    border:none;
-    flex-shrink:0;
-  }
-  .twin-btn:hover{opacity:.85;transform:scale(1.02)}
+/* ─── DIGITAL TWIN STATUS CARD ─── */
+.twin-card-panel{display:flex;flex-direction:column}
+.twin-card-body{flex:1;display:flex;flex-direction:column;gap:14px}
+.twin-head{display:flex;align-items:center;gap:12px}
+.twin-icon{
+  width:42px;
+  height:42px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.twin-icon svg{width:21px;height:21px;color:#fff}
+.twin-head-text .twin-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.twin-head-text .twin-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.twin-stat-list{display:flex;flex-direction:column;gap:0;flex:1}
+.twin-stat-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid var(--border);
+}
+.twin-stat-row:last-child{border-bottom:none}
+.twin-stat-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.twin-stat-label svg{width:13px;height:13px;color:var(--dim)}
+.twin-stat-value{font-size:14px;font-weight:700;color:var(--text)}
+.twin-btn{
+  padding:9px 16px;
+  border-radius:7px;
+  background:var(--accent);
+  color:#fff;
+  font-size:11.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  border:none;
+  flex-shrink:0;
+  width:100%;
+  text-align:center;
+}
+.twin-btn:hover{opacity:.88;transform:scale(1.01)}
 
-  /* ══════════════════════════════════════════════════
-    GLOBAL TOOLTIP
-  ══════════════════════════════════════════════════ */
-  #asset-tt{
-    display:none;position:fixed;
-    background:var(--card);border:1px solid var(--border);
-    border-radius:10px;padding:10px 13px;
-    font-size:11px;color:var(--text);
-    min-width:175px;z-index:9999;pointer-events:none;
-    box-shadow:0 8px 28px rgba(0,0,0,.22);
-  }
-  #tt-title{font-size:12.5px;font-weight:800;margin-bottom:6px}
-  #tt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:3px}
-  .tt-l{font-size:8.5px;color:var(--muted);margin-bottom:1px}
-  .tt-v{font-size:11.5px;font-weight:700;color:var(--text)}
-  #tt-upd{font-size:8.5px;color:var(--dim)}
+/* ══════════════════════════════════════════════════
+   ROW 4 — LIVE ASSET STATUS
+══════════════════════════════════════════════════ */
+.row4{flex-shrink:0}
+.asset-table{width:100%;border-collapse:collapse}
+.asset-table thead th{
+  font-size:10px;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--muted);font-weight:600;text-align:left;
+  padding:0 10px 8px;border-bottom:1px solid var(--border);
+}
+.asset-table thead th.num,.asset-table tbody td.num{text-align:right}
+.asset-table tbody td{
+  padding:9px 10px;font-size:11.5px;color:var(--text);
+  border-bottom:1px solid var(--border);vertical-align:middle;
+}
+.asset-table tbody tr:last-child td{border-bottom:none}
+.asset-table tbody tr{cursor:pointer;transition:background .15s}
+.asset-table tbody tr:hover{background:var(--nav-hover)}
+.asset-name-cell{display:flex;align-items:center;gap:9px;font-weight:600}
+.asset-type-tag{font-size:9.5px;color:var(--dim);font-weight:500}
+.status-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;
+}
+.status-chip .dot{width:6px;height:6px;border-radius:50%}
+.status-chip.healthy{background:var(--green-bg);color:var(--green)}
+.status-chip.healthy .dot{background:var(--green)}
+.status-chip.warning{background:var(--orange-bg);color:var(--orange)}
+.status-chip.warning .dot{background:var(--orange)}
+.status-chip.critical{background:var(--red-bg);color:var(--red)}
+.status-chip.critical .dot{background:var(--red)}
+.health-cell{display:flex;align-items:center;gap:8px;min-width:120px}
+.health-cell .health-bar-wrap{flex:1;height:6px}
+.health-cell .health-val{font-size:11px;font-weight:700;color:var(--text);flex:0 0 32px;text-align:right}
 
-  /* ══════════════════════════════════════════════════
-    RESPONSIVE
-  ══════════════════════════════════════════════════ */
-  @media(max-width:1200px){
-    .kpi-row{grid-template-columns:repeat(2,1fr)}
-    .row2{grid-template-columns:1fr 1fr;height:auto;min-height:230px}
-    .row2>.panel:nth-child(3){grid-column:1/3;height:180px}
-    .row3{grid-template-columns:1fr;height:auto}
-    .row3>.panel:last-child{grid-column:1;height:180px}
-    .row4{grid-template-columns:1fr;height:auto}
-  }
-  @media(max-width:900px){
-    :root{--sidebar-w:56px}
-    .content{padding:12px 14px}
-    .kpi-row{gap:10px}
-    .row2,.row3,.row4{gap:10px}
-  }
-  @media(max-width:768px){
-    .kpi-row{grid-template-columns:1fr 1fr}
-    .row2{grid-template-columns:1fr}
-    .row2>.panel:nth-child(3){grid-column:1}
-    .topbar{padding:0 12px}
-    .dt-pill .dt-date{display:none}
-    .admin-role{display:none}
-  }
-  @media(max-width:600px){
-    .kpi-row{grid-template-columns:1fr}
-    .content{padding:10px}
-    .kpi{padding:12px 16px}
-    .kpi-val{font-size:22px}
-  }
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media(max-width:1200px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .row2{grid-template-columns:1fr;height:auto}
+  .row2 .panel{height:212px}
+  .row3{grid-template-columns:1fr;height:auto}
+  .row3 .gis-map-panel{height:320px}
+  .row3 .twin-card-panel{height:auto}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:56px}
+  .content{padding:14px 16px}
+  .kpi-row{gap:10px}
+  .row2,.row3{gap:10px}
+}
+@media(max-width:768px){
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .topbar{padding:0 12px}
+  .dt-pill .dt-date{display:none}
+  .admin-role{display:none}
+  .asset-table thead th:nth-child(3),
+  .asset-table tbody td:nth-child(3){display:none}
+}
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:1fr}
+  .content{padding:10px}
+  .kpi{padding:12px 16px}
+  .kpi-val{font-size:22px}
+}
 
-  /* Leaflet dark tile filter */
-  [data-theme="dark"] .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
-  [data-theme="dark"] .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
-  </style>
-  </head>
-  <body>
+/* Leaflet dark tile filter */
+[data-theme="dark"] .leaflet-layer{filter:invert(1) hue-rotate(200deg) brightness(.7) contrast(1.1)}
+[data-theme="dark"] .leaflet-control-zoom a{background:#1e293b;color:#f1f5f9;border-color:#334155}
+[data-theme="dark"] .leaflet-popup-content-wrapper{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
+[data-theme="dark"] .leaflet-popup-tip{background:#1e293b}
+</style>
+</head>
+<body>
 
-  <!-- ═══════════════ GLOBAL TOOLTIP ═══════════════ -->
-  <div id="asset-tt">
-    <div id="tt-title"></div>
-    <div id="tt-grid">
-      <div><div class="tt-l">Status</div><div class="tt-v" id="tt-status"></div></div>
-      <div><div class="tt-l">Type</div><div class="tt-v" id="tt-location"></div></div>
+<!-- ═══════════════════ APP ═══════════════════ -->
+<div class="app">
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar"></div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="tb-left">
+      <i data-lucide="layout-dashboard" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Dashboard</h2>
     </div>
-    <div id="tt-upd"></div>
+    <div class="tb-right">
+      <div class="dt-pill">
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
+        <span style="color:var(--border)">|</span>
+        <span class="dt-time" id="clock-time">9:41 AM</span>
+      </div>
+      <button class="ib" id="theme-btn" onclick="toggleTheme()">
+        <i data-lucide="sun" id="theme-icon"></i>
+      </button>
+      <div class="notif-wrap">
+        <button class="ib"><i data-lucide="bell"></i></button>
+        <span class="notif-dot">8</span>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+    </div>
   </div>
 
-  <!-- ═══════════════ APP ═══════════════ -->
-  <div class="app">
+  <!-- Content -->
+  <div class="content">
 
-  <!-- ════════ SIDEBAR ════════ -->
-  <div class="sidebar"></div>
-
-  <!-- ════════ MAIN ════════ -->
-  <div class="main">
-
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="tb-left">
-        <i data-lucide="layout-dashboard" style="width:17px;height:17px;color:var(--muted)"></i>
-        <h2>Dashboard</h2>
+    <!-- ═══ ROW 1 — KPI CARDS ═══ -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-ico blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Total Assets</div>
+          <div class="kpi-val">456</div>
+          <div class="kpi-sub">+12 this month</div>
+        </div>
       </div>
-      <div class="tb-right">
-        <div class="dt-pill">
-          <span class="dt-date" id="clock-date">June 22, 2025</span>
-          <span style="color:var(--border)">|</span>
-          <span class="dt-time" id="clock-time">9:41 AM</span>
+      <div class="kpi">
+        <div class="kpi-ico green">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
         </div>
-        <button class="ib" id="theme-btn" onclick="toggleTheme()">
-          <i data-lucide="sun" id="theme-icon"></i>
-        </button>
-        <div class="notif-wrap">
-          <button class="ib"><i data-lucide="bell"></i></button>
-          <span class="notif-dot">8</span>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Active Assets</div>
+          <div class="kpi-val green">421</div>
+          <div class="kpi-sub green">92% online</div>
         </div>
-        <div class="admin-chip">
-          <div class="admin-av">A</div>
-          <div>
-            <div class="admin-name">Admin</div>
-            <div class="admin-role">Administrator</div>
-          </div>
-          <i data-lucide="chevron-down" style="width:12px;height:12px;color:var(--muted);margin-left:2px"></i>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Sensors</div>
+          <div class="kpi-val">2,450</div>
+          <div class="kpi-sub">Connected sensors</div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-ico orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="kpi-info">
+          <div class="kpi-lbl">Active Alerts</div>
+          <div class="kpi-val orange">8</div>
+          <div class="kpi-sub">3 critical, 5 warning</div>
         </div>
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="content">
+    <!-- ═══ ROW 2 — SYSTEM HEALTH + RECENT ALERTS ═══ -->
+    <div class="row2">
 
-      <!-- ═══ ROW 1 — KPI CARDS ═══ -->
-      <div class="kpi-row">
-        <div class="kpi">
-          <div class="kpi-ico" style="background:#eff6ff">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
-          </div>
-          <div class="kpi-info">
-            <div class="kpi-lbl">Total Assets</div>
-            <div class="kpi-val">456</div>
-            <div class="kpi-sub">+12 this month</div>
-          </div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-ico" style="background:#f0fdf4">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
-          </div>
-          <div class="kpi-info">
-            <div class="kpi-lbl">Active Assets</div>
-            <div class="kpi-val" style="color:#16a34a">421</div>
-            <div class="kpi-sub" style="color:#16a34a">92% online</div>
-          </div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-ico" style="background:#f5f3ff">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div class="kpi-info">
-            <div class="kpi-lbl">Sensors</div>
-            <div class="kpi-val">2,450</div>
-            <div class="kpi-sub">Connected sensors</div>
-          </div>
-        </div>
-        <div class="kpi">
-          <div class="kpi-ico" style="background:#fff7ed">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div class="kpi-info">
-            <div class="kpi-lbl">Active Alerts</div>
-            <div class="kpi-val" style="color:#ea580c">8</div>
-            <div class="kpi-sub">3 critical, 5 warning</div>
+      <!-- System Health -->
+      <div class="panel">
+        <div class="ph"><span class="pt">System Health</span></div>
+        <div class="pb">
+          <div class="health-container">
+            <div class="health-circle">
+              <svg width="96" height="96" viewBox="0 0 90 90">
+                <circle class="bg" cx="45" cy="45" r="36"/>
+                <circle class="progress" id="health-progress" cx="45" cy="45" r="36" stroke-dasharray="226.2" stroke-dashoffset="18.1"/>
+              </svg>
+              <div class="center">
+                <div class="big">92%</div>
+                <div class="sm">Overall</div>
+              </div>
+            </div>
+            <div class="health-bars">
+              <div class="health-row">
+                <span class="health-dot green"></span>
+                <span class="health-label">Healthy</span>
+                <span class="health-count">412</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar green" style="width:90.4%"></div>
+                </div>
+                <span class="health-percent">90.4%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-dot yellow"></span>
+                <span class="health-label">Warning</span>
+                <span class="health-count">28</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar yellow" style="width:6.1%"></div>
+                </div>
+                <span class="health-percent">6.1%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-dot red"></span>
+                <span class="health-label">Critical</span>
+                <span class="health-count">16</span>
+                <div class="health-bar-wrap">
+                  <div class="health-bar red" style="width:3.5%"></div>
+                </div>
+                <span class="health-percent">3.5%</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- ═══ ROW 2 ═══ -->
-      <div class="row2">
-
-        <!-- System Health -->
-        <div class="panel">
-          <div class="ph"><span class="pt">System Health</span></div>
-          <div class="pb">
-            <div class="health-container">
-              <div class="health-circle">
-                <svg width="90" height="90" viewBox="0 0 90 90">
-                  <circle class="bg" cx="45" cy="45" r="36"/>
-                  <circle class="progress" id="health-progress" cx="45" cy="45" r="36" stroke-dasharray="226.2" stroke-dashoffset="18.1"/>
-                </svg>
-                <div class="center">
-                  <div class="big">92%</div>
-                  <div class="sm">Overall</div>
-                </div>
-              </div>
-              <div class="health-bars">
-                <div class="health-row">
-                  <span class="health-dot green"></span>
-                  <span class="health-label">Healthy</span>
-                  <span class="health-count">412</span>
-                  <div class="health-bar-wrap">
-                    <div class="health-bar green" style="width:90.4%"></div>
-                  </div>
-                  <span class="health-percent">90.4%</span>
-                </div>
-                <div class="health-row">
-                  <span class="health-dot yellow"></span>
-                  <span class="health-label">Warning</span>
-                  <span class="health-count">28</span>
-                  <div class="health-bar-wrap">
-                    <div class="health-bar yellow" style="width:6.1%"></div>
-                  </div>
-                  <span class="health-percent">6.1%</span>
-                </div>
-                <div class="health-row">
-                  <span class="health-dot red"></span>
-                  <span class="health-label">Critical</span>
-                  <span class="health-count">16</span>
-                  <div class="health-bar-wrap">
-                    <div class="health-bar red" style="width:3.5%"></div>
-                  </div>
-                  <span class="health-percent">3.5%</span>
-                </div>
+      <!-- Recent Alerts -->
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Recent Alerts</span>
+          <button class="bl" onclick="location.href='alerts.html'">View All <i data-lucide="external-link"></i></button>
+        </div>
+        <div class="pb">
+          <div class="al-list">
+            <div class="al-item critical">
+              <span class="al-icon">🔴</span>
+              <div class="al-content">
+                <div class="al-msg">Compressor-02 — High Temperature</div>
+                <div class="al-meta"><span>10:45 AM</span><span class="al-badge" style="background:var(--red-bg);color:var(--red)">Critical</span></div>
               </div>
             </div>
+            <div class="al-item warning">
+              <span class="al-icon">🟡</span>
+              <div class="al-content">
+                <div class="al-msg">AHU-03 — Maintenance Due</div>
+                <div class="al-meta"><span>10:30 AM</span><span class="al-badge" style="background:var(--orange-bg);color:var(--orange)">Warning</span></div>
+              </div>
+            </div>
+            <div class="al-item critical">
+              <span class="al-icon">🔴</span>
+              <div class="al-content">
+                <div class="al-msg">Sensor-14 — Connection Lost</div>
+                <div class="al-meta"><span>10:12 AM</span><span class="al-badge" style="background:var(--red-bg);color:var(--red)">Critical</span></div>
+              </div>
+            </div>
+            <div class="al-item info">
+              <span class="al-icon">ℹ️</span>
+              <div class="al-content">
+                <div class="al-msg">Gateway-01 — Firmware Update Available</div>
+                <div class="al-meta"><span>09:58 AM</span><span class="al-badge" style="background:var(--green-bg);color:var(--accent)">Info</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="al-footer">
+            <span>🔴 Critical: <strong>3</strong></span>
+            <span>🟡 Warning: <strong>4</strong></span>
+            <span>ℹ️ Info: <strong>1</strong></span>
           </div>
         </div>
-
-        <!-- Recent Alerts -->
-        <div class="panel">
-          <div class="ph">
-            <span class="pt">Recent Alerts</span>
-            <button class="bl" onclick="location.href='alerts.html'">View All <i data-lucide="external-link"></i></button>
-          </div>
-          <div class="pb">
-            <div class="al-list">
-              <div class="al-item critical">
-                <span class="al-icon">🔴</span>
-                <div class="al-content">
-                  <div class="al-msg">Compressor-02 — High Temperature</div>
-                  <div class="al-meta"><span>10:45 AM</span><span class="al-badge" style="background:#fef2f2;color:#dc2626">Critical</span></div>
-                </div>
-              </div>
-              <div class="al-item warning">
-                <span class="al-icon">🟡</span>
-                <div class="al-content">
-                  <div class="al-msg">AHU-03 — Maintenance Due</div>
-                  <div class="al-meta"><span>10:30 AM</span><span class="al-badge" style="background:#fff7ed;color:#ea580c">Warning</span></div>
-                </div>
-              </div>
-              <div class="al-item critical">
-                <span class="al-icon">🔴</span>
-                <div class="al-content">
-                  <div class="al-msg">Sensor-14 — Connection Lost</div>
-                  <div class="al-meta"><span>10:12 AM</span><span class="al-badge" style="background:#fef2f2;color:#dc2626">Critical</span></div>
-                </div>
-              </div>
-              <div class="al-item info">
-                <span class="al-icon">ℹ️</span>
-                <div class="al-content">
-                  <div class="al-msg">Gateway-01 — Firmware Update Available</div>
-                  <div class="al-meta"><span>09:58 AM</span><span class="al-badge" style="background:#eff6ff;color:#3b82f6">Info</span></div>
-                </div>
-              </div>
-            </div>
-            <div class="al-footer">
-              <span>🔴 Critical: <strong>3</strong></span>
-              <span>🟡 Warning: <strong>4</strong></span>
-              <span>ℹ️ Info: <strong>1</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Asset Summary -->
-        <div class="panel">
-          <div class="ph"><span class="pt">Asset Summary</span></div>
-          <div class="pb">
-            <div class="summary-grid">
-              <div class="summary-item">
-                <span class="summary-label"><span class="summary-icon">📦</span> Assets</span>
-                <span class="summary-count">456</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label"><span class="summary-icon">🏷️</span> Properties</span>
-                <span class="summary-count">1,280</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label"><span class="summary-icon">🌡️</span> Sensors</span>
-                <span class="summary-count">2,450</span>
-              </div>
-              <div class="summary-item">
-                <span class="summary-label"><span class="summary-icon">⚙️</span> Controllers</span>
-                <span class="summary-count">45</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- ═══ ROW 3 ═══ -->
-      <div class="row3">
+    </div>
 
-        <!-- Live Asset Status -->
-        <div class="panel">
-          <div class="ph">
-            <span class="pt">Live Asset Status</span>
-            <button class="bl" onclick="location.href='asset_explorer.html'">View Assets <i data-lucide="external-link"></i></button>
-          </div>
-          <div class="pb" style="padding:8px 16px;">
-            <table class="status-table">
-              <thead>
-                <tr><th>Asset</th><th>Status</th><th>Health</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>COMP-01</strong></td>
-                  <td><span class="status-dot green"></span>Running</td>
-                  <td><span class="health-bar-mini"><span class="fill green" style="width:96%"></span></span> 96%</td>
-                </tr>
-                <tr>
-                  <td><strong>AHU-03</strong></td>
-                  <td><span class="status-dot yellow"></span>Warning</td>
-                  <td><span class="health-bar-mini"><span class="fill yellow" style="width:72%"></span></span> 72%</td>
-                </tr>
-                <tr>
-                  <td><strong>Sensor-14</strong></td>
-                  <td><span class="status-dot red"></span>Offline</td>
-                  <td><span class="health-bar-mini"><span class="fill red" style="width:0%"></span></span> 0%</td>
-                </tr>
-                <tr>
-                  <td><strong>Gateway-01</strong></td>
-                  <td><span class="status-dot green"></span>Running</td>
-                  <td><span class="health-bar-mini"><span class="fill green" style="width:100%"></span></span> 100%</td>
-                </tr>
-                <tr>
-                  <td><strong>Controller-05</strong></td>
-                  <td><span class="status-dot green"></span>Running</td>
-                  <td><span class="health-bar-mini"><span class="fill green" style="width:88%"></span></span> 88%</td>
-                </tr>
-              </tbody>
-            </table>
+    <!-- ═══ ROW 3 — GIS MAP + DIGITAL TWIN STATUS ═══ -->
+    <div class="row3">
+
+      <!-- Map Panel -->
+      <div class="panel gis-map-panel">
+        <div class="ph">
+          <span class="pt">Live GIS Map</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="map-hint">📍 Real-time tracking</span>
+            <span class="map-live-pill"><span class="dot"></span>Live</span>
           </div>
         </div>
+        <div id="gis-map"></div>
 
-        <!-- Quick Actions -->
-        <div class="panel">
-          <div class="ph"><span class="pt">Quick Actions</span></div>
-          <div class="pb">
-            <div class="quick-grid">
-              <div class="quick-btn" onclick="location.href='asset_explorer.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7.5" cy="18.5" r=".5"/><circle cx="16.5" cy="18.5" r=".5"/><line x1="8" y1="7" x2="8" y2="14"/><line x1="16" y1="7" x2="16" y2="14"/></svg>
-                <span class="qb-label">Assets</span>
-              </div>
-              <div class="quick-btn" onclick="location.href='telemetry_center.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                <span class="qb-label">Telemetry</span>
-              </div>
-              <div class="quick-btn" onclick="location.href='gis_monitoring.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                <span class="qb-label">GIS</span>
-              </div>
-              <div class="quick-btn" onclick="location.href='3d_twin.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><box x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/></svg>
-                <span class="qb-label">Digital Twin</span>
-              </div>
-              <div class="quick-btn" onclick="location.href='alerts.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.29 3.86-8.17 14.17A1 1 0 0 0 3 19.5h18a1 1 0 0 0 .87-1.5L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span class="qb-label">Alerts</span>
-              </div>
-              <div class="quick-btn" onclick="location.href='reports.html'">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-                <span class="qb-label">Reports</span>
-              </div>
-            </div>
-          </div>
+        <!-- Layers control floats on the map instead of taking its own panel -->
+        <div class="layers-float">
+          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('assets',this.checked)"><span class="layer-color" style="background:#3b82f6"></span>Assets</label>
+          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('routes',this.checked)"><span class="layer-color" style="background:#f59e0b"></span>Routes</label>
+          <label class="layer-item"><input type="checkbox" checked onchange="toggleLayer('stations',this.checked)"><span class="layer-color" style="background:#64748b"></span>Stations</label>
         </div>
-
       </div>
 
-      <!-- ═══ ROW 4 ═══ -->
-      <div class="row4">
-
-        <!-- Recent Activity -->
-        <div class="panel">
-          <div class="ph"><span class="pt">Recent Activity</span></div>
-          <div class="pb">
-            <div class="activity-list">
-              <div class="activity-item">
-                <span class="act-time">10:45</span>
-                <span class="act-dot red"></span>
-                <span class="act-msg">Compressor-02 alert generated</span>
+      <!-- Digital Twin Status -->
+      <div class="panel twin-card-panel">
+        <div class="ph"><span class="pt">Digital Twin Status</span></div>
+        <div class="pb">
+          <div class="twin-card-body">
+            <div class="twin-head">
+              <div class="twin-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
               </div>
-              <div class="activity-item">
-                <span class="act-time">10:32</span>
-                <span class="act-dot blue"></span>
-                <span class="act-msg">Metadata updated for AHU-03</span>
-              </div>
-              <div class="activity-item">
-                <span class="act-time">10:15</span>
-                <span class="act-dot green"></span>
-                <span class="act-msg">Sensor-14 reconnected</span>
-              </div>
-              <div class="activity-item">
-                <span class="act-time">09:58</span>
-                <span class="act-dot green"></span>
-                <span class="act-msg">User Admin logged in</span>
+              <div class="twin-head-text">
+                <div class="twin-title">Twin Sync Engine</div>
+                <div class="twin-sub">All models synced</div>
               </div>
             </div>
+            <div class="twin-stat-list">
+              <div class="twin-stat-row">
+                <span class="twin-stat-label"><i data-lucide="link-2"></i>Connected Assets</span>
+                <span class="twin-stat-value">421</span>
+              </div>
+              <div class="twin-stat-row">
+                <span class="twin-stat-label"><i data-lucide="radio"></i>Sensors Online</span>
+                <span class="twin-stat-value">2,450</span>
+              </div>
+              <div class="twin-stat-row">
+                <span class="twin-stat-label"><i data-lucide="activity"></i>Telemetry Messages</span>
+                <span class="twin-stat-value">18.2k/min</span>
+              </div>
+              <div class="twin-stat-row">
+                <span class="twin-stat-label"><i data-lucide="refresh-cw"></i>Last Sync</span>
+                <span class="twin-stat-value">12s ago</span>
+              </div>
+            </div>
+            <button class="twin-btn" onclick="location.href='3d_twin.html'">Open 3D Viewer</button>
           </div>
         </div>
-
-        <!-- Digital Twin Status -->
-        <div class="panel">
-          <div class="pb" style="flex-direction:row;align-items:center;gap:16px;padding:12px 16px;">
-            <div class="twin-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><box x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 3 12 7 16 3"/><line x1="12" y1="7" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
-            </div>
-            <div class="twin-info">
-              <div class="twin-title">Digital Twin Status</div>
-              <div class="twin-stats">
-                <span>Connected: <strong>421</strong></span>
-                <span>3D Models: <strong>145</strong></span>
-                <span>Sync: <strong>12s</strong></span>
-              </div>
-            </div>
-            <button class="twin-btn" onclick="location.href='3d_twin.html'">Open Viewer</button>
-          </div>
-        </div>
-
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-  </div><!-- /app -->
+    </div>
 
-  <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+    <!-- ═══ ROW 4 — LIVE ASSET STATUS ═══ -->
+    <!-- <div class="row4">
+      <div class="panel">
+        <div class="ph">
+          <span class="pt">Live Asset Status</span>
+          <span class="map-hint" id="asset-row-count">5 assets</span>
+        </div>
+        <div class="pb" style="padding:6px 0 10px">
+          <table class="asset-table">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th class="num">Health</th>
+              </tr>
+            </thead>
+            <tbody id="asset-table-body"><!-- rendered by JS --></tbody>
+          </table>
+        </div>
+      </div>
+    </div> -->
 
-  <script>
-    // ─── SIDEBAR LOAD ───
-  
-    // ─── THEME ───
-    let isDark = localStorage.getItem('rdt-theme') === 'dark';
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
 
-    function applyTheme(){
-      document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-      const icon = document.getElementById('theme-icon');
-      if(icon){
-        icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
-        lucide.createIcons();
-      }
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
+<script>
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
+
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
+  }
 
-    function toggleTheme(){
-      isDark = !isDark;
-      localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
-      applyTheme();
-    }
-
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
     applyTheme();
+  }
 
-    // ─── CLOCK ───
-    function updateClock(){
-      const n=new Date();
-      const dateEl=document.getElementById('clock-date');
-      const timeEl=document.getElementById('clock-time');
-      if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-      if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  applyTheme();
+
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  updateClock(); setInterval(updateClock,1000);
+
+  // ─── ASSET DATA ───
+  const mapAssets = [
+    { id: 'a1', name: 'COMP-01',      lat: 22.05, lng: 73.10, status: 'healthy',  type: 'Compressor', details: 'Running at 96%',      health: 96 },
+    { id: 'a2', name: 'AHU-03',       lat: 22.44, lng: 71.80, status: 'warning',  type: 'AHU',         details: 'Maintenance due',      health: 72 },
+    { id: 'a3', name: 'Sensor-14',    lat: 21.50, lng: 73.05, status: 'critical', type: 'Sensor',      details: 'Connection lost',      health: 0  },
+    { id: 'a4', name: 'Gateway-01',   lat: 22.75, lng: 72.85, status: 'healthy',  type: 'Gateway',     details: '100% online',          health: 100},
+    { id: 'a5', name: 'Controller-05',lat: 22.19, lng: 72.63, status: 'healthy',  type: 'Controller',  details: '88% health',           health: 88 },
+  ];
+
+  let mapInstance = null;
+  let markerLayers = {};
+
+  // ─── INIT MAP ───
+  function initMap() {
+    const container = document.getElementById('gis-map');
+    if (!container) return;
+
+    mapInstance = L.map('gis-map', {
+      center: [22.0, 72.5],
+      zoom: 7,
+      zoomControl: false,
+      attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap',
+      subdomains: 'abcd',
+      maxZoom: 19,
+    }).addTo(mapInstance);
+
+    L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+
+    // Routes
+    const routes = [
+      { color: '#f59e0b', points: [[19.076,72.877],[20.599,72.934],[20.946,72.952],[21.170,72.831],[21.627,73.001],[21.705,72.996],[22.307,73.181],[22.557,72.954],[23.022,72.571]] },
+      { color: '#60a5fa', points: [[22.303,70.802],[22.680,71.350],[22.900,71.880],[23.022,72.571]] },
+    ];
+    routes.forEach(r => {
+      L.polyline(r.points, { color: r.color, weight: 2.5, opacity: .7 }).addTo(mapInstance);
+    });
+
+    // Stations
+    const stations = {
+      'Mumbai': [19.076,72.877],
+      'Surat': [21.170,72.831],
+      'Vadodara': [22.307,73.181],
+      'Ahmedabad': [23.022,72.571],
+      'Rajkot': [22.303,70.802]
+    };
+    Object.entries(stations).forEach(([name, coords]) => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:8px;height:8px;border-radius:50%;background:#64748b;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>`,
+        iconAnchor: [4,4],
+      });
+      L.marker(coords, { icon, interactive: false }).addTo(mapInstance)
+        .bindTooltip(name, { permanent: true, direction: 'right', offset: [6,0], opacity: .7 });
+    });
+
+    // Asset markers — clicking opens a popup with the asset's details
+    mapAssets.forEach(asset => {
+      const statusColor = asset.status === 'healthy' ? '#22c55e' : asset.status === 'warning' ? '#f59e0b' : '#ef4444';
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;">
+          <div style="width:16px;height:16px;border-radius:50%;background:${statusColor};border:2.5px solid #fff;box-shadow:0 0 8px ${statusColor}88,0 2px 6px rgba(0,0,0,.3);"></div>
+          <div style="background:rgba(15,23,42,.85);backdrop-filter:blur(4px);color:#fff;font-size:7.5px;font-weight:600;padding:1px 4px;border-radius:3px;white-space:nowrap;border:1px solid ${statusColor}55;line-height:1.2;">${asset.name}</div>
+        </div>`,
+        iconSize: [70, 38],
+        iconAnchor: [8, 8],
+      });
+      const marker = L.marker([asset.lat, asset.lng], { icon, zIndexOffset: 100 })
+        .addTo(mapInstance)
+        .bindPopup(buildPopupHtml(asset));
+      markerLayers[asset.id] = marker;
+    });
+
+    renderAssetTable();
+    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 400);
+  }
+
+  function buildPopupHtml(asset){
+    const statusColor = asset.status === 'healthy' ? 'var(--green)' : asset.status === 'warning' ? 'var(--orange)' : 'var(--red)';
+    return `<div style="font-family:inherit;min-width:140px">
+      <div style="font-weight:800;font-size:12.5px;margin-bottom:4px">${asset.name}</div>
+      <div style="font-size:10.5px;color:#64748b;margin-bottom:2px">${asset.type}</div>
+      <div style="font-size:11px;font-weight:600;color:${statusColor}">${asset.details}</div>
+    </div>`;
+  }
+
+  // ─── ASSET TABLE (Row 4) ───
+  function renderAssetTable(){
+    const body = document.getElementById('asset-table-body');
+    if (!body) return;
+    body.innerHTML = mapAssets.map(a => {
+      const barColor = a.status === 'healthy' ? 'green' : a.status === 'warning' ? 'yellow' : 'red';
+      return `
+        <tr onclick="focusAsset('${a.id}')">
+          <td>
+            <div class="asset-name-cell">${a.name}</div>
+          </td>
+          <td><span class="asset-type-tag">${a.type}</span></td>
+          <td><span class="status-chip ${a.status}"><span class="dot"></span>${a.status.charAt(0).toUpperCase() + a.status.slice(1)}</span></td>
+          <td class="num">
+            <div class="health-cell">
+              <div class="health-bar-wrap"><div class="health-bar ${barColor}" style="width:${a.health}%"></div></div>
+              <span class="health-val">${a.health}%</span>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+    document.getElementById('asset-row-count').textContent = mapAssets.length + ' assets';
+  }
+
+  // Clicking a table row pans the map to that asset and opens its popup
+  function focusAsset(id){
+    const asset = mapAssets.find(a => a.id === id);
+    const marker = markerLayers[id];
+    if (!asset || !marker || !mapInstance) return;
+    mapInstance.flyTo([asset.lat, asset.lng], 9, { duration: 0.6 });
+    marker.openPopup();
+  }
+
+  // ─── TOGGLE LAYER ───
+  function toggleLayer(layer, visible) {
+    if (layer === 'assets') {
+      Object.values(markerLayers).forEach(m => {
+        if (visible) m.addTo(mapInstance);
+        else m.remove();
+      });
     }
-    updateClock(); setInterval(updateClock,1000);
+    // 'routes' and 'stations' layers are static reference data on this map;
+    // wire to real layer groups here once they come from the backend.
+  }
 
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initMap, 300);
+  });
+
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
     lucide.createIcons();
-  </script>
+  }
 
-  <script src="sidebar.js"></script>
-  </body>
-  </html>
+  // ─── MAKE FUNCTIONS GLOBAL ───
+  window.toggleLayer = toggleLayer;
+  window.focusAsset = focusAsset;
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>
