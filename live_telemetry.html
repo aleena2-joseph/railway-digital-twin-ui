@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Telemetry - Railway Digital Twin</title>
+<title>Telemetry Center - Digital Twin Platform</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="sidebar.css">
 <style>
   /* ══════════════════════════════════════════════════
-   CSS VARIABLES  — LIGHT (default) + DARK overrides
+   CSS VARIABLES
 ══════════════════════════════════════════════════ */
 :root {
   --bg:           #f0f4f8;
@@ -81,7 +81,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* ══════════════════════════════════════════════════
-   SIDEBAR
+   SIDEBAR - from sidebar.css
 ══════════════════════════════════════════════════ */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
@@ -94,94 +94,6 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   position:relative;
 }
 
-/* Logo area */
-.sb-logo{
-  padding:14px 12px 12px;
-  border-bottom:1px solid var(--sidebar-bd);
-  display:flex;align-items:center;gap:10px;flex-shrink:0;
-}
-.sb-logo-icon{
-  width:38px;height:38px;border-radius:9px;flex-shrink:0;
-  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-  display:flex;align-items:center;justify-content:center;
-}
-.sb-logo-icon svg{width:20px;height:20px;color:#fff}
-.sb-brand{line-height:1.25}
-.sb-brand .b1{font-size:13px;font-weight:800;color:#1d4ed8;letter-spacing:.4px}
-[data-theme="dark"] .sb-brand .b1{color:#60a5fa}
-.sb-brand .b2{font-size:8.5px;color:var(--muted);font-weight:400}
-.sb-brand .b3{font-size:8px;font-weight:700;color:#1d4ed8;letter-spacing:.7px;text-transform:uppercase}
-[data-theme="dark"] .sb-brand .b3{color:#60a5fa}
-
-/* Overview active button */
-.sb-overview{padding:10px 10px 4px}
-.sb-overview-btn{
-  display:flex;align-items:center;gap:8px;
-  width:100%;padding:9px 14px;border-radius:8px;
-  background:#3b82f6;color:#fff;
-  font-size:12px;font-weight:600;
-  border:none;cursor:pointer;
-}
-.sb-overview-btn svg{width:15px;height:15px}
-
-/* Section label */
-.sb-sec{padding:10px 12px 2px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim)}
-
-/* Nav item */
-.sb-item{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 12px;cursor:pointer;
-  color:var(--nav-txt);font-size:11.5px;
-  transition:background .12s,color .12s;
-  border-right:2.5px solid transparent;
-}
-.sb-item:hover{background:var(--nav-hover);color:var(--text)}
-.sb-item.active{background:var(--nav-act-bg);color:var(--nav-act-txt);border-right-color:#3b82f6}
-.sb-item svg{width:14px;height:14px;flex-shrink:0}
-.sb-chevron{margin-left:auto;width:12px;height:12px;opacity:.45;flex-shrink:0}
-.sb-badge{
-  margin-left:auto;min-width:17px;height:17px;
-  background:#ef4444;border-radius:8px;
-  font-size:9px;font-weight:700;color:#fff;
-  display:flex;align-items:center;justify-content:center;padding:0 4px;
-}
-
-/* Train image in sidebar */
-.sb-train-img{
-  flex-shrink:0;
-  overflow:hidden;
-  height:160px;
-  position:relative;
-  margin-top:auto;
-}
-.sb-train-img img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  opacity:.75;
-  transition:opacity .25s;
-  position:absolute;
-  top:0;
-  left:0;
-}
-.sb-train-img:hover img{opacity:.9}
-
-/* Logout btn */
-.sb-logout{
-  display:flex;align-items:center;gap:8px;
-  width:calc(100% - 20px);margin:6px 10px 4px;
-  padding:8px 14px;border-radius:8px;
-  background:var(--red-bg);color:var(--red);
-  font-size:11.5px;font-weight:600;
-  border:1px solid rgba(220,38,38,.2);
-  cursor:pointer;transition:background .15s;
-}
-.sb-logout:hover{background:rgba(220,38,38,.22)}
-.sb-logout svg{width:14px;height:14px}
-
-.sb-footer{padding:7px 12px;font-size:9.5px;color:var(--dim);border-top:1px solid var(--sidebar-bd)}
-
 /* ══════════════════════════════════════════════════
    MAIN
 ══════════════════════════════════════════════════ */
@@ -193,16 +105,16 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   background:var(--topbar-bg);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 18px;box-shadow:var(--shadow);
-  transition:background .25s;
+  padding:0 20px;
+  box-shadow:var(--shadow);
 }
-.tb-left{display:flex;align-items:center;gap:9px}
+.tb-left{display:flex;align-items:center;gap:10px}
 .tb-left h2{font-size:15px;font-weight:700;white-space:nowrap}
-.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .dt-pill{
   display:flex;align-items:center;gap:6px;
   background:var(--card2);border:1px solid var(--border);
-  border-radius:7px;padding:4px 10px;font-size:11px;color:var(--muted);
+  border-radius:7px;padding:4px 12px;font-size:11px;color:var(--muted);
 }
 .dt-pill .dt-date{font-weight:600;color:var(--text)}
 .dt-pill .dt-time{font-weight:700;color:var(--text);font-size:12px}
@@ -222,9 +134,9 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   display:flex;align-items:center;justify-content:center;
 }
 .admin-chip{
-  display:flex;align-items:center;gap:7px;
+  display:flex;align-items:center;gap:8px;
   background:var(--card2);border:1px solid var(--border);
-  border-radius:8px;padding:3px 9px 3px 3px;cursor:pointer;
+  border-radius:8px;padding:3px 10px 3px 3px;cursor:pointer;
 }
 .admin-av{
   width:28px;height:28px;border-radius:6px;
@@ -235,26 +147,29 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .admin-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2}
 .admin-role{font-size:9px;color:var(--muted)}
 
-/* Scrollable content */
+/* Content */
 .content{
   flex:1;overflow-y:auto;
-  padding:12px 14px;
-  display:flex;flex-direction:column;gap:10px;
+  padding:16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
 /* ══════════════════════════════════════════════════
-   LIVE TELEMETRY CONTENT
+   TELEMETRY CENTER STYLES
 ══════════════════════════════════════════════════ */
 .card{
   background:var(--card);border:1px solid var(--border);
   border-radius:10px;box-shadow:var(--shadow);
-  padding:14px 16px;
+  padding:16px 18px;
   transition:background .25s,border-color .25s;
 }
 .card h3{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text)}
 .subtle{color:var(--muted);font-size:11px}
 .dim{color:var(--dim)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.row-start{display:flex;align-items:center;gap:10px}
 
 .icon-box{
   width:36px;height:36px;border-radius:8px;
@@ -293,41 +208,78 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .chart-wrap canvas{width:100% !important;height:100% !important}
 
 .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px}
+.status-dot.connected{background:var(--green)}
+.status-dot.disconnected{background:var(--red)}
+.status-dot.warning{background:var(--orange)}
+
+/* ─── Connection Status ─── */
+.conn-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  flex-shrink:0;
+}
+.conn-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 14px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.conn-card .conn-info{display:flex;align-items:center;gap:8px}
+.conn-card .conn-info .conn-icon{font-size:18px}
+.conn-card .conn-info .conn-name{font-size:12px;color:var(--muted)}
+.conn-card .conn-status{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;
+}
+.conn-card .conn-status .dot{
+  width:6px;height:6px;border-radius:50%;display:inline-block;
+}
+.conn-card .conn-status .dot.green{background:var(--green)}
+.conn-card .conn-status .dot.red{background:var(--red)}
+.conn-card .conn-status.connected{color:var(--green)}
+.conn-card .conn-status.disconnected{color:var(--red)}
+
+/* ─── Header Actions ─── */
+.header-actions{display:flex;align-items:center;gap:8px}
+.header-actions .action-btn{
+  padding:4px 12px;border-radius:6px;font-size:10px;font-weight:500;
+  border:1px solid var(--border);color:var(--muted);transition:all .2s;
+  background:var(--card2);cursor:pointer;display:flex;align-items:center;gap:4px;
+}
+.header-actions .action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.header-actions .action-btn svg{width:14px;height:14px}
+.last-updated{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:4px}
 
 /* ══════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════ */
 @media(max-width:1200px){
-  :root{--sidebar-w:190px}
   .cols-3{grid-template-columns:1fr 1fr}
+  .conn-row{grid-template-columns:1fr 1fr}
 }
 @media(max-width:900px){
   :root{--sidebar-w:56px}
-  .sb-brand,.sb-sec,.sb-item span,.sb-chevron,.sb-badge,.sb-logout span,.sb-footer{display:none}
-  .sb-item{justify-content:center;padding:10px}
-  .sb-overview-btn{justify-content:center;padding:10px}
-  .sb-overview-btn span{display:none}
-  .sb-train-img{height:100px}
-  .sb-logout{justify-content:center;padding:10px;width:calc(100% - 12px);margin:4px 6px}
-  body{overflow:auto}
-  html,body{height:auto}
-  .app{height:auto;flex-direction:column}
-  .main{overflow:auto}
-  .content{overflow:visible}
+  .content{padding:12px 14px}
+  .conn-row{grid-template-columns:1fr 1fr}
 }
 @media(max-width:768px){
   .topbar{padding:0 12px}
-  .tb-left h2{font-size:14px}
   .dt-pill .dt-date{display:none}
   .admin-role{display:none}
   .cols-3{grid-template-columns:1fr 1fr}
+  .conn-row{grid-template-columns:1fr}
+  .cols-2{grid-template-columns:1fr}
+  .header-actions{flex-wrap:wrap}
 }
 @media(max-width:600px){
-  .topbar{padding:0 10px}
   .content{padding:10px}
-  .dt-pill .dt-date{display:none}
-  .admin-role,.admin-name~*{display:none}
   .cols-3,.cols-2{grid-template-columns:1fr}
+  .conn-row{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -337,8 +289,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 <div class="app">
 
 <!-- ════════ SIDEBAR ════════ -->
-<aside class="sidebar">
-  </aside>
+<div class="sidebar"></div>
 
 <!-- ════════ MAIN ════════ -->
 <div class="main">
@@ -346,12 +297,12 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   <!-- Topbar -->
   <div class="topbar">
     <div class="tb-left">
-      <i data-lucide="radio" style="width:17px;height:17px;color:var(--muted)"></i>
-      <h2>Live Telemetry</h2>
+      <i data-lucide="activity" style="width:17px;height:17px;color:var(--muted)"></i>
+      <h2>Telemetry Center</h2>
     </div>
     <div class="tb-right">
       <div class="dt-pill">
-        <span class="dt-date" id="clock-date">June 18, 2026</span>
+        <span class="dt-date" id="clock-date">June 22, 2025</span>
         <span style="color:var(--border)">|</span>
         <span class="dt-time" id="clock-time">9:41 AM</span>
       </div>
@@ -382,450 +333,505 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 </div>
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+
 <script>
-lucide.createIcons();
+  // ─── SIDEBAR AUTO-INIT ───
+  // sidebar.js will auto-render on DOMContentLoaded
 
-/* ─── CLOCK ─── */
-function updateClock(){
-  const n=new Date();
-  const dateEl=document.getElementById('clock-date');
-  const timeEl=document.getElementById('clock-time');
-  if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-}
-updateClock(); setInterval(updateClock,1000);
-
-/* ─── THEME ─── */
-let isDark = localStorage.getItem('rdt-theme') === 'dark';
-let speedChart = null;
-let tempChart = null;
-let voltageChart = null;
-let chartsInitialized = false;
-
-function applyTheme(){
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-  const icon = document.getElementById('theme-icon');
-  if(icon){
-    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
-    lucide.createIcons();
+  // ─── CLOCK ───
+  function updateClock(){
+    const n=new Date();
+    const dateEl=document.getElementById('clock-date');
+    const timeEl=document.getElementById('clock-time');
+    if(dateEl) dateEl.textContent=n.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if(timeEl) timeEl.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
   }
-  // Update chart colors only if charts are initialized
-  if(chartsInitialized) {
-    updateCharts();
-  }
-}
+  updateClock(); setInterval(updateClock,1000);
 
-function toggleTheme(){
-  isDark = !isDark;
-  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+  // ─── THEME ───
+  let isDark = localStorage.getItem('rdt-theme') === 'dark';
+  let speedChart = null;
+  let tempChart = null;
+  let voltageChart = null;
+  let chartsInitialized = false;
+
+  function applyTheme(){
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = document.getElementById('theme-icon');
+    if(icon){
+      icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+    if(chartsInitialized) updateCharts();
+  }
+
+  function toggleTheme(){
+    isDark = !isDark;
+    localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
+    applyTheme();
+  }
+
   applyTheme();
-}
 
-applyTheme();
+  // ─── TELEMETRY DATA ───
+  const telemetryData = [
+    { label: 'Speed', value: 120, unit: 'km/h', color: 'blue', max: 180, icon: 'SP' },
+    { label: 'Voltage', value: 385, unit: 'V', color: 'yellow', max: 500, icon: 'VL' },
+    { label: 'Current', value: 245, unit: 'A', color: 'green', max: 400, icon: 'CR' },
+    { label: 'Temperature', value: 68, unit: '°C', color: 'red', max: 100, icon: 'TP' },
+    { label: 'Brake Pressure', value: 8.5, unit: 'bar', color: 'purple', max: 10, icon: 'BR' },
+    { label: 'Fuel Level', value: 75, unit: '%', color: 'cyan', max: 100, icon: 'FL' },
+  ];
 
-/* ─── NAVIGATION ─── */
-function openAssetHierarchy(){ window.location.href = 'asset_hierarchy.html'; }
-function openAssetDetails(){ window.location.href = 'asset_details.html'; }
-function openOverview(){ window.location.href = 'index.html'; }
-function openLiveTelemetry(){ window.location.href = 'live_telemetry.html'; }
-function openGisMonitoring(){ window.location.href = 'gis_monitoring.html'; }
-function openGoogleEarthView(){ window.location.href = 'googleEarthView.html'; }
-function openRoutevisualization(){ window.location.href = 'route_visualization.html'; }
-function openDevices(){ window.location.href = 'devices.html'; }
-function openSettings(){ window.location.href = 'settings.html'; }
-function openAlerts(){ window.location.href = 'alerts.html'; }
-function doLogout(){ if(confirm('Are you sure you want to logout?')){ window.location.href='Login.html'; } }
+  const speedHistory = [95, 88, 92, 110, 130, 140, 145, 138, 125, 115, 100, 90];
+  const tempHistory = [85, 82, 84, 90, 98, 105, 108, 102, 95, 88, 83, 80];
+  const voltageHistory = [380, 385, 390, 385, 380, 385, 385];
 
-/* ─── TELEMETRY DATA ─── */
-const telemetryData = [
-  { label: 'Speed', value: 120, unit: 'km/h', color: 'blue', max: 180, icon: 'SP' },
-  { label: 'Voltage', value: 385, unit: 'V', color: 'yellow', max: 500, icon: 'VL' },
-  { label: 'Current', value: 245, unit: 'A', color: 'green', max: 400, icon: 'CR' },
-  { label: 'Temperature', value: 68, unit: '°C', color: 'red', max: 100, icon: 'TP' },
-  { label: 'Brake Pressure', value: 8.5, unit: 'bar', color: 'purple', max: 10, icon: 'BR' },
-  { label: 'Fuel Level', value: 75, unit: '%', color: 'cyan', max: 100, icon: 'FL' },
-];
+  const connectionStatus = [
+    { name: 'OPC UA', icon: '🔌', status: 'connected' },
+    { name: 'GraphQL', icon: '⚡', status: 'connected' },
+    { name: 'WebSocket', icon: '📡', status: 'connected' },
+    { name: 'Telemetry', icon: '📊', status: 'connected' },
+  ];
 
-const speedHistory = [95, 88, 92, 110, 130, 140, 145, 138, 125, 115, 100, 90];
-const tempHistory = [85, 82, 84, 90, 98, 105, 108, 102, 95, 88, 83, 80];
-const voltageHistory = [380, 385, 390, 385, 380, 385, 385];
+  // ─── HELPERS ───
+  function getColorValue(colorName){
+    const colors = {
+      'blue': '#3b82f6',
+      'green': '#22c55e',
+      'red': '#ef4444',
+      'yellow': '#eab308',
+      'purple': '#8b5cf6',
+      'cyan': '#06b6d4',
+      'orange': '#f97316'
+    };
+    return colors[colorName] || colors.blue;
+  }
 
-function getColorValue(colorName){
-  const colors = {
-    'blue': '#3b82f6',
-    'green': '#22c55e',
-    'red': '#ef4444',
-    'yellow': '#eab308',
-    'purple': '#8b5cf6',
-    'cyan': '#06b6d4',
-    'orange': '#f97316'
-  };
-  return colors[colorName] || colors.blue;
-}
+  function getPillClass(colorName){
+    const classes = {
+      'blue': 'blue',
+      'green': 'green',
+      'red': 'red',
+      'yellow': 'orange',
+      'purple': 'purple',
+      'cyan': 'cyan',
+      'orange': 'orange'
+    };
+    return classes[colorName] || 'blue';
+  }
 
-function getPillClass(colorName){
-  const classes = {
-    'blue': 'blue',
-    'green': 'green',
-    'red': 'red',
-    'yellow': 'orange',
-    'purple': 'purple',
-    'cyan': 'cyan',
-    'orange': 'orange'
-  };
-  return classes[colorName] || 'blue';
-}
+  function getStatusColor(status){
+    return status === 'connected' ? 'green' : 'red';
+  }
 
-function renderTelemetry(){
-  const container = document.getElementById('telemetry-content');
-  if(!container) return;
+  // ─── EXPORT CSV ───
+  function exportCSV(){
+    let csv = 'Sensor,Value,Unit,Status,Last Update\n';
+    telemetryData.forEach(m => {
+      const status = m.value > m.max * 0.9 ? 'Warning' : 'Healthy';
+      csv += `${m.label},${typeof m.value === 'number' && !Number.isInteger(m.value) ? m.value.toFixed(1) : Math.round(m.value)},${m.unit},${status},Just now\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `telemetry_data_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
-  // Build metric cards
-  let metricsHtml = telemetryData.map(m => `
-    <div class="card" data-metric="${m.label.toLowerCase().replace(' ', '-')}">
-      <div class="row">
-        <div class="icon-box" style="background:${getColorValue(m.color)}">${m.icon}</div>
-        <div>
-          <span style="font-size:26px;font-weight:700" class="metric-value">${m.value}</span>
-          <span class="subtle" style="font-size:12px">${m.unit}</span>
+  // ─── RENDER TELEMETRY ───
+  function renderTelemetry(){
+    const container = document.getElementById('telemetry-content');
+    if(!container) return;
+
+    // Build connection status
+    const connHtml = connectionStatus.map(c => `
+      <div class="conn-card">
+        <div class="conn-info">
+          <span class="conn-icon">${c.icon}</span>
+          <span class="conn-name">${c.name}</span>
+        </div>
+        <span class="conn-status ${c.status}"><span class="dot ${getStatusColor(c.status)}"></span> ${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</span>
+      </div>
+    `).join('');
+
+    // Build metric cards
+    let metricsHtml = telemetryData.map(m => `
+      <div class="card" data-metric="${m.label.toLowerCase().replace(' ', '-')}">
+        <div class="row">
+          <div class="icon-box" style="background:${getColorValue(m.color)}">${m.icon}</div>
+          <div>
+            <span style="font-size:26px;font-weight:700" class="metric-value">${typeof m.value === 'number' && !Number.isInteger(m.value) ? m.value.toFixed(1) : Math.round(m.value)}</span>
+            <span class="subtle" style="font-size:12px">${m.unit}</span>
+          </div>
+        </div>
+        <p class="subtle" style="margin-top:4px">${m.label}</p>
+        <div class="progress"><span style="--value:${(m.value/m.max)*100}%;--bar:${getColorValue(m.color)}" class="progress-bar"></span></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:3px;">
+          <span class="pill ${m.value > m.max * 0.9 ? 'orange' : 'green'}">${m.value > m.max * 0.9 ? '⚠️ Warning' : '✅ Healthy'}</span>
         </div>
       </div>
-      <p class="subtle" style="margin-top:4px">${m.label}</p>
-      <div class="progress"><span style="--value:${(m.value/m.max)*100}%;--bar:${getColorValue(m.color)}" class="progress-bar"></span></div>
-    </div>
-  `).join('');
+    `).join('');
 
-  // Build charts
-  const chartHtml = `
-    <div class="grid cols-2">
-      <div class="card">
-        <h3>Speed vs Time</h3>
-        <div class="chart-wrap"><canvas id="speedChart"></canvas></div>
-      </div>
-      <div class="card">
-        <h3>Temperature vs Time</h3>
-        <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
-      </div>
-    </div>
-    <div class="card">
-      <h3>Voltage vs Time</h3>
-      <div class="chart-wrap" style="height:140px"><canvas id="voltageChart"></canvas></div>
-    </div>
-  `;
-
-  container.innerHTML = `
-    <div class="grid cols-3">${metricsHtml}</div>
-    <div style="height:6px"></div>
-    ${chartHtml}
-    <div class="card">
-      <div class="row">
-        <div>
-          <h3 style="margin:0">System Status</h3>
-          <p class="subtle">All systems operational</p>
+    // Build charts
+    const chartHtml = `
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Speed vs Time</h3>
+          <div class="chart-wrap"><canvas id="speedChart"></canvas></div>
         </div>
-        <span class="pill green"><span class="status-dot"></span>Online</span>
+        <div class="card">
+          <h3>Temperature vs Time</h3>
+          <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+        </div>
       </div>
-    </div>
-  `;
+      <div class="card">
+        <h3>Voltage vs Time</h3>
+        <div class="chart-wrap" style="height:140px"><canvas id="voltageChart"></canvas></div>
+      </div>
+    `;
 
-  // Initialize charts after DOM update
-  setTimeout(() => {
-    initCharts();
-  }, 100);
-}
+    // Build header with actions
+    const headerHtml = `
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div class="row-start">
+          <span class="pill green"><span class="status-dot connected"></span> Live</span>
+          <span class="last-updated">🔄 Last updated: <span id="lastUpdatedTime">Just now</span></span>
+        </div>
+        <div class="header-actions">
+          <button class="action-btn" onclick="exportCSV()" title="Export CSV">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+    `;
 
-function initCharts(){
-  const isDarkMode = isDark;
-  const textColor = isDarkMode ? '#94a3b8' : '#64748b';
-  const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
+    container.innerHTML = `
+      <!-- Connection Status -->
+      <div class="conn-row">${connHtml}</div>
+      
+      <!-- Header with actions -->
+      ${headerHtml}
+      
+      <!-- Metrics -->
+      <div class="grid cols-3">${metricsHtml}</div>
+      
+      <!-- Charts -->
+      ${chartHtml}
+      
+      <!-- System Status -->
+      <div class="card">
+        <div class="row">
+          <div>
+            <h3 style="margin:0">System Status</h3>
+            <p class="subtle">All systems operational</p>
+          </div>
+          <span class="pill green"><span class="status-dot"></span>Online</span>
+        </div>
+      </div>
+    `;
 
-  // Speed Chart
-  const speedCtx = document.getElementById('speedChart');
-  if(speedCtx){
-    if(speedChart) speedChart.destroy();
-    speedChart = new Chart(speedCtx, {
-      type: 'line',
-      data: {
-        labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],
-        datasets: [{
-          label: 'Speed (km/h)',
-          data: speedHistory,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 2,
-          pointBackgroundColor: '#3b82f6',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-            borderWidth: 1,
-            titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
-            bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
-          }
+    // Initialize charts after DOM update
+    setTimeout(() => {
+      initCharts();
+    }, 100);
+  }
+
+  // ─── INIT CHARTS ───
+  function initCharts(){
+    const isDarkMode = isDark;
+    const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+    const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
+
+    // Speed Chart
+    const speedCtx = document.getElementById('speedChart');
+    if(speedCtx){
+      if(speedChart) speedChart.destroy();
+      speedChart = new Chart(speedCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],
+          datasets: [{
+            label: 'Speed (km/h)',
+            data: speedHistory,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            pointBackgroundColor: '#3b82f6',
+          }]
         },
-        scales: {
-          x: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 }, maxTicksLimit: 6 }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+              borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+              borderWidth: 1,
+              titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
+              bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+            }
           },
-          y: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 }, stepSize: 50 },
-            min: 0, max: 200
+          scales: {
+            x: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 }, maxTicksLimit: 6 }
+            },
+            y: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 }, stepSize: 50 },
+              min: 0, max: 200
+            }
           }
         }
+      });
+    }
+
+    // Temperature Chart
+    const tempCtx = document.getElementById('tempChart');
+    if(tempCtx){
+      if(tempChart) tempChart.destroy();
+      tempChart = new Chart(tempCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],
+          datasets: [{
+            label: 'Temperature (°F)',
+            data: tempHistory,
+            borderColor: '#ef4444',
+            backgroundColor: 'rgba(239,68,68,0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            pointBackgroundColor: '#ef4444',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+              borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+              borderWidth: 1,
+              titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
+              bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 }, maxTicksLimit: 6 }
+            },
+            y: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 }, stepSize: 20 },
+              min: 60, max: 140
+            }
+          }
+        }
+      });
+    }
+
+    // Voltage Chart
+    const voltCtx = document.getElementById('voltageChart');
+    if(voltCtx){
+      if(voltageChart) voltageChart.destroy();
+      voltageChart = new Chart(voltCtx, {
+        type: 'line',
+        data: {
+          labels: ['T1','T2','T3','T4','T5','T6','T7'],
+          datasets: [{
+            label: 'Voltage (V)',
+            data: voltageHistory,
+            borderColor: '#eab308',
+            backgroundColor: 'rgba(234,179,8,0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            pointBackgroundColor: '#eab308',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+              borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+              borderWidth: 1,
+              titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
+              bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 } }
+            },
+            y: {
+              grid: { color: gridColor, drawBorder: false },
+              ticks: { color: textColor, font: { size: 9 }, stepSize: 50 },
+              min: 300, max: 500
+            }
+          }
+        }
+      });
+    }
+
+    chartsInitialized = true;
+  }
+
+  // ─── UPDATE CHARTS THEME ───
+  function updateCharts(){
+    if(!chartsInitialized) return;
+    
+    const isDarkMode = isDark;
+    const textColor = isDarkMode ? '#94a3b8' : '#64748b';
+    const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
+
+    [speedChart, tempChart, voltageChart].forEach(chart => {
+      if(!chart) return;
+      chart.options.scales.x.ticks.color = textColor;
+      chart.options.scales.x.grid.color = gridColor;
+      if(chart.options.scales.y){
+        chart.options.scales.y.ticks.color = textColor;
+        chart.options.scales.y.grid.color = gridColor;
       }
+      chart.options.plugins.tooltip.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
+      chart.options.plugins.tooltip.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
+      chart.options.plugins.tooltip.titleColor = isDarkMode ? '#f1f5f9' : '#0f172a';
+      chart.options.plugins.tooltip.bodyColor = isDarkMode ? '#94a3b8' : '#64748b';
+      chart.update('none');
     });
   }
 
-  // Temperature Chart
-  const tempCtx = document.getElementById('tempChart');
-  if(tempCtx){
-    if(tempChart) tempChart.destroy();
-    tempChart = new Chart(tempCtx, {
-      type: 'line',
-      data: {
-        labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'],
-        datasets: [{
-          label: 'Temperature (°F)',
-          data: tempHistory,
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239,68,68,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 2,
-          pointBackgroundColor: '#ef4444',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-            borderWidth: 1,
-            titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
-            bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
-          }
-        },
-        scales: {
-          x: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 }, maxTicksLimit: 6 }
-          },
-          y: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 }, stepSize: 20 },
-            min: 60, max: 140
-          }
-        }
+  // ─── UPDATE LAST UPDATED TIME ───
+  function updateLastUpdated(){
+    const el = document.getElementById('lastUpdatedTime');
+    if(el){
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+  }
+
+  // ─── SIMULATE LIVE DATA ───
+  setInterval(() => {
+    // Update last updated time
+    updateLastUpdated();
+
+    if(!chartsInitialized) return;
+
+    // Update speed
+    if(speedChart){
+      const d = speedChart.data.datasets[0].data;
+      const prev = d[d.length-1];
+      const next = Math.min(160, Math.max(80, Math.round(prev + (Math.random() - 0.47) * 10)));
+      d.push(next);
+      d.shift();
+      speedChart.update('none');
+    }
+
+    // Update temperature
+    if(tempChart){
+      const d = tempChart.data.datasets[0].data;
+      const prev = d[d.length-1];
+      const next = Math.min(120, Math.max(70, Math.round(prev + (Math.random() - 0.45) * 8)));
+      d.push(next);
+      d.shift();
+      tempChart.update('none');
+    }
+
+    // Update voltage
+    if(voltageChart){
+      const d = voltageChart.data.datasets[0].data;
+      const prev = d[d.length-1];
+      const next = Math.min(410, Math.max(360, Math.round(prev + (Math.random() - 0.5) * 6)));
+      d.push(next);
+      d.shift();
+      voltageChart.update('none');
+    }
+
+    // Update metric values
+    const metricCards = document.querySelectorAll('.card[data-metric]');
+    const metricMap = {
+      'speed': 0,
+      'voltage': 1,
+      'current': 2,
+      'temperature': 3,
+      'brake-pressure': 4,
+      'fuel-level': 5
+    };
+
+    metricCards.forEach(card => {
+      const metricName = card.dataset.metric;
+      const index = metricMap[metricName];
+      if(index === undefined) return;
+      
+      const m = telemetryData[index];
+      let newValue = m.value;
+      
+      if(metricName === 'speed') {
+        newValue = Math.min(160, Math.max(80, m.value + (Math.random() - 0.47) * 8));
+      } else if(metricName === 'temperature') {
+        newValue = Math.min(95, Math.max(50, m.value + (Math.random() - 0.45) * 3));
+      } else if(metricName === 'voltage') {
+        newValue = Math.min(420, Math.max(350, m.value + (Math.random() - 0.5) * 5));
+      } else if(metricName === 'current') {
+        newValue = Math.min(350, Math.max(150, m.value + (Math.random() - 0.5) * 10));
+      } else if(metricName === 'brake-pressure') {
+        newValue = Math.min(9.5, Math.max(4, m.value + (Math.random() - 0.5) * 0.3));
+      } else if(metricName === 'fuel-level') {
+        newValue = Math.min(98, Math.max(20, m.value + (Math.random() - 0.48) * 2));
+      }
+      
+      m.value = Math.round(newValue * 10) / 10;
+      
+      const valueSpan = card.querySelector('.metric-value');
+      if(valueSpan) {
+        valueSpan.textContent = typeof m.value === 'number' && !Number.isInteger(m.value) ? m.value.toFixed(1) : Math.round(m.value);
+      }
+      
+      const progressBar = card.querySelector('.progress-bar');
+      if(progressBar) {
+        const pct = (m.value / m.max) * 100;
+        progressBar.style.setProperty('--value', pct + '%');
+      }
+      
+      // Update status pill
+      const statusPill = card.querySelector('.pill');
+      if(statusPill) {
+        const isWarning = m.value > m.max * 0.9;
+        statusPill.className = `pill ${isWarning ? 'orange' : 'green'}`;
+        statusPill.textContent = isWarning ? '⚠️ Warning' : '✅ Healthy';
       }
     });
-  }
 
-  // Voltage Chart
-  const voltCtx = document.getElementById('voltageChart');
-  if(voltCtx){
-    if(voltageChart) voltageChart.destroy();
-    voltageChart = new Chart(voltCtx, {
-      type: 'line',
-      data: {
-        labels: ['T1','T2','T3','T4','T5','T6','T7'],
-        datasets: [{
-          label: 'Voltage (V)',
-          data: voltageHistory,
-          borderColor: '#eab308',
-          backgroundColor: 'rgba(234,179,8,0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 2,
-          pointBackgroundColor: '#eab308',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
-            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
-            borderWidth: 1,
-            titleColor: isDarkMode ? '#f1f5f9' : '#0f172a',
-            bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
-          }
-        },
-        scales: {
-          x: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 } }
-          },
-          y: {
-            grid: { color: gridColor, drawBorder: false },
-            ticks: { color: textColor, font: { size: 9 }, stepSize: 50 },
-            min: 300, max: 500
-          }
-        }
-      }
-    });
-  }
+  }, 2000);
 
-  chartsInitialized = true;
-}
+  // ─── RENDER ───
+  renderTelemetry();
 
-function updateCharts(){
-  if(!chartsInitialized) return;
-  
-  const isDarkMode = isDark;
-  const textColor = isDarkMode ? '#94a3b8' : '#64748b';
-  const gridColor = isDarkMode ? 'rgba(71,85,105,.3)' : 'rgba(148,163,184,.15)';
-
-  [speedChart, tempChart, voltageChart].forEach(chart => {
-    if(!chart) return;
-    chart.options.scales.x.ticks.color = textColor;
-    chart.options.scales.x.grid.color = gridColor;
-    if(chart.options.scales.y){
-      chart.options.scales.y.ticks.color = textColor;
-      chart.options.scales.y.grid.color = gridColor;
-    }
-    chart.options.plugins.tooltip.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
-    chart.options.plugins.tooltip.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
-    chart.options.plugins.tooltip.titleColor = isDarkMode ? '#f1f5f9' : '#0f172a';
-    chart.options.plugins.tooltip.bodyColor = isDarkMode ? '#94a3b8' : '#64748b';
-    chart.update('none');
-  });
-}
-
-// ─── SIMULATE LIVE DATA ───
-setInterval(() => {
-  if(!chartsInitialized) return;
-
-  // Update speed
-  if(speedChart){
-    const d = speedChart.data.datasets[0].data;
-    const prev = d[d.length-1];
-    const next = Math.min(160, Math.max(80, Math.round(prev + (Math.random() - 0.47) * 10)));
-    d.push(next);
-    d.shift();
-    speedChart.update('none');
-  }
-
-  // Update temperature
-  if(tempChart){
-    const d = tempChart.data.datasets[0].data;
-    const prev = d[d.length-1];
-    const next = Math.min(120, Math.max(70, Math.round(prev + (Math.random() - 0.45) * 8)));
-    d.push(next);
-    d.shift();
-    tempChart.update('none');
-  }
-
-  // Update voltage
-  if(voltageChart){
-    const d = voltageChart.data.datasets[0].data;
-    const prev = d[d.length-1];
-    const next = Math.min(410, Math.max(360, Math.round(prev + (Math.random() - 0.5) * 6)));
-    d.push(next);
-    d.shift();
-    voltageChart.update('none');
-  }
-
-  // Update metric values - using data attributes for better targeting
-  const metricCards = document.querySelectorAll('.card[data-metric]');
-  const metricMap = {
-    'speed': 0,
-    'voltage': 1,
-    'current': 2,
-    'temperature': 3,
-    'brake-pressure': 4,
-    'fuel-level': 5
-  };
-
-  metricCards.forEach(card => {
-    const metricName = card.dataset.metric;
-    const index = metricMap[metricName];
-    if(index === undefined) return;
-    
-    const m = telemetryData[index];
-    let newValue = m.value;
-    
-    // Simulate changes based on metric type
-    if(metricName === 'speed') {
-      newValue = Math.min(160, Math.max(80, m.value + (Math.random() - 0.47) * 8));
-    } else if(metricName === 'temperature') {
-      newValue = Math.min(95, Math.max(50, m.value + (Math.random() - 0.45) * 3));
-    } else if(metricName === 'voltage') {
-      newValue = Math.min(420, Math.max(350, m.value + (Math.random() - 0.5) * 5));
-    } else if(metricName === 'current') {
-      newValue = Math.min(350, Math.max(150, m.value + (Math.random() - 0.5) * 10));
-    } else if(metricName === 'brake-pressure') {
-      newValue = Math.min(9.5, Math.max(4, m.value + (Math.random() - 0.5) * 0.3));
-    } else if(metricName === 'fuel-level') {
-      newValue = Math.min(98, Math.max(20, m.value + (Math.random() - 0.48) * 2));
-    }
-    
-    m.value = newValue;
-    
-    // Update display
-    const valueSpan = card.querySelector('.metric-value');
-    if(valueSpan) {
-      valueSpan.textContent = typeof newValue === 'number' && !Number.isInteger(newValue) ? newValue.toFixed(1) : Math.round(newValue);
-    }
-    
-    const progressBar = card.querySelector('.progress-bar');
-    if(progressBar) {
-      const pct = (newValue / m.max) * 100;
-      progressBar.style.setProperty('--value', pct + '%');
-    }
-  });
-
-}, 2000);
-
-// ─── RENDER ───
-renderTelemetry();
-
-// Fix theme toggle to not re-render entire page
-const originalToggleTheme = toggleTheme;
-toggleTheme = function(){
-  isDark = !isDark;
-  localStorage.setItem('rdt-theme', isDark ? 'dark' : 'light');
-  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-  const icon = document.getElementById('theme-icon');
-  if(icon){
-    icon.setAttribute('data-lucide', isDark ? 'moon' : 'sun');
+  // ─── LUCIDE ICONS ───
+  if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
-  if(chartsInitialized) {
-    updateCharts();
-  }
-};
-
-// Re-render on window resize to fix chart sizing
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    if(speedChart) speedChart.resize();
-    if(tempChart) tempChart.resize();
-    if(voltageChart) voltageChart.resize();
-  }, 200);
-});
-
-lucide.createIcons();
 </script>
+
 <script src="sidebar.js"></script>
 </body>
 </html>

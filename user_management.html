@@ -80,7 +80,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* ══════════════════════════════════════════════════
-   SIDEBAR
+   SIDEBAR - from sidebar.css
 ══════════════════════════════════════════════════ */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
@@ -884,6 +884,26 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 
   let selectedUserId = 1;
 
+  // ─── ROLE STATISTICS ───
+  function updateRoleStats() {
+    const adminCount = users.filter(u => u.role === 'Admin').length;
+    const operatorCount = users.filter(u => u.role === 'Operator').length;
+    const viewerCount = users.filter(u => u.role === 'Viewer').length;
+    
+    // Update the admin card in statistics
+    document.getElementById('adminUsers').textContent = adminCount;
+    
+    // Update role filter options with counts
+    const roleFilter = document.getElementById('roleFilter');
+    const options = roleFilter.options;
+    for (let opt of options) {
+      if (opt.value === 'Admin') opt.text = `Admin (${adminCount})`;
+      else if (opt.value === 'Operator') opt.text = `Operator (${operatorCount})`;
+      else if (opt.value === 'Viewer') opt.text = `Viewer (${viewerCount})`;
+      else if (opt.value === 'all') opt.text = `All Roles (${users.length})`;
+    }
+  }
+
   // ─── RENDER USERS ───
   function renderUsers(filteredUsers) {
     const tbody = document.getElementById('userTableBody');
@@ -923,12 +943,17 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     const active = users.filter(u => u.status === 'Active').length;
     const inactive = users.filter(u => u.status === 'Inactive' || u.status === 'Pending').length;
     const admin = users.filter(u => u.role === 'Admin').length;
+    const operator = users.filter(u => u.role === 'Operator').length;
+    const viewer = users.filter(u => u.role === 'Viewer').length;
 
     document.getElementById('totalUsers').textContent = total;
     document.getElementById('activeUsers').textContent = active;
     document.getElementById('inactiveUsers').textContent = inactive;
     document.getElementById('adminUsers').textContent = admin;
     document.getElementById('userCount').textContent = `(${data.length})`;
+
+    // Update role stats
+    updateRoleStats();
 
     // Show selected user details if still in list
     if (users.find(u => u.id === selectedUserId)) {

@@ -371,6 +371,33 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 }
 .tree-node .children.open{max-height:2000px}
 
+/* ─── LOAD MORE BUTTON ─── */
+.load-more-container{
+  padding:8px 8px 4px;
+  text-align:center;
+}
+.load-more-btn{
+  padding:6px 20px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--card2);
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s;
+  width:100%;
+}
+.load-more-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:rgba(59,130,246,.08);
+}
+.load-more-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
 /* ─── DETAILS PANEL ─── */
 .details-panel{
   background:var(--card);
@@ -693,7 +720,15 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
           <span class="pt">Asset Hierarchy <span class="count">(2,450 assets)</span></span>
           <button class="bl" onclick="toggleAll()">Expand All <i data-lucide="chevrons-down"></i></button>
         </div>
-        <div class="tree-container" id="treeContainer"></div>
+        <div class="tree-container" id="treeContainer">
+          <!-- Tree rendered by JS -->
+        </div>
+        <!-- Load More Button -->
+        <div class="load-more-container">
+          <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreAssets()">
+            Load More Assets
+          </button>
+        </div>
       </div>
 
       <!-- Details Panel -->
@@ -776,6 +811,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     'default': '📦'
   };
 
+  // Asset Tree with Property Layer (Asset → Property → Sensor)
   const assetTree = {
     id: 'root',
     label: 'METRO-001',
@@ -806,13 +842,15 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
                     type: 'compressor',
                     status: 'healthy',
                     children: [
+                      // Property Layer: Asset → Property → Sensor
                       {
                         id: 'prop_temp',
                         label: 'Temperature',
                         type: 'property',
                         status: 'healthy',
                         children: [
-                          { id: 'sensor_temp', label: 'Temp Sensor', type: 'sensor', status: 'healthy', children: [] }
+                          { id: 'sensor_temp', label: 'Temp Sensor 1', type: 'sensor', status: 'healthy', children: [] },
+                          { id: 'sensor_temp2', label: 'Temp Sensor 2', type: 'sensor', status: 'healthy', children: [] }
                         ]
                       },
                       {
@@ -958,7 +996,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
         { name: 'Vibration', value: '0.2 mm/s' },
         { name: 'Current', value: '12.4 A' }
       ],
-      sensors: ['Temp Sensor', 'Pressure Sensor', 'Vibration Sensor']
+      sensors: ['Temp Sensor 1', 'Temp Sensor 2', 'Pressure Sensor', 'Vibration Sensor']
     },
     'comp2': {
       name: 'COMP-002',
@@ -1038,6 +1076,8 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   // ─── STATE ───
   let selectedNodeId = null;
   let expandedNodes = new Set();
+  let loadedCount = 0;
+  const LOAD_INCREMENT = 5;
 
   // ─── FIND NODE ───
   function findNode(tree, id) {
@@ -1142,7 +1182,6 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     const node = findNode(assetTree, nodeId);
     if (!node) return;
     
-    // Expand parents
     expandParents(nodeId);
     selectedNodeId = nodeId;
     renderTreeView();
@@ -1176,6 +1215,60 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     const container = document.getElementById('treeContainer');
     if (!container) return;
     container.innerHTML = renderTree(assetTree);
+    
+    // Show/hide load more button based on loaded count
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      const totalNodes = countNodes(assetTree);
+      if (loadedCount < totalNodes) {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.textContent = `Load More Assets (${loadedCount}/${totalNodes})`;
+      } else {
+        loadMoreBtn.style.display = 'none';
+      }
+    }
+  }
+
+  // ─── COUNT NODES ───
+  function countNodes(node) {
+    let count = 1;
+    if (node.children) {
+      for (let child of node.children) {
+        count += countNodes(child);
+      }
+    }
+    return count;
+  }
+
+  // ─── LOAD MORE ASSETS ───
+  function loadMoreAssets() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent = 'Loading...';
+    
+    // Simulate API call with setTimeout
+    setTimeout(() => {
+      loadedCount += LOAD_INCREMENT;
+      // In a real implementation, this would fetch more nodes from the API
+      // For demo, we just show the button state change
+      renderTreeView();
+      loadMoreBtn.disabled = false;
+      
+      // Show success feedback
+      loadMoreBtn.textContent = '✓ Loaded More Assets';
+      setTimeout(() => {
+        const totalNodes = countNodes(assetTree);
+        if (loadedCount < totalNodes) {
+          loadMoreBtn.textContent = `Load More Assets (${loadedCount}/${totalNodes})`;
+        } else {
+          loadMoreBtn.textContent = '✓ All Assets Loaded';
+          setTimeout(() => {
+            loadMoreBtn.style.display = 'none';
+          }, 1500);
+        }
+      }, 1000);
+    }, 800);
   }
 
   // ─── RENDER DETAILS ───
@@ -1424,6 +1517,11 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     expandedNodes.add('kochi');
     expandedNodes.add('hvac1');
     expandedNodes.add('comp1');
+    expandedNodes.add('prop_temp');
+    expandedNodes.add('prop_pressure');
+    
+    // Initialize loaded count
+    loadedCount = countNodes(assetTree) / 2;
     
     renderTreeView();
     updateBreadcrumb('kochi');

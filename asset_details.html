@@ -184,7 +184,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 }
 
 /* ══════════════════════════════════════════════════
-   ASSET OVERVIEW CARD
+   ASSET OVERVIEW CARD WITH IMAGE
 ══════════════════════════════════════════════════ */
 .overview-card{
   background:var(--card);
@@ -193,17 +193,36 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   padding:20px 24px;
   box-shadow:var(--shadow);
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
   flex-wrap:wrap;
   gap:16px;
 }
-.overview-left{display:flex;align-items:flex-start;gap:16px}
-.overview-icon{
-  width:52px;height:52px;border-radius:10px;
-  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;flex-shrink:0;
+.overview-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex:1;
+}
+.overview-image{
+  width:80px;
+  height:80px;
+  border-radius:10px;
+  overflow:hidden;
+  flex-shrink:0;
+  background:linear-gradient(135deg,#1e293b,#0f172a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.overview-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.overview-image .placeholder-icon{
+  font-size:36px;
+  color:#94a3b8;
 }
 .overview-info .oi-title{
   font-size:18px;font-weight:700;color:var(--text);
@@ -218,9 +237,17 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   font-size:12px;color:var(--muted);
 }
 .overview-info .oi-meta strong{color:var(--text)}
-.overview-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.overview-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+}
 .overview-right .status-badge{
-  padding:4px 14px;border-radius:12px;font-size:12px;font-weight:600;
+  padding:4px 14px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:600;
 }
 .overview-right .status-badge.green{background:var(--green-bg);color:var(--green)}
 .overview-right .status-badge.yellow{background:var(--orange-bg);color:var(--orange)}
@@ -489,6 +516,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   .content{padding:12px 14px}
   .overview-card{flex-direction:column;align-items:flex-start}
   .overview-right{align-items:flex-start;width:100%}
+  .overview-image{width:60px;height:60px}
 }
 @media(max-width:768px){
   .health-grid{grid-template-columns:1fr}
@@ -497,12 +525,12 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   .topbar{padding:0 12px}
   .dt-pill .dt-date{display:none}
   .admin-role{display:none}
-  .overview-icon{width:40px;height:40px;font-size:18px}
-  .overview-info .oi-title{font-size:16px}
 }
 @media(max-width:600px){
   .content{padding:10px}
   .quick-actions .qa-btn{padding:6px 12px;font-size:11px}
+  .overview-image{width:50px;height:50px}
+  .overview-image .placeholder-icon{font-size:24px}
 }
 </style>
 </head>
@@ -550,21 +578,33 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
   <!-- Content -->
   <div class="content">
 
-    <!-- Breadcrumb -->
+    <!-- ═══ BREADCRUMB ═══ -->
     <div class="breadcrumb">
       <span class="crumb" onclick="location.href='index.html'">🏠 Home</span>
       <span class="separator">›</span>
       <span class="crumb" onclick="location.href='asset_explorer.html'">Asset Explorer</span>
       <span class="separator">›</span>
-      <span class="crumb" onclick="location.href='asset_explorer.html'">HVAC</span>
+      <span class="crumb" onclick="location.href='asset_explorer.html'">Metro</span>
       <span class="separator">›</span>
-      <span class="crumb active">COMP-001</span>
+      <span class="crumb" onclick="location.href='asset_explorer.html'">Station</span>
+      <span class="separator">›</span>
+      <span class="crumb active">HVAC</span>
     </div>
 
-    <!-- ═══ ASSET OVERVIEW CARD ═══ -->
+    <!-- ═══ ASSET OVERVIEW CARD WITH IMAGE ═══ -->
     <div class="overview-card">
       <div class="overview-left">
-        <div class="overview-icon">⚙</div>
+        <div class="overview-image">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="13" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            <circle cx="7.5" cy="18.5" r="0.5" fill="currentColor"/>
+            <circle cx="16.5" cy="18.5" r="0.5" fill="currentColor"/>
+            <line x1="8" y1="7" x2="8" y2="14"/>
+            <line x1="16" y1="7" x2="16" y2="14"/>
+            <line x1="8" y1="14" x2="16" y2="14"/>
+          </svg>
+        </div>
         <div class="overview-info">
           <div class="oi-title">COMP-001</div>
           <div class="oi-sub">Asset ID: AS-1001 · Type: Compressor</div>
@@ -655,6 +695,20 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
               </div>
             </div>
             <div class="prop-item">
+              <span class="prop-icon">⚡</span>
+              <div class="prop-info">
+                <div class="prop-name">Motor Current</div>
+                <div class="prop-value">12.4 A</div>
+              </div>
+            </div>
+            <div class="prop-item">
+              <span class="prop-icon">🌀</span>
+              <div class="prop-info">
+                <div class="prop-name">Speed</div>
+                <div class="prop-value">1,450 RPM</div>
+              </div>
+            </div>
+            <div class="prop-item">
               <span class="prop-icon">〰</span>
               <div class="prop-info">
                 <div class="prop-name">Vibration</div>
@@ -666,20 +720,6 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
               <div class="prop-info">
                 <div class="prop-name">Voltage</div>
                 <div class="prop-value">230V</div>
-              </div>
-            </div>
-            <div class="prop-item">
-              <span class="prop-icon">💧</span>
-              <div class="prop-info">
-                <div class="prop-name">Current</div>
-                <div class="prop-value">12.4 A</div>
-              </div>
-            </div>
-            <div class="prop-item">
-              <span class="prop-icon">🌀</span>
-              <div class="prop-info">
-                <div class="prop-name">Speed</div>
-                <div class="prop-value">1,450 RPM</div>
               </div>
             </div>
           </div>
@@ -696,8 +736,14 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
           <div class="sensors-grid">
             <div class="sensor-item">
               <span class="s-icon">🌡</span>
-              <span class="s-name">Temperature Sensor</span>
+              <span class="s-name">Temperature Sensor 1</span>
               <span class="s-value">24°C</span>
+              <span class="s-status green">Online</span>
+            </div>
+            <div class="sensor-item">
+              <span class="s-icon">🌡</span>
+              <span class="s-name">Temperature Sensor 2</span>
+              <span class="s-value">24.5°C</span>
               <span class="s-status green">Online</span>
             </div>
             <div class="sensor-item">
@@ -714,8 +760,8 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
             </div>
             <div class="sensor-item">
               <span class="s-icon">⚡</span>
-              <span class="s-name">Voltage Sensor</span>
-              <span class="s-value">230V</span>
+              <span class="s-name">Current Sensor</span>
+              <span class="s-value">12.4 A</span>
               <span class="s-status green">Online</span>
             </div>
           </div>
@@ -727,7 +773,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     <!-- ═══ ROW 4 — Metadata + Alerts ═══ -->
     <div class="row4">
 
-      <!-- Metadata -->
+      <!-- Metadata Card -->
       <div class="panel">
         <div class="ph">
           <span class="pt">Metadata</span>
@@ -780,13 +826,6 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
               <div class="a-content">
                 <div class="a-msg">Firmware Update Available</div>
                 <div class="a-time">09:50 AM · 1 hour ago</div>
-              </div>
-            </div>
-            <div class="alert-item info" style="border-left-color:var(--green)">
-              <span class="a-icon">✅</span>
-              <div class="a-content">
-                <div class="a-msg">System Check Passed</div>
-                <div class="a-time">09:30 AM · 1.5 hours ago</div>
               </div>
             </div>
           </div>

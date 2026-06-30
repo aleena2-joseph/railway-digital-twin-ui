@@ -588,7 +588,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
               </div>
               <div class="form-group">
                 <label>Value</label>
-                <input type="text" id="newValue" placeholder="e.g. Carrier" required>
+                <input type="text" id="newValue" placeholder="e.g. Siemens" required>
               </div>
             </div>
             <div class="form-group">
@@ -654,7 +654,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     <form id="editMetadataForm" onsubmit="submitEdit(event)">
       <div class="form-group">
         <label>Key</label>
-        <input type="text" id="editKey" readonly style="background:var(--border);">
+        <input type="text" id="editKey" readonly style="background:var(--border);color:var(--text);">
       </div>
       <div class="form-group">
         <label>Value</label>
@@ -706,8 +706,8 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
 
   // ─── METADATA DATA ───
   let metadata = [
-    { id: 1, key: 'Manufacturer', value: 'Carrier', entity: 'asset', entityName: 'HVAC-SYS-001' },
-    { id: 2, key: 'Model', value: 'XR-200', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 1, key: 'Manufacturer', value: 'Siemens', entity: 'asset', entityName: 'HVAC-SYS-001' },
+    { id: 2, key: 'Model', value: 'XR200', entity: 'asset', entityName: 'HVAC-SYS-001' },
     { id: 3, key: 'Installation Date', value: '2024-03-15', entity: 'asset', entityName: 'HVAC-SYS-001' },
     { id: 4, key: 'Warranty', value: '3 Years', entity: 'asset', entityName: 'HVAC-SYS-001' },
     { id: 5, key: 'Location', value: 'Kochi Station', entity: 'asset', entityName: 'HVAC-SYS-001' },
@@ -737,8 +737,8 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
           <td><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--card2);border:1px solid var(--border);">${entityLabel}</span></td>
           <td>
             <div class="actions">
-              <button class="edit" onclick="openEditModal(${m.id})" title="Edit">✏️</button>
-              <button class="delete" onclick="deleteMetadata(${m.id})" title="Delete">🗑</button>
+              <button class="edit" onclick="openEditModal(${m.id})" title="Edit Metadata">✏️</button>
+              <button class="delete" onclick="deleteMetadata(${m.id})" title="Delete Metadata">🗑</button>
             </div>
           </td>
         </tr>
@@ -766,7 +766,7 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     renderMetadata(filtered);
   }
 
-  // ─── ADD METADATA ───
+  // ─── ADD METADATA (createMetadata) ───
   function addMetadata(e) {
     e.preventDefault();
     const key = document.getElementById('newKey').value.trim();
@@ -795,10 +795,14 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
     const btn = document.querySelector('.btn-add');
     const originalText = btn.innerHTML;
     btn.innerHTML = '✅ Added!';
-    setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { 
+      btn.innerHTML = originalText;
+      btn.style.background = '';
+    }, 1500);
   }
 
-  // ─── EDIT METADATA ───
+  // ─── EDIT METADATA (updateMetadata) ───
   function openEditModal(id) {
     const item = metadata.find(m => m.id === id);
     if (!item) return;
@@ -823,10 +827,13 @@ button{cursor:pointer;background:none;border:none;color:inherit;font-family:inhe
       item.value = value;
       closeEditModal();
       filterMetadata();
+      
+      // Show success feedback
+      alert('✅ Metadata updated successfully!');
     }
   }
 
-  // ─── DELETE METADATA ───
+  // ─── DELETE METADATA (deleteMetadata) ───
   function deleteMetadata(id) {
     if (!confirm('Are you sure you want to delete this metadata entry?')) return;
     const index = metadata.findIndex(m => m.id === id);
